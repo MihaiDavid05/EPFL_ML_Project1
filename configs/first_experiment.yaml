@@ -1,4 +1,4 @@
-# Parameters
+# Each config file should have a general naming format
 
 # step_size
 gamma: 0.7
