@@ -1,0 +1,13 @@
+# Parameters
+
+# step_size
+gamma: 0.7
+
+# number of steps to run
+max_iters: 50
+
+# regularization parameter
+lambda: 0.01
+
+
+
