@@ -1,21 +1,61 @@
+import csv
 import numpy as np
 
 
-def load_data(file_path, train=True):
+def load_csv_data(data_path, sub_sample=False):
     """
-    Load data and convert it to the metrics system.
-    :param file_path:
-    :param train:
+    Loads data.
+    :param data_path:
+    :param sub_sample:
+    :return: y (class labels), tX (features), ids (event ids) and features names
+    """
+    y = np.genfromtxt(data_path, delimiter=",", skip_header=1, dtype=str, usecols=1)
+    x = np.genfromtxt(data_path, delimiter=",", skip_header=1)
+    feats_name = np.genfromtxt(data_path, delimiter=",", max_rows=1, autostrip=True, dtype='str')[2:]
+    ids = x[:, 0].astype(np.int)
+    input_data = x[:, 2:]
+
+    # convert class labels from strings to binary (-1,1)
+    yb = np.ones(len(y))
+    yb[np.where(y == 'b')] = -1
+
+    # sub-sample
+    if sub_sample:
+        yb = yb[::50]
+        input_data = input_data[::50]
+        ids = ids[::50]
+
+    return yb, input_data, ids, feats_name
+
+
+def predict_labels(weights, data):
+    """
+    Generates class predictions given weights, and a test data matrix.
+    :param weights:
+    :param data:
     :return:
     """
-    feats_name = np.genfromtxt(file_path, delimiter=",", max_rows=1, autostrip=True, dtype='str')[2:]
-    if train:
-        labels = np.genfromtxt(file_path, delimiter=",", usecols=1, skip_header=1, dtype='str')
-    else:
-        labels = None
-    index = np.genfromtxt(file_path, delimiter=",", usecols=0, skip_header=1, dtype='int32')
-    samples_feats = np.genfromtxt(file_path, delimiter=",", skip_header=1, dtype='float32')[:, 2:]
-    return feats_name, samples_feats, index, labels
+    y_pred = np.dot(data, weights)
+    y_pred[np.where(y_pred <= 0)] = -1
+    y_pred[np.where(y_pred > 0)] = 1
+
+    return y_pred
+
+
+def create_csv_submission(ids, y_pred, name):
+    """
+    Creates an output file in .csv format for submission to Kaggle or AIcrowd
+    :param ids: event ids associated with each prediction
+    :param y_pred: predicted class labels
+    :param name: string name of .csv output file to be created
+    :return:
+    """
+    with open(name, 'w') as csvfile:
+        fieldnames = ['Id', 'Prediction']
+        writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
+        writer.writeheader()
+        for r1, r2 in zip(ids, y_pred):
+            writer.writerow({'Id': int(r1), 'Prediction': int(r2)})
 
 
 def standardize(x):
@@ -33,19 +73,16 @@ def standardize(x):
     return x, mean_x, std_x
 
 
-def build_model_data(feats, labels):
+def build_model_data(feats):
     """
     Form (y,tx) to get regression data in matrix form.
     :param feats:
-    :param labels:
     :return:
     """
-    # Decode labels into 0 and 1
-    y = list(map(lambda l: 0 if l == 'b' else 1, labels))
     num_samples = feats.shape[0]
     # Build matrix 'tilda' x
     tx = np.c_[np.ones(num_samples), feats]
-    return y, tx
+    return tx
 
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
