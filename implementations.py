@@ -83,12 +83,54 @@ def ridge_regression(y, tx, lambda_):
     """
     return np.linalg.solve(np.dot(tx.T, tx) + lambda_ * 2 * tx.shape[0] * np.identity(tx.shape[1]), np.dot(tx.T, y))
 
+# TODO: add comments
+
+def sigmoid(v):
+    return 1 / (1 + np.exp(-v))
+
+def hypothesis_linear_regression(tx, w):
+    return tx @ w
+
+def hypothesis_logistic_regression(tx, w):
+    return sigmoid(hypothesis_linear_regression(tx, w))
+
+def compute_loss_logistic_regression(y, tx, w):
+    N = y.shape[0]
+    h = hypothesis_logr(tx, w)
+
+    return -1/N * ((y.T @ np.log(h)) + (1 - y.T) @ np.log(1 - h))
+
+def compute_loss_logistic_regression_regularized(y, tx, w, lambda_):
+    N = y.shape[0]
+
+    return compute_loss_logistic_regression(y, tx, w) + lambda_/(2 * N) * w.T @ w
+
+def compute_gradient_logistic_regression(y, tx, w):
+    N = y.shape[0]
+    h = hypothesis_logr(tx, w)
+
+    return tx.T @ (h - y) / N
+
+def compute_gradient_logistic_regression_regularized(y, tx, w, lambda_):
+    N = y.shape[0]
+
+    return compute_gradient_logistic_regression(y, tx, w) + lambda_/N * np.sum(w)
+
+def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_gradient, comp_loss):
+    w = initial_w
+
+    for n_iter in range(max_iters):
+
+        gr = comp_gradient(y, tx, w, lambda_)
+        loss = comp_loss(y, tx, w, lambda_)
+
+        w = w - gamma * gr
+
+    return w, loss
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
-    # TODO: implement this
-    raise NotImplementedError
+    return generic_gradient_descent(y, tx, 0, initial_w, max_iters, gamma, compute_gradient_logistic_regression_regularized, compute_loss_logistic_regression_regularized)
 
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
-    # TODO: implement this
-    raise NotImplementedError
+    return generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, compute_gradient_logistic_regression_regularized, compute_loss_logistic_regression_regularized)
