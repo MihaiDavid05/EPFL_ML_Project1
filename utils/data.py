@@ -17,7 +17,8 @@ def load_csv_data(data_path, sub_sample=False):
 
     # convert class labels from strings to binary (-1,1)
     yb = np.ones(len(y))
-    yb[np.where(y == 'b')] = -1
+    # TODO: vezi aici ca e -1 nu 0
+    yb[np.where(y == 'b')] = 0
 
     # sub-sample
     if sub_sample:
@@ -36,8 +37,11 @@ def predict_labels(weights, data):
     :return:
     """
     y_pred = np.dot(data, weights)
-    y_pred[np.where(y_pred <= 0)] = -1
-    y_pred[np.where(y_pred > 0)] = 1
+    # y_pred[np.where(y_pred <= 0)] = -1
+    # y_pred[np.where(y_pred > 0)] = 1
+    # TODO: vezi aici
+    y_pred[np.where(y_pred <= 0.5)] = 0
+    y_pred[np.where(y_pred > 0.5)] = 1
 
     return y_pred
 

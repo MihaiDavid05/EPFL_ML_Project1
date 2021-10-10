@@ -1,11 +1,11 @@
 import argparse
+import numpy as np
 from utils.config import read_config
-from utils.data import load_csv_data, create_csv_submission
+from utils.data import load_csv_data, create_csv_submission, predict_labels, build_model_data
+from utils.algo import accuracy
+from implementations import logistic_regression
 
 CONFIGS_PATH = 'configs/'
-TRAIN_DATA = 'data/train.csv'
-TEST_DATA = 'data/test.csv'
-OUTPUT_PATH = 'submissions/'
 
 
 def parse_arguments():
@@ -23,8 +23,18 @@ if __name__ == '__main__':
     c = read_config(config_path)
 
     # Load data
-    labels, feats, index, feats_name = load_csv_data(TRAIN_DATA)
-    output_filename = OUTPUT_PATH + args.output_filename
-
+    labels, feats, index, feats_name = load_csv_data(c['train_data'])
     # Output data
-    create_csv_submission(index, labels, output_filename)
+    output_filename = c['output_path'] + args.output_filename
+
+    # Train and get weights
+    feats = build_model_data(feats)
+    labels = labels.reshape((labels.shape[0], 1))
+    weights, loss = logistic_regression(labels, feats, np.zeros((31, 1)), c['max_iters'], c['gamma'])
+
+    preds = predict_labels(weights, feats)
+
+    acc = accuracy(preds, labels)
+    print("Accuracy is {:.2f} %".format(acc * 100))
+    # Dummy submission with the labels
+    create_csv_submission(index, preds, output_filename)
