@@ -1,11 +1,13 @@
 # Parameters
 
 # step_size
-gamma: 0.2
+gamma: 0.5
 # number of steps to run
-max_iters: 5000
+max_iters: 1000
 # regularization parameter
 lambda: 0.01
+# ratio split
+ratio: 0.8
 
 # Paths
 train_data: data/train.csv

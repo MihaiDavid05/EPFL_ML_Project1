@@ -50,6 +50,7 @@ def compute_loss_mae(y, tx, w):
 
 
 def sigmoid(v):
+    # print("Aici")
     return 1 / (1 + np.exp(-v))
 
 

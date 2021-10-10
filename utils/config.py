@@ -1,7 +1,7 @@
 import yaml
 
 
-def read_config(config_file_path='configs/first_experiment.yaml'):
+def read_config(config_file_path):
     """
     Read config file.
     :param config_file_path:

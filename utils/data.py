@@ -59,7 +59,8 @@ def create_csv_submission(ids, y_pred, name):
         writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
         writer.writeheader()
         for r1, r2 in zip(ids, y_pred):
-            writer.writerow({'Id': int(r1), 'Prediction': int(r2)})
+            # TODO: Aici la Prediction
+            writer.writerow({'Id': int(r1), 'Prediction': int(r2) if int(r2) == 1 else -1})
 
 
 def standardize(x):
@@ -73,7 +74,7 @@ def standardize(x):
     x = x - mean_x
     # Transform to unit standard deviation
     std_x = np.std(x, axis=0)
-    x = x / std_x
+    x = x / (std_x + 0.0000001)
     return x, mean_x, std_x
 
 
@@ -120,3 +121,30 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         end_index = min((batch_num + 1) * batch_size, data_size)
         if start_index != end_index:
             yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
+
+
+def split_data(x, y, ratio=0.8, seed=1):
+    """
+    Split the dataset based on the split ratio. If ratio is 0.8
+    you will have 80% of your data set dedicated to training
+    and the rest dedicated to validation
+    :param x:
+    :param y:
+    :param ratio:
+    :param seed:
+    :return:
+    """
+    # set seed
+    np.random.seed(seed)
+
+    num_row = y.shape[0]
+    indices = np.random.permutation(num_row)
+    index_split = int(np.floor(ratio * num_row))
+    index_tr = indices[:index_split]
+    index_val = indices[index_split:]
+    # create split
+    x_tr = x[index_tr]
+    x_val = x[index_val]
+    y_tr = y[index_tr]
+    y_val = y[index_val]
+    return x_tr, x_val, y_tr, y_val
