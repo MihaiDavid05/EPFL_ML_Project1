@@ -1,6 +1,7 @@
 # DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE SECOND EXPERIMENT, BUILD ANOTHER ONE
 # This experiment was done by training on the whole training set.
 # All the features, but normalized to zero mean and unit variance.
+# Cross-validation.
 # Regularized logistic regression.
 # Accuracy 0.75 and F1 score 0.622 on the test set.
 
@@ -13,7 +14,7 @@ max_iters: 6000
 # regularization parameter
 lambda: 0.05
 # ratio split
-ratio: 0.8
+ratio: null
 # Enable cross validation
 cross_val: True
 # Number of folds for cross-validation
@@ -21,7 +22,7 @@ kfold: 5
 # Whether to build polynomial features or not
 build_poly: False
 # Degrees for polynomial features
-degree: 3
+degree: null
 
 # Paths
 train_data: "../data/train.csv"

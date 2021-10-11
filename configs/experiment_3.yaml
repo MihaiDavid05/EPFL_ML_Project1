@@ -1,6 +1,8 @@
 # This experiment was done by training on the whole training set.
 # All the features, but normalized to zero mean and unit variance.
 # Regularized logistic regression.
+# Cross validation.
+# 3 degree polynomial features
 # Accuracy 0.75 and F1 score 0.622 on the test set.
 
 # Parameters
@@ -12,7 +14,7 @@ max_iters: 5000
 # regularization parameter
 lambda: 0.05
 # ratio split
-ratio: 0.8
+ratio: null
 # Enable cross validation
 cross_val: True
 # Number of folds for cross-validation

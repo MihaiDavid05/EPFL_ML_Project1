@@ -18,11 +18,11 @@ ratio: 0.8
 # Enable cross validation
 cross_val: False
 # Number of folds for cross-validation
-kfold: 5
+kfold: null
 # Whether to build polynomial features or not
 build_poly: False
 # Degrees for polynomial features
-degree: 3
+degree: null
 
 # Paths
 train_data: "../data/train.csv"

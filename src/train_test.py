@@ -38,7 +38,7 @@ def train(config, args):
     labels = labels.reshape((labels.shape[0], 1))
 
     # Feature normalization
-    # TODO: we should not standardize feature 23 because it is categorical
+    # TODO: we should not normalize feature 23 because it is categorical
     feats, tr_mean, tr_std = normalize(feats)
 
     if config['cross_val']:
