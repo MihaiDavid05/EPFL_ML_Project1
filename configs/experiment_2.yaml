@@ -8,6 +8,8 @@ max_iters: 5000
 lambda: 0.01
 # ratio split
 ratio: 0.8
+# Enable cross validation
+cross_val: True
 # Number of folds for cross-validation
 kfold: 5
 

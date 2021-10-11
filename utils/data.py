@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+from random import randrange
 
 
 def load_csv_data(data_path, sub_sample=False):
@@ -29,23 +30,6 @@ def load_csv_data(data_path, sub_sample=False):
     return yb, input_data, ids, feats_name
 
 
-def predict_labels(weights, data):
-    """
-    Generates class predictions given weights, and a test data matrix.
-    :param weights:
-    :param data:
-    :return:
-    """
-    y_pred = np.dot(data, weights)
-    # y_pred[np.where(y_pred <= 0)] = -1
-    # y_pred[np.where(y_pred > 0)] = 1
-    # TODO: vezi aici
-    y_pred[np.where(y_pred <= 0.5)] = 0
-    y_pred[np.where(y_pred > 0.5)] = 1
-
-    return y_pred
-
-
 def create_csv_submission(ids, y_pred, name):
     """
     Creates an output file in .csv format for submission to Kaggle or AIcrowd
@@ -63,7 +47,7 @@ def create_csv_submission(ids, y_pred, name):
             writer.writerow({'Id': int(r1), 'Prediction': int(r2) if int(r2) == 1 else -1})
 
 
-def standardize(x):
+def normalize(x):
     """
     Standardize the original data set.
     :param x:
@@ -80,8 +64,9 @@ def standardize(x):
 
 def build_model_data(feats):
     """
-    Form (y,tx) to get regression data in matrix form.
+    Get necessary format for feats and labels.
     :param feats:
+    :param labels:
     :return:
     """
     num_samples = feats.shape[0]
@@ -136,9 +121,9 @@ def split_data(x, y, ratio=0.8, seed=1):
     """
     # set seed
     np.random.seed(seed)
-
+    # Randomly select indexes for training and validation
     num_row = y.shape[0]
-    indices = np.random.permutation(num_row)
+    indices = np.random.RandomState(seed=seed).permutation(num_row)
     index_split = int(np.floor(ratio * num_row))
     index_tr = indices[:index_split]
     index_val = indices[index_split:]
@@ -148,3 +133,22 @@ def split_data(x, y, ratio=0.8, seed=1):
     y_tr = y[index_tr]
     y_val = y[index_val]
     return x_tr, x_val, y_tr, y_val
+
+
+def cross_validation_split(dataset, folds=5):
+    """
+    Create folds for cross validation.
+    :param dataset:
+    :param folds:
+    :return:
+    """
+    dataset_split = list()
+    dataset_copy = list(dataset)
+    fold_size = int(len(dataset) / folds)
+    for i in range(folds):
+        fold = list()
+        while len(fold) < fold_size:
+            index = randrange(len(dataset_copy))
+            fold.append(dataset_copy.pop(index))
+        dataset_split.append(fold)
+    return dataset_split
