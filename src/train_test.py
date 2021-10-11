@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 from utils.config import read_config
 from utils.data import load_csv_data, create_csv_submission, build_model_data, normalize, build_poly
-from utils.algo import do_cross_validation, predict_labels
+from utils.algo import do_cross_validation, predict_labels, accuracy
 from utils.implementations import logistic_regression, reg_logistic_regression
 from utils.vizualization import plot_hist_panel
 
@@ -23,7 +23,6 @@ def train(config, args):
     labels, feats, index, feats_name = load_csv_data(config['train_data'])
 
     if args.see_hist:
-        # TODO: Maybe get rid of useless features by analyzing this plot which is also saved
         plot_hist_panel(feats, feats_name, config['viz_path'] + 'hist_panel')
         # These seems like good features to me
         # feats = feats[:, [0, 1, 2, 3, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 26, 29]]
@@ -51,6 +50,9 @@ def train(config, args):
     else:
         weights, tr_loss = logistic_regression(labels, feats, np.zeros((feats.shape[1], 1)), config['max_iters'],
                                                config['gamma'])
+        tr_preds = predict_labels(weights, feats)
+        tr_acc = accuracy(tr_preds, labels)
+        print("Training accuracy is {:.2f} % ".format(tr_acc * 100))
 
     return tr_mean, tr_std, weights
 

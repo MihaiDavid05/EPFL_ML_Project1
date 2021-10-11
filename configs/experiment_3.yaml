@@ -3,19 +3,19 @@
 # step_size
 gamma: 0.5
 # number of steps to run
-max_iters: 1000
+max_iters: 5000
 # regularization parameter
 lambda: null
 # ratio split
 ratio: null
 # Enable cross validation
-cross_val: True
+cross_val: False
 # Number of folds for cross-validation
-kfold: 5
+kfold: null
 # Whether to build polynomial features or not
-build_poly: False
+build_poly: True
 # Degrees for polynomial features
-degree: null
+degree: 2
 
 # Paths
 train_data: "../data/train.csv"
