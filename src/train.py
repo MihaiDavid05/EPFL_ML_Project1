@@ -1,13 +1,13 @@
 import argparse
 import numpy as np
 from utils.config import read_config
-from utils.data import load_csv_data, create_csv_submission, build_model_data, split_data, normalize,\
+from utils.data import load_csv_data, create_csv_submission, build_model_data, normalize,\
     cross_validation_split
-from utils.algo import accuracy, do_cross_validation, predict_labels
-from implementations import logistic_regression
+from utils.algo import do_cross_validation, predict_labels
+from utils.implementations import logistic_regression
 from utils.vizualization import plot_hist_panel
 
-CONFIGS_PATH = 'configs/'
+CONFIGS_PATH = '../configs/'
 
 
 def parse_arguments():

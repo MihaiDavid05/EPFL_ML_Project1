@@ -20,7 +20,7 @@ cross_val: False
 # Paths
 train_data: data/train.csv
 test_data: data/test.csv
-output_path: submissions/
+output_path: results/
 
 
 

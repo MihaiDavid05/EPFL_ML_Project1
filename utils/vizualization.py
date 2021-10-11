@@ -2,6 +2,12 @@ import matplotlib.pyplot as plt
 
 
 def plot_hist_panel(feats, feats_name):
+    """
+    PLot a panel with histograms for each feature.
+    :param feats:
+    :param feats_name:
+    :return:
+    """
     h = 6
     w = 5
     fig, ax = plt.subplots(h, w, figsize=(10, 8))
