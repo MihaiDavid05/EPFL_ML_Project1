@@ -160,7 +160,6 @@ def build_poly(x, degree):
     :param degree: polynomial degree
     :return: matrix formed by applying the polynomial basis to the input data. All features to power 1, then to power 2 and so on.
     """
-    # TODO: This is not working yet. Check for 2D x array !
     nr_feats = x.shape[1]
     final_matrix = np.zeros((x.shape[0], nr_feats + (degree - 1) * nr_feats + 1))
     final_matrix[:, 0] = np.ones((final_matrix.shape[0],))

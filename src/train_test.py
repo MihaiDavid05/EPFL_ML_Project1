@@ -26,7 +26,7 @@ def train(config, args):
         # TODO: Maybe get rid of useless features by analyzing this plot which is also saved
         plot_hist_panel(feats, feats_name, config['viz_path'] + 'hist_panel')
         # These seems like good features to me
-        # feats = feats[:, [0, 1, 2, 3, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 29]]
+        # feats = feats[:, [0, 1, 2, 3, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 26, 29]]
 
     # TODO: check this website for standardization and poly features build: https://samchaaa.medium.com/preprocessing-why-you-should-generate-polynomial-features-first-before-standardizing-892b4326a91d
     if config["build_poly"]:
