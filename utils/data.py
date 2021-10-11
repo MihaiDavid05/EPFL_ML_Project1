@@ -167,3 +167,18 @@ def build_poly(x, degree):
         for k in range(nr_feats):
             final_matrix[:, 1 + k + ((j - 1) * x.shape[1])] = np.power(x[:, k], j)
     return final_matrix
+
+
+def replace_values(config, feats):
+    """
+    Replace values of -999 with zeros or feature-wise mean.
+    :param config:
+    :param feats:
+    :return:
+    """
+    if config["replace_with"] == 'mean':
+        # TODO: Implement this
+        pass
+    elif config["replace_with"] == 'zero':
+        feats = np.where(feats == float(-999), float(0), feats)
+    return feats
