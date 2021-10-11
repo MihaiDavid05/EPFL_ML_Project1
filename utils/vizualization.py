@@ -9,7 +9,6 @@ def plot_hist_panel(feats, feats_name, output_path):
     :param output_path:
     :return:
     """
-    # TODO: Check this hardcoded values
     h = 6
     w = 5
     fig, ax = plt.subplots(h, w, figsize=(10, 8))
@@ -29,15 +28,12 @@ def plot_hist_panel(feats, feats_name, output_path):
 
 
 def check_relevant_samples():
-    # TODO: Implement this
+    # TODO: I do not know what this should do
     pass
 
 
-def plot_loss():
-    # TODO: Implement this
-    pass
+def plot_loss_accuracy(losses, accs):
+    fig, ax = plt.subplots(2, 2, figsize=(10, 8))
 
-
-def plot_accuracy():
-    # TODO: Implement this
+    # TODO: Implement this and create folder for each experiment
     pass

@@ -67,7 +67,7 @@ def test(config, tr_mean, tr_std, tr_weights, output):
     # Load test data
     _, test_feats, test_index, _ = load_csv_data(config['test_data'])
     if config["replace_with"] is not None:
-        test_feats = np.where(test_feats == float(-999), float(config["replace_with"]), test_feats)
+        test_feats = replace_values(config, test_feats)
     if config["build_poly"]:
         # Build polynomial features
         test_feats = build_poly(test_feats, config["degree"])

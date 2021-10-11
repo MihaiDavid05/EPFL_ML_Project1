@@ -1,6 +1,7 @@
 import numpy as np
 from utils.data import cross_validation_split
 
+
 def compute_gradient(y, tx, w):
     """
     Compute the gradient.

@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+import numpy.ma as ma
 from random import randrange
 
 
@@ -18,7 +19,7 @@ def load_csv_data(data_path, sub_sample=False):
 
     # convert class labels from strings to binary (-1,1)
     yb = np.ones(len(y))
-    # TODO: Check here it should be -1 not 0
+    # TODO: Check here it should be -1, not 0
     yb[np.where(y == 'b')] = 0
 
     # sub-sample
@@ -64,13 +65,12 @@ def normalize(x):
 
 def build_model_data(feats):
     """
-    Get necessary format for feats and labels.
+    Get necessary format for feats.
     :param feats:
     :return:
     """
-    num_samples = feats.shape[0]
     # Build matrix 'tilda' x
-    tx = np.c_[np.ones(num_samples), feats]
+    tx = np.c_[np.ones(feats.shape[0]), feats]
     return tx
 
 
@@ -158,12 +158,13 @@ def build_poly(x, degree):
     Polynomial basis functions for input data x, for j=0 up to j=degree.
     :param x: input data
     :param degree: polynomial degree
-    :return: matrix formed by applying the polynomial basis to the input data. All features to power 1, then to power 2 and so on.
+    :return: matrix formed by applying the polynomial basis to the input data. All features to power 1, then to power 2
+    and so on.
     """
     nr_feats = x.shape[1]
     final_matrix = np.zeros((x.shape[0], nr_feats + (degree - 1) * nr_feats + 1))
     final_matrix[:, 0] = np.ones((final_matrix.shape[0],))
-    for j in range(1, degree+1):
+    for j in range(1, degree + 1):
         for k in range(nr_feats):
             final_matrix[:, 1 + k + ((j - 1) * x.shape[1])] = np.power(x[:, k], j)
     return final_matrix
@@ -177,8 +178,10 @@ def replace_values(config, feats):
     :return:
     """
     if config["replace_with"] == 'mean':
-        # TODO: Implement this
-        pass
+        # Replace -999 values with nan
+        feats = np.where(feats == float(-999), np.nan, feats)
+        # Column-wise mean on the masked array
+        feats = np.where(np.isnan(feats), ma.array(feats, mask=np.isnan(feats)).mean(axis=0), feats)
     elif config["replace_with"] == 'zero':
         feats = np.where(feats == float(-999), float(0), feats)
     return feats
