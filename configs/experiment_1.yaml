@@ -1,10 +1,9 @@
-"""
 # DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE FIRST EXPERIMENT, BUILD ANOTHER ONE
-# This experiment was done by training on an arbitrary 80% of the training set and not the whole training set.
-# We used split data function for that.
-# We used all the features, but normalized to zero mean and unit variance.
+# This experiment was done by training on an arbitrary 80% of the training set and not the whole training set by using
+# split_data() function.
+# All the features, but normalized to zero mean and unit variance.
+# Simple logistic regression.
 # Accuracy 0.75 and F1 score 0.624 on the test set.
-"""
 
 # Parameters
 
@@ -12,15 +11,26 @@
 gamma: 0.5
 # number of steps to run
 max_iters: 1000
+# regularization parameter
+lambda: null
 # ratio split
 ratio: 0.8
 # Enable cross validation
 cross_val: False
+# Number of folds for cross-validation
+kfold: 5
+# Whether to build polynomial features or not
+build_poly: False
+# Degrees for polynomial features
+degree: 3
 
 # Paths
-train_data: data/train.csv
-test_data: data/test.csv
-output_path: results/
+train_data: "../data/train.csv"
+test_data: "../data/test.csv"
+# Submissions output_path
+output_path: "../results/"
+# Visualizations output path
+viz_path: "../visualizations/"
 
 
 

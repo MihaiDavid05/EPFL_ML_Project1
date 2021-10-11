@@ -13,9 +13,13 @@ Please download the data and store all the `.csv` files under the `data` folder.
 
 
 ## Configs
-Check `config` folder for different configs.
+Check `config` folder for different configs and experiments descriptions.
 
-## Train
+## Train and test
 
-## Evaluate
+For training and testing run the following commands:
+```bash
+cd src
+python train_test.py <config_filenme> [OPTIONAL_ARGUMENTS]
+``` 
 

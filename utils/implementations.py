@@ -80,12 +80,31 @@ def ridge_regression(y, tx, lambda_):
 
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
+    """
+    Perform simple logistic regression.
+    :param y:
+    :param tx:
+    :param initial_w:
+    :param max_iters:
+    :param gamma:
+    :return:
+    """
     return generic_gradient_descent(y, tx, 0, initial_w, max_iters, gamma,
                                     compute_gradient_logistic_regression_regularized,
                                     compute_loss_logistic_regression_regularized)
 
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    """
+    Perform regularized logistic regression
+    :param y:
+    :param tx:
+    :param lambda_:
+    :param initial_w:
+    :param max_iters:
+    :param gamma:
+    :return:
+    """
     return generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma,
                                     compute_gradient_logistic_regression_regularized,
                                     compute_loss_logistic_regression_regularized)

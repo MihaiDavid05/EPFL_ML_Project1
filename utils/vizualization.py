@@ -1,13 +1,15 @@
 import matplotlib.pyplot as plt
 
 
-def plot_hist_panel(feats, feats_name):
+def plot_hist_panel(feats, feats_name, output_path):
     """
     PLot a panel with histograms for each feature.
     :param feats:
     :param feats_name:
+    :param output_path:
     :return:
     """
+    # TODO: Check this hardcoded values
     h = 6
     w = 5
     fig, ax = plt.subplots(h, w, figsize=(10, 8))
@@ -23,4 +25,19 @@ def plot_hist_panel(feats, feats_name):
     fig.text(0.4, 0, "Specific feature range of values")
     fig.text(0, 0.4, "Occurrences of the value", rotation=90)
 
-    fig.show()
+    fig.savefig(output_path)
+
+
+def check_relevant_samples():
+    # TODO: Implement this
+    pass
+
+
+def plot_loss():
+    # TODO: Implement this
+    pass
+
+
+def plot_accuracy():
+    # TODO: Implement this
+    pass

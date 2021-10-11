@@ -1,5 +1,5 @@
 import numpy as np
-
+from utils.data import cross_validation_split
 
 def compute_gradient(y, tx, w):
     """
@@ -87,6 +87,18 @@ def compute_gradient_logistic_regression_regularized(y, tx, w, lambda_):
 
 
 def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_gradient, comp_loss):
+    """
+    Generic funtion for computing weights and loss.
+    :param y:
+    :param tx:
+    :param lambda_:
+    :param initial_w:
+    :param max_iters:
+    :param gamma:
+    :param comp_gradient:
+    :param comp_loss:
+    :return:
+    """
     w = initial_w
 
     loss = None
@@ -129,21 +141,27 @@ def predict_labels(weights, data):
     y_pred = np.dot(data, weights)
     # y_pred[np.where(y_pred <= 0)] = -1
     # y_pred[np.where(y_pred > 0)] = 1
-    # TODO: vezi aici
+    # TODO: Check here
     y_pred[np.where(y_pred <= 0.5)] = 0
     y_pred[np.where(y_pred > 0.5)] = 1
 
     return y_pred
 
 
-def do_cross_validation(folds, model, config):
+def do_cross_validation(feats, labels, model, config):
     """
     Perform cross validation
-    :param folds:
+    :param feats:
+    :param labels:
     :param model:
     :param config:
     :return:
     """
+    # Concatenate feats and labels
+    data = np.hstack((feats, labels))
+    # Split in k-folds for cross_validation
+    folds = cross_validation_split(data)
+
     final_val_acc = 0
     folds = np.array(folds)
     for i, fold in enumerate(folds):
@@ -168,5 +186,4 @@ def do_cross_validation(folds, model, config):
                                                                                                       val_acc * 100))
     # Compute final validation accuracy
     final_val_acc = final_val_acc / len(folds)
-
-    return final_val_acc
+    print("Validation accuracy is {:.2f} %".format(final_val_acc * 100))

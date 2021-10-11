@@ -18,7 +18,7 @@ def load_csv_data(data_path, sub_sample=False):
 
     # convert class labels from strings to binary (-1,1)
     yb = np.ones(len(y))
-    # TODO: vezi aici ca e -1 nu 0
+    # TODO: Check here it should be -1 not 0
     yb[np.where(y == 'b')] = 0
 
     # sub-sample
@@ -43,7 +43,7 @@ def create_csv_submission(ids, y_pred, name):
         writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
         writer.writeheader()
         for r1, r2 in zip(ids, y_pred):
-            # TODO: Aici la Prediction
+            # TODO: Check here at Prediction
             writer.writerow({'Id': int(r1), 'Prediction': int(r2) if int(r2) == 1 else -1})
 
 
@@ -66,7 +66,6 @@ def build_model_data(feats):
     """
     Get necessary format for feats and labels.
     :param feats:
-    :param labels:
     :return:
     """
     num_samples = feats.shape[0]
@@ -152,3 +151,20 @@ def cross_validation_split(dataset, folds=5):
             fold.append(dataset_copy.pop(index))
         dataset_split.append(fold)
     return dataset_split
+
+
+def build_poly(x, degree):
+    """
+    Polynomial basis functions for input data x, for j=0 up to j=degree.
+    :param x: input data
+    :param degree: polynomial degree
+    :return: matrix formed by applying the polynomial basis to the input data. All features to power 1, then to power 2 and so on.
+    """
+    # TODO: This is not working yet. Check for 2D x array !
+    nr_feats = x.shape[1]
+    final_matrix = np.zeros((x.shape[0], nr_feats + (degree - 1) * nr_feats + 1))
+    final_matrix[:, 0] = np.ones((final_matrix.shape[0],))
+    for j in range(1, degree+1):
+        for k in range(nr_feats):
+            final_matrix[:, 1 + k + ((j - 1) * x.shape[1])] = np.power(x[:, k], j)
+    return final_matrix

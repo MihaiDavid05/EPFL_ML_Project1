@@ -1,4 +1,3 @@
-# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE SECOND EXPERIMENT, BUILD ANOTHER ONE
 # This experiment was done by training on the whole training set.
 # All the features, but normalized to zero mean and unit variance.
 # Regularized logistic regression.
@@ -9,7 +8,7 @@
 # step_size
 gamma: 0.4
 # number of steps to run
-max_iters: 6000
+max_iters: 5000
 # regularization parameter
 lambda: 0.05
 # ratio split
@@ -19,7 +18,7 @@ cross_val: True
 # Number of folds for cross-validation
 kfold: 5
 # Whether to build polynomial features or not
-build_poly: False
+build_poly: True
 # Degrees for polynomial features
 degree: 3
 
