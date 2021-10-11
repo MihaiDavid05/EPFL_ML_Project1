@@ -12,10 +12,10 @@ def plot_hist_panel(feats, feats_name, output_path):
     h = 6
     w = 5
     fig, ax = plt.subplots(h, w, figsize=(10, 8))
-    plt.yscale('log', nonpositive='clip')
     for i in range(h):
         for j in range(w):
             sbplt = ax[i, j]
+            sbplt.set_yscale('log')
             sbplt.hist(feats[:, j + i * w], bins=100)
             sbplt.set_title(feats_name[j + i * w])
 
@@ -27,13 +27,6 @@ def plot_hist_panel(feats, feats_name, output_path):
     fig.savefig(output_path)
 
 
-def check_relevant_samples():
-    # TODO: I do not know what this should do
-    pass
-
-
-def plot_loss_accuracy(losses, accs):
-    fig, ax = plt.subplots(2, 2, figsize=(10, 8))
-
+def plot_loss_accuracy(losses, accuracies):
     # TODO: Implement this and create folder for each experiment
     pass

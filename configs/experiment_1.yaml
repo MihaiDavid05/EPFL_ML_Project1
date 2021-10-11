@@ -2,7 +2,7 @@
 
 # This experiment was done by training on an arbitrary 80% of the training set and not the whole training set by using
 # split_data() function.
-# All the features, but normalized to zero mean and unit variance.
+# All the features, but standardized to zero mean and unit variance.
 # Simple logistic regression.
 # Accuracy 0.75 and F1 score 0.624 on the test set.
 

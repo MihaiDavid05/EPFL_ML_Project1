@@ -1,7 +1,7 @@
 # DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE THIRD EXPERIMENT, BUILD ANOTHER ONE
 
 # This experiment was done by training on the whole training set.
-# All the features + 2 degree polynomial, but normalized to zero mean and unit variance.
+# All the features + 2 degree polynomial, but standardized to zero mean and unit variance.
 # Accuracy 0.774 and F1 score 0.652 on the test set.
 
 

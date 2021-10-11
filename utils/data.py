@@ -48,18 +48,31 @@ def create_csv_submission(ids, y_pred, name):
             writer.writerow({'Id': int(r1), 'Prediction': int(r2) if int(r2) == 1 else -1})
 
 
-def normalize(x):
+def standardize(x, tr_mean=None, tr_std=None, without=None):
     """
     Standardize the original data set.
     :param x:
+    :param without:
+    :param tr_mean:
+    :param tr_std:
     :return:
     """
+    # TODO: implement without
     # Transform to zero mean
-    mean_x = np.mean(x, axis=0)
-    x = x - mean_x
+    if tr_mean is None:
+        mean_x = np.mean(x, axis=0)
+        x = x - mean_x
+    else:
+        x = x - tr_mean
+        mean_x = None
     # Transform to unit standard deviation
-    std_x = np.std(x, axis=0)
-    x = x / (std_x + 0.0000001)
+    if tr_std is None:
+        std_x = np.std(x, axis=0)
+        x = x / (std_x + 0.0000001)
+    else:
+        x = x / (tr_std + 0.0000001)
+        std_x = None
+
     return x, mean_x, std_x
 
 

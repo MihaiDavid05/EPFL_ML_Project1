@@ -1,7 +1,7 @@
 import argparse
 import numpy as np
 from utils.config import read_config
-from utils.data import load_csv_data, create_csv_submission, build_model_data, normalize, build_poly, replace_values
+from utils.data import load_csv_data, create_csv_submission, build_model_data, standardize, build_poly, replace_values
 from utils.algo import do_cross_validation, predict_labels, accuracy
 from utils.implementations import logistic_regression, reg_logistic_regression
 from utils.vizualization import plot_hist_panel
@@ -33,7 +33,6 @@ def train(config, args):
         # These seems like good features to me, but selecting only them does not help apparently
         # feats = feats[:, [0, 1, 2, 3, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 26, 29]]
 
-    # TODO: check this website for standardization and poly features build: https://samchaaa.medium.com/preprocessing-why-you-should-generate-polynomial-features-first-before-standardizing-892b4326a91d
     if config["build_poly"]:
         # Build polynomial features
         feats = build_poly(feats, config["degree"])
@@ -42,9 +41,9 @@ def train(config, args):
         feats = build_model_data(feats)
     labels = labels.reshape((labels.shape[0], 1))
 
-    # Feature normalization
-    # TODO: we should not normalize feature 23 because it is categorical
-    feats, tr_mean, tr_std = normalize(feats)
+    # Feature standardization: we should not standardize feature 23 because it is categorical
+    feats, tr_mean, tr_std = standardize(feats, without=[23])
+    # plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + 'hist_panel_after_standardization')
 
     if config['cross_val']:
         do_cross_validation(feats, labels, logistic_regression, config)
@@ -76,8 +75,7 @@ def test(config, tr_mean, tr_std, tr_weights, output):
         test_feats = build_model_data(test_feats)
 
     # Normalize features
-    test_feats = test_feats - tr_mean
-    test_feats = test_feats / (tr_std + 0.0000001)
+    test_feats = standardize(test_feats, tr_mean, tr_std, without=[23])
     # Predictions
     test_preds = predict_labels(tr_weights, test_feats)
     # Create submission file
