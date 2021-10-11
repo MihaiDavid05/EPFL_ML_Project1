@@ -50,9 +50,9 @@ def train(config, args):
     else:
         weights, tr_loss = logistic_regression(labels, feats, np.zeros((feats.shape[1], 1)), config['max_iters'],
                                                config['gamma'])
-        tr_preds = predict_labels(weights, feats)
-        tr_acc = accuracy(tr_preds, labels)
-        print("Training accuracy is {:.2f} % ".format(tr_acc * 100))
+        # tr_preds = predict_labels(weights, feats)
+        # tr_acc = accuracy(tr_preds, labels)
+        # print("Training accuracy is {:.2f} % ".format(tr_acc * 100))
 
     return tr_mean, tr_std, weights
 
