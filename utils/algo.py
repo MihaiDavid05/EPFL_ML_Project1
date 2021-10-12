@@ -188,15 +188,3 @@ def do_cross_validation(feats, labels, model, config):
     # Compute final validation accuracy
     final_val_acc = final_val_acc / len(folds)
     print("Validation accuracy is {:.2f} %".format(final_val_acc * 100))
-
-
-def compute_pca(scaled_x):
-    # TODO: maybe finish this
-    cov_matrix = np.cov(scaled_x.T)
-    values, vectors = np.linalg.eig(cov_matrix)
-
-    explained_variances = []
-    for i in range(len(values)):
-        explained_variances.append(values[i] / np.sum(values))
-
-    print(explained_variances)

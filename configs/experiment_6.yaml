@@ -10,8 +10,7 @@
 # step_size
 gamma: 0.5
 # number of steps to run
-max_iters: 50
-#TODO: max_iters: 5000
+max_iters: 5000
 # regularization parameter
 lambda: null
 # ratio split
