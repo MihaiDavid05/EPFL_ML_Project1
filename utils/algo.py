@@ -101,15 +101,15 @@ def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_g
     :return:
     """
     w = initial_w
-
+    losses = []
     loss = None
     for n_iter in range(max_iters):
         gr = comp_gradient(y, tx, w, lambda_)
         loss = comp_loss(y, tx, w, lambda_)
 
         w = w - gamma * gr
-
-    return w, loss
+        losses.append(loss)
+    return w, losses
 
 
 def error(preds, labels):
@@ -188,3 +188,16 @@ def do_cross_validation(feats, labels, model, config):
     # Compute final validation accuracy
     final_val_acc = final_val_acc / len(folds)
     print("Validation accuracy is {:.2f} %".format(final_val_acc * 100))
+
+
+def compute_pca(scaled_x):
+    # TODO: finish this
+    cov_matrix = np.cov(scaled_x.T)
+    values, vectors = np.linalg.eig(cov_matrix)
+
+    explained_variances = []
+    for i in range(len(values)):
+        explained_variances.append(values[i] / np.sum(values))
+
+    print(explained_variances)
+

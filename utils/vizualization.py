@@ -27,6 +27,18 @@ def plot_hist_panel(feats, feats_name, output_path):
     fig.savefig(output_path)
 
 
-def plot_loss_accuracy(losses, accuracies):
-    # TODO: Implement this and create folder for each experiment
-    pass
+def plot_loss_accuracy(iters, tr_loss, tr_acc, val_loss, val_acc, output_path):
+    # TODO: check if this works
+    fig, ax = plt.subplots(2, 1, figsize=(10, 8))
+    ax[0, 0].plot(iters, tr_loss, '-b', label='train')
+    ax[0, 0].plot(iters, val_loss, '-r', label='val')
+    ax[0, 0].set_title("Training and validation loss")
+    ax[1, 0].plot(iters, tr_acc, '-b', label='train')
+    ax[1, 0].plot(iters, val_acc, '-r', label='val')
+    ax[0, 0].set_title("Training and validation accuracy")
+
+    fig.xlabel("n iteration")
+    fig.legend(loc='upper left')
+    fig.tight_layout()
+
+    fig.savefig(output_path)

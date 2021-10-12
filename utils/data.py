@@ -2,6 +2,7 @@ import csv
 import numpy as np
 import numpy.ma as ma
 from random import randrange
+from utils.vizualization import plot_hist_panel
 
 
 def load_csv_data(data_path, sub_sample=False):
@@ -48,16 +49,14 @@ def create_csv_submission(ids, y_pred, name):
             writer.writerow({'Id': int(r1), 'Prediction': int(r2) if int(r2) == 1 else -1})
 
 
-def standardize(x, tr_mean=None, tr_std=None, without=None):
+def standardize(x, tr_mean=None, tr_std=None):
     """
     Standardize the original data set.
     :param x:
-    :param without:
     :param tr_mean:
     :param tr_std:
     :return:
     """
-    # TODO: implement without
     # Transform to zero mean
     if tr_mean is None:
         mean_x = np.mean(x, axis=0)
@@ -198,3 +197,65 @@ def replace_values(config, feats):
     elif config["replace_with"] == 'zero':
         feats = np.where(feats == float(-999), float(0), feats)
     return feats
+
+
+def prepare_train_data(config, args):
+    labels, feats, index, feats_name = load_csv_data(config['train_data'])
+    cat_feat_index = np.where(feats_name == 'PRI_jet_num')[0][0]
+
+    if config["replace_with"] is not None:
+        feats = replace_values(config, feats)
+
+    cont_feats = np.delete(feats, cat_feat_index, axis=1)
+    cat_feat = feats[:, cat_feat_index]
+
+    if args.see_hist:
+        name = 'hist_panel'
+        if config["replace_with"] is not None:
+            name += '_replaced_with_' + str(config["replace_with"])
+        plot_hist_panel(feats, feats_name, config['viz_path'] + name)
+        # These seems like good features to me, but selecting only them does not help apparently
+        # feats = feats[:, [0, 1, 2, 3, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 26, 29]]
+
+    if config["build_poly"]:
+        # Build polynomial features
+        feats = build_poly(cont_feats, config["degree"])
+        feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
+    else:
+        # Create x 'tilda'
+        feats = build_model_data(feats)
+    labels = labels.reshape((labels.shape[0], 1))
+
+    # Feature standardization: we should not standardize feature 23 because it is categorical
+    cont_feats = np.delete(feats, cat_feat_index + 1, axis=1)
+    feats, tr_mean, tr_std = standardize(cont_feats)
+    feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
+    # plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + 'hist_panel_after_standardization')
+
+    return feats, labels, tr_mean, tr_std
+
+
+def prepare_test_data(config, tr_mean, tr_std):
+    # Load test data
+    _, test_feats, test_index, feats_name = load_csv_data(config['test_data'])
+    cat_feat_index = np.where(feats_name == 'PRI_jet_num')[0][0]
+    if config["replace_with"] is not None:
+        test_feats = replace_values(config, test_feats)
+
+    cont_test_feats = np.delete(test_feats, cat_feat_index, axis=1)
+    cat_test_feat = test_feats[:, cat_feat_index]
+
+    if config["build_poly"]:
+        # Build polynomial features
+        test_feats = build_poly(cont_test_feats, config["degree"])
+        test_feats = np.insert(test_feats, cat_feat_index + 1, cat_test_feat, axis=1)
+    else:
+        # Create x 'tilda'
+        test_feats = build_model_data(test_feats)
+
+    # Normalize features
+    cont_test_feats = np.delete(test_feats, cat_feat_index + 1, axis=1)
+    test_feats, _, _ = standardize(cont_test_feats, tr_mean, tr_std)
+    test_feats = np.insert(test_feats, cat_feat_index + 1, cat_test_feat, axis=1)
+
+    return test_feats, test_index

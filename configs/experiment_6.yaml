@@ -1,0 +1,37 @@
+# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE SIXTH EXPERIMENT, BUILD ANOTHER ONE
+
+# This experiment was done by training on the whole training set.
+# All the features + 3 degree polynomial, but standardized to zero mean and unit variance.
+# Replaced all -999 values with feature-wise mean.
+# Accuracy 0.788 and F1 score 0.618 on the test set.
+
+# Parameters
+
+# step_size
+gamma: 0.5
+# number of steps to run
+#max_iters: 5000
+max_iters: 8000
+# regularization parameter
+#lambda: null
+lambda: 0.1
+# ratio split
+ratio: null
+# Enable cross validation
+cross_val: False
+# Number of folds for cross-validation
+kfold: null
+# Whether to build polynomial features or not
+build_poly: True
+# Degrees for polynomial features
+degree: 3
+# Replace -999 values with specified value, this can take 'zero', 'mean' or null
+replace_with: 'mean'
+
+# Paths
+train_data: "../data/train.csv"
+test_data: "../data/test.csv"
+# Submissions output_path
+output_path: "../results/"
+# Visualizations output path
+viz_path: "../visualizations/"
