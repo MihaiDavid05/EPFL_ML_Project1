@@ -11,7 +11,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     :param initial_w:
     :param max_iters:
     :param gamma:
-    :return:
+    :return Tuple<>: ws[-1] the last weight vector and its corresponding loss losses[-1]
     """
     # Define parameters to store w and loss
     ws = [initial_w]
@@ -28,7 +28,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
         losses.append(loss)
         print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
             bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
-    return losses, ws
+    return ws[-1], losses[-1]
 
 
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
@@ -39,7 +39,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     :param initial_w:
     :param max_iters:
     :param gamma:
-    :return:
+    :return Tuple<>: ws[-1] the last weight vector and its corresponding loss losses[-1]
     """
     # Define parameters to store w and loss
     ws = [initial_w]
@@ -58,7 +58,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
             print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
                 bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
 
-    return losses, ws
+    return ws[-1], losses[-1]
 
 
 def least_squares(y, tx):
@@ -66,11 +66,11 @@ def least_squares(y, tx):
     Calculate the least squares solution.
     :param y:
     :param tx:
-    :return Tuple<>: mse and optimal weights
+    :return Tuple<>: optimal_weights and mse
     """
     optimal_weights = np.linalg.solve(np.dot(tx.T, tx), np.dot(tx.T, y))
     mse = compute_loss(y, tx, optimal_weights)
-    return mse, optimal_weights
+    return optimal_weights, mse
 
 
 def ridge_regression(y, tx, lambda_):
@@ -79,9 +79,11 @@ def ridge_regression(y, tx, lambda_):
     :param y:
     :param tx:
     :param lambda_:
-    :return:
+    :return Tuple<>: optimal_weights and mse
     """
-    return np.linalg.solve(np.dot(tx.T, tx) + lambda_ * 2 * tx.shape[0] * np.identity(tx.shape[1]), np.dot(tx.T, y))
+    optimal_weight = np.linalg.solve(np.dot(tx.T, tx) + lambda_ * 2 * tx.shape[0] * np.identity(tx.shape[1]), np.dot(tx.T, y))
+    mse = compute_loss(y, tx, optimal_weight)
+    return optimal_weight, mse
 
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
