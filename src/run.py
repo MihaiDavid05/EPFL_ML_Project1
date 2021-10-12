@@ -1,11 +1,10 @@
 import argparse
 import numpy as np
 from utils.config import read_config
-from utils.data import load_csv_data, create_csv_submission, build_model_data, standardize, build_poly, replace_values, \
-    prepare_train_data, prepare_test_data
-from utils.algo import do_cross_validation, predict_labels, accuracy, compute_pca
+from utils.data import create_csv_submission, prepare_train_data, prepare_test_data
+from utils.algo import do_cross_validation, predict_labels, accuracy
 from utils.implementations import logistic_regression, reg_logistic_regression
-from utils.vizualization import plot_hist_panel
+from utils.vizualization import plot_loss
 
 CONFIGS_PATH = '../configs/'
 
@@ -15,6 +14,7 @@ def parse_arguments():
     parser.add_argument('config_filename', type=str, help='Config name that you want to use during the run.')
     parser.add_argument('--test', action='store_true', help='Also test and create submission file')
     parser.add_argument('--see_hist', action='store_true', help='See features histogram panel')
+    parser.add_argument('--see_loss', action='store_true', help='See training loss plot')
 
     return parser.parse_args()
 
@@ -38,6 +38,9 @@ def train(config, args):
     else:
         weights, tr_loss = logistic_regression(labels, feats, np.zeros((feats.shape[1], 1)), config['max_iters'],
                                                config['gamma'])
+    if args.see_loss:
+        output_path = config["viz_path"] + 'loss_plot_' + args.config_filename
+        plot_loss(range(config['max_iters']), np.ravel(tr_loss), output_path=output_path)
 
     tr_preds = predict_labels(weights, feats)
     tr_acc = accuracy(tr_preds, labels)

@@ -165,11 +165,12 @@ def cross_validation_split(dataset, folds=5):
     return dataset_split
 
 
-def build_poly(x, degree):
+def build_poly(x, degree, multiply_each=False):
     """
     Polynomial basis functions for input data x, for j=0 up to j=degree.
     :param x: input data
     :param degree: polynomial degree
+    :param multiply_each: Form new columns by muliplying xi * xj for i,j=0,...,nr_feats
     :return: matrix formed by applying the polynomial basis to the input data. All features to power 1, then to power 2
     and so on.
     """
@@ -179,6 +180,12 @@ def build_poly(x, degree):
     for j in range(1, degree + 1):
         for k in range(nr_feats):
             final_matrix[:, 1 + k + ((j - 1) * x.shape[1])] = np.power(x[:, k], j)
+
+    if multiply_each:
+        for i in range(nr_feats):
+            for j in range(nr_feats):
+                mul = np.multiply(x[:, i], x[:, j]).reshape((-1, 1))
+                final_matrix = np.hstack([final_matrix, mul])
     return final_matrix
 
 
@@ -200,8 +207,13 @@ def replace_values(config, feats):
 
 
 def prepare_train_data(config, args):
-    labels, feats, index, feats_name = load_csv_data(config['train_data'])
+    labels, feats, _, feats_name = load_csv_data(config['train_data'])
+
+    # feats = feats[:, [0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29]]
+    # feats_name = feats_name[[0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29]]
+
     cat_feat_index = np.where(feats_name == 'PRI_jet_num')[0][0]
+    # correlation = compute_correlation(feats.T)
 
     if config["replace_with"] is not None:
         feats = replace_values(config, feats)
@@ -215,11 +227,10 @@ def prepare_train_data(config, args):
             name += '_replaced_with_' + str(config["replace_with"])
         plot_hist_panel(feats, feats_name, config['viz_path'] + name)
         # These seems like good features to me, but selecting only them does not help apparently
-        # feats = feats[:, [0, 1, 2, 3, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 26, 29]]
 
     if config["build_poly"]:
         # Build polynomial features
-        feats = build_poly(cont_feats, config["degree"])
+        feats = build_poly(cont_feats, config["degree"], multiply_each=config["multiply_each"])
         feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
     else:
         # Create x 'tilda'
@@ -238,6 +249,10 @@ def prepare_train_data(config, args):
 def prepare_test_data(config, tr_mean, tr_std):
     # Load test data
     _, test_feats, test_index, feats_name = load_csv_data(config['test_data'])
+    # test_feats = test_feats[:,
+    #              [0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29]]
+    # feats_name = feats_name[[0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29]]
+
     cat_feat_index = np.where(feats_name == 'PRI_jet_num')[0][0]
     if config["replace_with"] is not None:
         test_feats = replace_values(config, test_feats)
@@ -247,7 +262,7 @@ def prepare_test_data(config, tr_mean, tr_std):
 
     if config["build_poly"]:
         # Build polynomial features
-        test_feats = build_poly(cont_test_feats, config["degree"])
+        test_feats = build_poly(cont_test_feats, config["degree"], multiply_each=config["multiply_each"])
         test_feats = np.insert(test_feats, cat_feat_index + 1, cat_test_feat, axis=1)
     else:
         # Create x 'tilda'
@@ -259,3 +274,16 @@ def prepare_test_data(config, tr_mean, tr_std):
     test_feats = np.insert(test_feats, cat_feat_index + 1, cat_test_feat, axis=1)
 
     return test_feats, test_index
+
+
+def compute_correlation(x):
+    corr = np.corrcoef(x)
+    corr = np.tril(corr)
+    high_corr = np.where(corr > 0.99)
+    high_corr_idxs = [x for x in list(zip(high_corr[0], high_corr[1])) if x[0] != x[1]]
+    all_idxs = [item for t in high_corr_idxs for item in t]
+    freq = {}
+    for i in all_idxs:
+        freq[i] = all_idxs.count(i)
+
+    return freq

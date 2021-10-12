@@ -24,6 +24,8 @@ kfold: 5
 build_poly: False
 # Degrees for polynomial features
 degree: null
+# Wheather to multiply each column with each column and expand features
+multiply_each: False
 # Replace -999 values with specified value, this can take 'zero', 'mean' or null
 replace_with: null
 

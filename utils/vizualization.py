@@ -27,18 +27,20 @@ def plot_hist_panel(feats, feats_name, output_path):
     fig.savefig(output_path)
 
 
-def plot_loss_accuracy(iters, tr_loss, tr_acc, val_loss, val_acc, output_path):
-    # TODO: check if this works
-    fig, ax = plt.subplots(2, 1, figsize=(10, 8))
-    ax[0, 0].plot(iters, tr_loss, '-b', label='train')
-    ax[0, 0].plot(iters, val_loss, '-r', label='val')
-    ax[0, 0].set_title("Training and validation loss")
-    ax[1, 0].plot(iters, tr_acc, '-b', label='train')
-    ax[1, 0].plot(iters, val_acc, '-r', label='val')
-    ax[0, 0].set_title("Training and validation accuracy")
+def plot_loss(iters, tr_loss, output_path):
+    """
+    PLot the training loss.
+    :param iters: Number of iterations.
+    :param tr_loss: Loss.
+    :param output_path: Output path for the plot.
+    """
+    fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+    ax.plot(iters, tr_loss, '-b', label='train loss')
+    ax.set_title("Training loss")
+    ax.set_xlabel("Nr iteration")
+    ax.set_ylabel("Loss")
 
-    fig.xlabel("n iteration")
-    fig.legend(loc='upper left')
+    fig.legend(loc='upper right')
     fig.tight_layout()
 
     fig.savefig(output_path)

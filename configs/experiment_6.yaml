@@ -10,11 +10,10 @@
 # step_size
 gamma: 0.5
 # number of steps to run
-#max_iters: 5000
-max_iters: 8000
+max_iters: 50
+#TODO: max_iters: 5000
 # regularization parameter
-#lambda: null
-lambda: 0.1
+lambda: null
 # ratio split
 ratio: null
 # Enable cross validation
@@ -25,6 +24,8 @@ kfold: null
 build_poly: True
 # Degrees for polynomial features
 degree: 3
+# Wheather to multiply each column with each column and expand features
+multiply_each: False
 # Replace -999 values with specified value, this can take 'zero', 'mean' or null
 replace_with: 'mean'
 

@@ -191,7 +191,7 @@ def do_cross_validation(feats, labels, model, config):
 
 
 def compute_pca(scaled_x):
-    # TODO: finish this
+    # TODO: maybe finish this
     cov_matrix = np.cov(scaled_x.T)
     values, vectors = np.linalg.eig(cov_matrix)
 
@@ -200,4 +200,3 @@ def compute_pca(scaled_x):
         explained_variances.append(values[i] / np.sum(values))
 
     print(explained_variances)
-

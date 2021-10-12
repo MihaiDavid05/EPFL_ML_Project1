@@ -1,18 +1,18 @@
-# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE THIRD EXPERIMENT, BUILD ANOTHER ONE
-
 # This experiment was done by training on the whole training set.
-# All the features + 2 degree polynomial, but standardized to zero mean and unit variance.
-# Accuracy 0.774 and F1 score 0.652 on the test set.
-
+# All the features + 3 degree polynomial, but standardized to zero mean and unit variance.
+# Replaced all -999 values with feature-wise mean.
+# Max_iters was increased to 10000.
+# Did multiply_each - BUT NOT OK !!! Maybe need a lambda - so set it to 0.1 ??? - STILL NOT WORKING
+# Accuracy ? and F1 score ? on the test set.
 
 # Parameters
 
 # step_size
 gamma: 0.5
 # number of steps to run
-max_iters: 5000
+max_iters: 10000
 # regularization parameter
-lambda: null
+lambda: 0.1
 # ratio split
 ratio: null
 # Enable cross validation
@@ -22,11 +22,11 @@ kfold: null
 # Whether to build polynomial features or not
 build_poly: True
 # Degrees for polynomial features
-degree: 2
+degree: 3
 # Wheather to multiply each column with each column and expand features
-multiply_each: False
+multiply_each: True
 # Replace -999 values with specified value, this can take 'zero', 'mean' or null
-replace_with: null
+replace_with: 'mean'
 
 # Paths
 train_data: "../data/train.csv"
