@@ -2,7 +2,9 @@ import csv
 import numpy as np
 import numpy.ma as ma
 from random import randrange
-from utils.vizualization import plot_hist_panel
+from utils.vizualization import plot_hist_panel, plot_pca
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def load_csv_data(data_path, sub_sample=False):
@@ -230,7 +232,9 @@ def replace_values(config, feats):
 
 def prepare_train_data(config, args):
     labels, feats, _, feats_name = load_csv_data(config['train_data'])
+    feats, labels = remove_outliers(feats, labels)
 
+    # These are the features with low correlation
     # feats = feats[:, [0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29]]
     # feats_name = feats_name[[0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29]]
 
@@ -244,7 +248,7 @@ def prepare_train_data(config, args):
     cat_feat = feats[:, cat_feat_index]
 
     if args.see_hist:
-        name = 'hist_panel'
+        name = 'train_hist_panel'
         if config["replace_with"] is not None:
             name += '_replaced_with_' + str(config["replace_with"])
         plot_hist_panel(feats, feats_name, config['viz_path'] + name)
@@ -267,8 +271,13 @@ def prepare_train_data(config, args):
     else:
         feats, tr_mean, tr_std = standardize(cont_feats)
         stats = tr_mean, tr_std
+
+    if args.see_pca:
+        compute_pca(feats, labels, config['viz_path'] + '2_comp_pca')
+
     feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
-    # plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + 'hist_panel_after_scale')
+    if args.see_hist:
+        plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + 'train_hist_panel_after_scale')
 
     return feats, labels, stats
 
@@ -317,3 +326,46 @@ def compute_correlation(x):
         freq[i] = all_idxs.count(i)
 
     return freq
+
+
+def remove_outliers(feats, labels, threshold=3):
+    """
+    Remove samples that have outliers features.
+    :param feats:
+    :param threshold:
+    :param labels:
+    :return:
+    """
+    outliers = []
+    mean_1 = np.mean(feats, axis=0)
+    std_1 = np.std(feats, axis=0)
+    for i in range(feats.shape[0]):
+        z_scores_per_sample = (feats[i] - mean_1) / (std_1 + 0.0000001)
+        # If there is a feature with z_score above threshold consider the sample as an outlier
+        if np.any(np.abs(z_scores_per_sample) > threshold):
+            outliers.append(i)
+
+    feats = np.delete(feats, outliers, axis=0)
+    labels = np.delete(labels, outliers)
+    return feats, labels
+
+
+def compute_pca(scaled_x, y, output_path):
+    """
+    Perform PCA with 2 principal components.
+    :param scaled_x: Scaled input data
+    :param y: Labels
+    :param output_path:
+    :return:
+    """
+    cov_matrix = np.cov(scaled_x.T)
+    values, vectors = np.linalg.eig(cov_matrix)
+
+    explained_variances = []
+    for i in range(len(values)):
+        explained_variances.append(values[i] / np.sum(values))
+
+    projected_1 = scaled_x.dot(vectors.T[0])
+    projected_2 = scaled_x.dot(vectors.T[1])
+
+    plot_pca(projected_1, projected_2, np.ravel(y), output_path)

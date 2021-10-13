@@ -1,15 +1,16 @@
+# COMPARABLE WITH EXPERIMENT 3, WITH FEATURE SCALING CHANGED TO NORMALIZE
+
 # This experiment was done by training on the whole training set.
-# All the features + 3 degree polynomial, but NORMALIZED.
-# Replaced all -999 values with feature-wise mean.
-# Max_iters was increased to 10000.
-# Accuracy ? and F1 score ? on the test set. - Accuracy was 0.728 on training so this was not tested and submitted.
+# All the features + 2 degree polynomial, but normalized.
+# Training accuracy is 0.707, so test was not run !
+
 
 # Parameters
 
 # step_size
 gamma: 0.5
 # number of steps to run
-max_iters: 10000
+max_iters: 5000
 # regularization parameter
 lambda: null
 # ratio split
@@ -21,13 +22,14 @@ kfold: null
 # Whether to build polynomial features or not
 build_poly: True
 # Degrees for polynomial features
-degree: 3
+degree: 2
 # Wheather to multiply each column with each column and expand features
 multiply_each: False
 # Replace -999 values with specified value, this can take 'zero', 'mean' or null
-replace_with: 'mean'
+replace_with: null
 # Apply only normalization
 only_normalize: True
+
 
 # Paths
 train_data: "../data/train.csv"

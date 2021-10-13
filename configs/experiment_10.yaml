@@ -2,8 +2,7 @@
 # All the features + 3 degree polynomial, but standardized to zero mean and unit variance.
 # Replaced all -999 values with feature-wise mean.
 # Max_iters was increased to 10000.
-# Tried multiply_each=True - BUT NOT OK
-# Accuracy ? and F1 score ? on the test set.
+# Removed outliers at training before replacing values of -999. TODO: parametrize this outliers removal
 
 # Parameters
 
@@ -24,7 +23,7 @@ build_poly: True
 # Degrees for polynomial features
 degree: 3
 # Wheather to multiply each column with each column and expand features
-multiply_each: True
+multiply_each: False
 # Replace -999 values with specified value, this can take 'zero', 'mean' or null
 replace_with: 'mean'
 # Apply only normalization

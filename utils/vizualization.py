@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def plot_hist_panel(feats, feats_name, output_path):
@@ -43,4 +44,11 @@ def plot_loss(iters, tr_loss, output_path):
     fig.legend(loc='upper right')
     fig.tight_layout()
 
+    fig.savefig(output_path)
+
+
+def plot_pca(x1, x2, y, output_path):
+    fig, ax = plt.subplots(1, 1, figsize=(20, 10))
+    sns.scatterplot(x1, x2, hue=y, s=5)
+    fig.tight_layout()
     fig.savefig(output_path)
