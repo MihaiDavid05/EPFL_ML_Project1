@@ -75,6 +75,28 @@ def standardize(x, tr_mean=None, tr_std=None):
     return x, mean_x, std_x
 
 
+def normalize(x, diff=None, minim=None):
+    """
+    Apply normalization to data
+    :param x: Input data
+    :param diff:
+    :param minim:
+    :return:
+    """
+    if minim is None and diff is None:
+        xmin = np.min(x, axis=0)
+        xmax = np.max(x, axis=0)
+        xdiff = xmax - xmin
+    else:
+        xmin = minim
+        xdiff = diff
+
+    x = (x - xmin) / xdiff
+    x = build_model_data(x)
+
+    return x, xdiff, xmin
+
+
 def build_model_data(feats):
     """
     Get necessary format for feats.
@@ -239,14 +261,19 @@ def prepare_train_data(config, args):
 
     # Feature standardization: we should not standardize feature 23 because it is categorical
     cont_feats = np.delete(feats, cat_feat_index + 1, axis=1)
-    feats, tr_mean, tr_std = standardize(cont_feats)
+    if config["only_normalize"]:
+        feats, diff, minim = normalize(cont_feats[:, 1:])
+        stats = diff, minim
+    else:
+        feats, tr_mean, tr_std = standardize(cont_feats)
+        stats = tr_mean, tr_std
     feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
-    # plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + 'hist_panel_after_standardization')
+    # plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + 'hist_panel_after_scale')
 
-    return feats, labels, tr_mean, tr_std
+    return feats, labels, stats
 
 
-def prepare_test_data(config, tr_mean, tr_std):
+def prepare_test_data(config, stat1, stat2):
     # Load test data
     _, test_feats, test_index, feats_name = load_csv_data(config['test_data'])
     # test_feats = test_feats[:,
@@ -270,7 +297,10 @@ def prepare_test_data(config, tr_mean, tr_std):
 
     # Normalize features
     cont_test_feats = np.delete(test_feats, cat_feat_index + 1, axis=1)
-    test_feats, _, _ = standardize(cont_test_feats, tr_mean, tr_std)
+    if config["only_normalize"]:
+        test_feats, _, _ = normalize(cont_test_feats[:, 1:], stat1, stat2)
+    else:
+        test_feats, _, _ = standardize(cont_test_feats, stat1, stat2)
     test_feats = np.insert(test_feats, cat_feat_index + 1, cat_test_feat, axis=1)
 
     return test_feats, test_index

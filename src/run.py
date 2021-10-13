@@ -26,7 +26,7 @@ def train(config, args):
     :param args: Command line arguments
     :return:
     """
-    feats, labels, tr_mean, tr_std = prepare_train_data(config, args)
+    feats, labels, stat = prepare_train_data(config, args)
 
     if config['cross_val']:
         do_cross_validation(feats, labels, logistic_regression, config)
@@ -46,21 +46,21 @@ def train(config, args):
     tr_acc = accuracy(tr_preds, labels)
     print("Training accuracy is {:.2f} % ".format(tr_acc * 100))
 
-    return tr_mean, tr_std, weights
+    return stat, weights
 
 
-def test(config, tr_mean, tr_std, tr_weights, output):
+def test(config, stat1, stat2, tr_weights, output):
     """
     Pipeline for testing.
     :param config: Configuration parameters.
-    :param tr_mean: Feature-wise training mean.
-    :param tr_std: Feature-wise training standard deviation.
+    :param stat1: Feature-wise training mean or max - min
+    :param stat2: Feature-wise training standard deviation or minimum
     :param tr_weights: Weights of the model.
     :param output: Output file_name
     :return:
     """
 
-    test_feats, test_index = prepare_test_data(config, tr_mean, tr_std)
+    test_feats, test_index = prepare_test_data(config, stat1, stat2)
     # Predictions
     test_preds = predict_labels(tr_weights, test_feats)
     # Create submission file
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     output_filename = c['output_path'] + cli_args.config_filename + '_submission'
 
     # Train
-    mean, std, w = train(c, cli_args)
+    stats, w = train(c, cli_args)
     # Test
     if cli_args.test:
-        test(c, mean, std, w, output_filename)
+        test(c, stats[0], stats[1], w, output_filename)

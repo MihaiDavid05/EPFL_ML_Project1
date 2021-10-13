@@ -1,16 +1,15 @@
-# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE SIXTH EXPERIMENT, BUILD ANOTHER ONE
-
 # This experiment was done by training on the whole training set.
-# All the features + 3 degree polynomial, but standardized to zero mean and unit variance.
+# All the features + 3 degree polynomial, but NORMALIZED.
 # Replaced all -999 values with feature-wise mean.
-# Accuracy 0.788 and F1 score 0.618 on the test set.
+# Max_iters was increased to 10000.
+# Accuracy ? and F1 score ? on the test set. - Accuracy was 0.728 on training so this was not tested and submitted.
 
 # Parameters
 
 # step_size
 gamma: 0.5
 # number of steps to run
-max_iters: 5000
+max_iters: 10000
 # regularization parameter
 lambda: null
 # ratio split
@@ -28,7 +27,7 @@ multiply_each: False
 # Replace -999 values with specified value, this can take 'zero', 'mean' or null
 replace_with: 'mean'
 # Apply only normalization
-only_normalize: False
+only_normalize: True
 
 # Paths
 train_data: "../data/train.csv"
