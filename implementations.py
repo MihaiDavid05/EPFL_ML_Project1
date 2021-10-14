@@ -109,7 +109,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
             # store w and loss
             ws.append(w)
             losses.append(loss)
-            print("Gradient Descent({bi}/{ti}): loss={l}".format(
+            print("Stochastic Gradient Descent({bi}/{ti}): loss={l}".format(
                 bi=n_iter, ti=max_iters - 1, l=loss))
     return ws[-1], losses[-1]
 
