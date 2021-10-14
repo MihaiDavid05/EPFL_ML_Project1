@@ -34,7 +34,7 @@ def compute_loss(y, tx, w):
     :return:
     """
     e = y - np.dot(tx, w)
-    return np.dot(e.T, e) / (2*tx.shape[0])
+    return np.dot(e.T, e) / (2 * tx.shape[0])
 
 
 def compute_loss_mae(y, tx, w):
@@ -47,3 +47,18 @@ def compute_loss_mae(y, tx, w):
     """
     e = y - np.dot(tx, w)
     return np.sum(np.absolute(e)) / (tx.shape[0])
+
+
+def compute_loss_lr(y, tx, w):
+    """
+    Calculate the loss by logistic regression
+    :param y:
+    :param tx:
+    :param w:
+    :return:
+    """
+    sigmoid = 1 / (1 + np.exp(np.dot(-tx, w)))
+    loss = -np.sum(y * np.log(sigmoid) + (1 - y) * np.log(1 - sigmoid))
+    gradient = np.dot(tx.T, (sigmoid - y))
+    return loss, gradient
+
