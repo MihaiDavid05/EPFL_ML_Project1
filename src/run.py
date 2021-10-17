@@ -1,8 +1,8 @@
 import argparse
 import numpy as np
 from utils.config import read_config
-from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data
-from utils.algo import do_cross_validation, predict_labels, get_f1
+from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data, do_cross_validation
+from utils.algo import predict_labels, get_f1, get_precision_recall_accuracy
 from utils.implementations import logistic_regression, reg_logistic_regression
 from utils.vizualization import plot_loss
 
@@ -33,7 +33,8 @@ def train(config, args):
     feats, labels, stat = prepare_train_data(config, args, labels, feats, feats_name)
     # Perform cross validation
     if config['cross_val']:
-        do_cross_validation(feats, labels, logistic_regression, config)
+        final_val_f1, _ = do_cross_validation(feats, labels, config['lambda'], config)
+        print("Validation f1 score is {:.2f} %".format(final_val_f1 * 100))
     # Use logisitc regression or regularized logisitc regression and find weights
     if config['lambda'] is not None:
         weights, tr_loss = reg_logistic_regression(labels, feats, config['lambda'], np.zeros((feats.shape[1], 1)),
@@ -50,7 +51,8 @@ def train(config, args):
     tr_preds = predict_labels(weights, feats, config["reg_threshold"])
     # Get F1 score for training
     f1_score = get_f1(tr_preds, labels)
-    print("Training F1 score is {:.2f} % ".format(f1_score * 100))
+    prec, recall, acc = get_precision_recall_accuracy(tr_preds, labels)
+    print("Training F1 score is {:.2f} % and accuracy is {}".format(f1_score * 100, acc * 100))
 
     return stat, weights
 
