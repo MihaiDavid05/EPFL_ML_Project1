@@ -1,8 +1,8 @@
 import argparse
 import numpy as np
 from utils.config import read_config
-from utils.data import create_csv_submission, prepare_train_data, prepare_test_data
-from utils.algo import do_cross_validation, predict_labels, accuracy
+from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data
+from utils.algo import do_cross_validation, predict_labels, get_f1
 from utils.implementations import logistic_regression, reg_logistic_regression
 from utils.vizualization import plot_loss
 
@@ -27,25 +27,30 @@ def train(config, args):
     :param args: Command line arguments
     :return:
     """
-    feats, labels, stat = prepare_train_data(config, args)
-
+    # Load data
+    labels, feats, _, feats_name = load_csv_data(config['train_data'])
+    # Prepare data for training
+    feats, labels, stat = prepare_train_data(config, args, labels, feats, feats_name)
+    # Perform cross validation
     if config['cross_val']:
         do_cross_validation(feats, labels, logistic_regression, config)
-
-    # Train on whole data set and find weights
+    # Use logisitc regression or regularized logisitc regression and find weights
     if config['lambda'] is not None:
         weights, tr_loss = reg_logistic_regression(labels, feats, config['lambda'], np.zeros((feats.shape[1], 1)),
                                                    config['max_iters'], config['gamma'])
     else:
         weights, tr_loss = logistic_regression(labels, feats, np.zeros((feats.shape[1], 1)), config['max_iters'],
                                                config['gamma'])
+    # Plot training loss
     if args.see_loss:
         output_path = config["viz_path"] + 'loss_plot_' + args.config_filename
         plot_loss(range(config['max_iters']), np.ravel(tr_loss), output_path=output_path)
 
-    tr_preds = predict_labels(weights, feats)
-    tr_acc = accuracy(tr_preds, labels)
-    print("Training accuracy is {:.2f} % ".format(tr_acc * 100))
+    # Get predictions
+    tr_preds = predict_labels(weights, feats, config["reg_threshold"])
+    # Get F1 score for training
+    f1_score = get_f1(tr_preds, labels)
+    print("Training F1 score is {:.2f} % ".format(f1_score * 100))
 
     return stat, weights
 
@@ -55,15 +60,17 @@ def test(config, stat1, stat2, tr_weights, output):
     Pipeline for testing.
     :param config: Configuration parameters.
     :param stat1: Feature-wise training mean or max - min
-    :param stat2: Feature-wise training standard deviation or minimum
-    :param tr_weights: Weights of the model.
-    :param output: Output file_name
+    :param stat2: Feature-wise training standard deviation or min
+    :param tr_weights: Weights of the trained model.
+    :param output: Output filename.
     :return:
     """
-
-    test_feats, test_index = prepare_test_data(config, stat1, stat2)
-    # Predictions
-    test_preds = predict_labels(tr_weights, test_feats)
+    # Load data
+    _, test_feats, test_index, feats_name = load_csv_data(config['test_data'])
+    # Prepare data for testing
+    test_feats, test_index, _ = prepare_test_data(config, stat1, stat2, test_feats, test_index)
+    # Get predictions
+    test_preds = predict_labels(tr_weights, test_feats, config["reg_threshold"])
     # Create submission file
     create_csv_submission(test_index, test_preds, output)
 
@@ -75,8 +82,8 @@ if __name__ == '__main__':
     c = read_config(config_path)
     output_filename = c['output_path'] + cli_args.config_filename + '_submission'
 
-    # Train
+    # Train pipeline
     stats, w = train(c, cli_args)
-    # Test
+    # Test pipeline
     if cli_args.test:
         test(c, stats[0], stats[1], w, output_filename)
