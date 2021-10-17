@@ -25,11 +25,16 @@ build_poly: True
 degree: 2
 # Wheather to multiply each column with each column and expand features
 multiply_each: False
-# Replace -999 values with specified value, this can take 'zero', 'mean' or null
+# Take square root of features
+square_root: False
+# Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
 replace_with: 'mean'
 # Apply only normalization
 only_normalize: False
-
+# Logistic regression threshold
+reg_threshold: 0.5
+# remove ouliers:
+remove_outliers: False
 
 # Paths
 train_data: "../data/train.csv"

@@ -1,5 +1,4 @@
 from utils.algo import *
-from utils.data import batch_iter
 
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
@@ -61,7 +60,7 @@ def least_squares(y, tx):
     Calculate the least squares solution.
     :param y:
     :param tx:
-    :return Tuple<>: mse and optimal weights
+    :return: mse and optimal weights
     """
     optimal_weights = np.linalg.solve(np.dot(tx.T, tx), np.dot(tx.T, y))
     mse_loss = compute_loss(y, tx, optimal_weights)
@@ -96,7 +95,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """
-    Perform regularized logistic regression
+    Perform regularized logistic regression.
     :param y:
     :param tx:
     :param lambda_:

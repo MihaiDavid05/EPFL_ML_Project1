@@ -1,8 +1,20 @@
+# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE TENTH EXPERIMENT (COMPARABLE WITH 7), BUILD ANOTHER ONE
+
 # This experiment was done by training on the whole training set.
 # All the features + 3 degree polynomial, but standardized to zero mean and unit variance.
 # Replaced all -999 values with feature-wise mean.
 # Max_iters was increased to 10000.
-# Removed outliers at training before replacing values of -999. TODO: parametrize this outliers removal
+# Cross validation was run.
+# Removed outliers at training, before replacing values of -999.
+# Accuracy 0.792 and F1 score 0.631 on the test set.
+
+# For fold 1, training accuracy is 80.65 % and validation accuracy is 80.53 %
+# For fold 2, training accuracy is 80.66 % and validation accuracy is 80.60 %
+# For fold 3, training accuracy is 80.59 % and validation accuracy is 80.68 %
+# For fold 4, training accuracy is 80.62 % and validation accuracy is 80.60 %
+# For fold 5, training accuracy is 80.63 % and validation accuracy is 80.55 %
+# Validation accuracy is 80.59 %
+# Training accuracy is 80.63 %
 
 # Parameters
 
@@ -15,19 +27,25 @@ lambda: null
 # ratio split
 ratio: null
 # Enable cross validation
-cross_val: False
+cross_val: True
 # Number of folds for cross-validation
-kfold: null
+kfold: 5
 # Whether to build polynomial features or not
 build_poly: True
 # Degrees for polynomial features
 degree: 3
 # Wheather to multiply each column with each column and expand features
 multiply_each: False
-# Replace -999 values with specified value, this can take 'zero', 'mean' or null
+# Take square root of features
+square_root: False
+# Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
 replace_with: 'mean'
 # Apply only normalization
 only_normalize: False
+# Logistic regression threshold
+reg_threshold: 0.5
+# remove ouliers:
+remove_outliers: True
 
 # Paths
 train_data: "../data/train.csv"

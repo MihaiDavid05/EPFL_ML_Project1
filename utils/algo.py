@@ -1,27 +1,7 @@
 import numpy as np
-from utils.data import cross_validation_split
 
 
 def compute_gradient(y, tx, w):
-    """
-    Compute the gradient.
-    :param y:
-    :param tx:
-    :param w:
-    :return:
-    """
-    e = y - np.dot(tx, w)
-    return (-1 / tx.shape[0]) * np.dot(tx.T, e)
-
-
-def compute_stoch_gradient(y, tx, w):
-    """
-    Compute a stochastic gradient from just few examples n and their corresponding y_n labels.
-    :param y:
-    :param tx:
-    :param w:
-    :return:
-    """
     e = y - np.dot(tx, w)
     return (-1 / tx.shape[0]) * np.dot(tx.T, e)
 
@@ -89,7 +69,7 @@ def compute_gradient_logistic_regression_regularized(y, tx, w, lambda_):
 
 def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_gradient, comp_loss):
     """
-    Generic funtion for computing weights and loss.
+    Generic function for computing weights and loss.
     :param y:
     :param tx:
     :param lambda_:
@@ -102,7 +82,6 @@ def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_g
     """
     w = initial_w
     losses = []
-    loss = None
     for n_iter in range(max_iters):
         gr = comp_gradient(y, tx, w, lambda_)
         loss = comp_loss(y, tx, w, lambda_)
@@ -112,79 +91,49 @@ def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_g
     return w, losses
 
 
-def error(preds, labels):
+def get_precision_recall_accuracy(preds, labels):
     """
-    Calculate error.
+    Compute precision, recall and accuracy.
     :param preds:
     :param labels:
     :return:
     """
-    return np.sum(np.absolute(preds - labels))/labels.shape[0]
+    preds = np.ravel(preds)
+    labels = np.ravel(labels)
+    tp = len(np.where(np.logical_and(preds == 1, labels == 1))[0])
+    fp = len(np.where(np.logical_and(preds == 1, labels == 0))[0])
+    fn = len(np.where(np.logical_and(preds == 0, labels == 1))[0])
+    tn = len(np.where(np.logical_and(preds == 0, labels == 0))[0])
+
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    accuracy = (tp + tn) / (tp + fp + fn + tn)
+
+    return precision, recall, accuracy
 
 
-def accuracy(preds, labels):
+def get_f1(preds, labels):
     """
-    Calculate accuracy.
+    Compute f1 score.
     :param preds:
     :param labels:
     :return:
     """
-    return 1 - error(preds, labels)
+    precision, recall, _ = get_precision_recall_accuracy(preds, labels)
+    f1_score = (2 * precision * recall) / (precision + recall)
+    return f1_score
 
 
-def predict_labels(weights, data):
+def predict_labels(weights, data, threshold=0.5):
     """
     Generates class predictions given weights, and a test data matrix.
     :param weights:
     :param data:
+    :param threshold
     :return:
     """
     y_pred = np.dot(data, weights)
-    # y_pred[np.where(y_pred <= 0)] = -1
-    # y_pred[np.where(y_pred > 0)] = 1
-    # TODO: Check here
-    y_pred[np.where(y_pred <= 0.5)] = 0
-    y_pred[np.where(y_pred > 0.5)] = 1
+    y_pred[np.where(y_pred <= threshold)] = 0
+    y_pred[np.where(y_pred > threshold)] = 1
 
     return y_pred
-
-
-def do_cross_validation(feats, labels, model, config):
-    """
-    Perform cross validation
-    :param feats:
-    :param labels:
-    :param model:
-    :param config:
-    :return:
-    """
-    # Concatenate feats and labels
-    data = np.hstack((feats, labels))
-    # Split in k-folds for cross_validation
-    folds = cross_validation_split(data)
-
-    final_val_acc = 0
-    folds = np.array(folds)
-    for i, fold in enumerate(folds):
-        # Get validation data and labels for the validation fold
-        val_feats, val_labels = (fold[:, :-1], fold[:, -1].reshape((-1, 1)))
-        # Set training data and labels as the rest of the folds
-        train_split = np.vstack([fold for j, fold in enumerate(folds) if j != i])
-        tr_feats, tr_labels = (train_split[:, :-1], train_split[:, -1].reshape((-1, 1)))
-        # Find weights
-        weights, tr_loss = model(tr_labels, tr_feats, np.zeros((val_feats.shape[1], 1)), config['max_iters'],
-                                 config['gamma'])
-        # Make predictions for both training and validation
-        tr_preds = predict_labels(weights, tr_feats)
-        val_preds = predict_labels(weights, val_feats)
-        # Get accuracy for training and validation
-        tr_acc = accuracy(tr_preds, tr_labels)
-        val_acc = accuracy(val_preds, val_labels)
-        # Sum validation accuracy
-        final_val_acc += val_acc
-        print("For fold {}, training accuracy is {:.2f} % and validation accuracy is {:.2f} %".format(i + 1,
-                                                                                                      tr_acc * 100,
-                                                                                                      val_acc * 100))
-    # Compute final validation accuracy
-    final_val_acc = final_val_acc / len(folds)
-    print("Validation accuracy is {:.2f} %".format(final_val_acc * 100))

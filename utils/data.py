@@ -3,8 +3,8 @@ import numpy as np
 import numpy.ma as ma
 from random import randrange
 from utils.vizualization import plot_hist_panel, plot_pca
-import matplotlib.pyplot as plt
-import seaborn as sns
+from utils.algo import predict_labels, get_f1
+from utils.implementations import logistic_regression, reg_logistic_regression
 
 
 def load_csv_data(data_path, sub_sample=False):
@@ -22,7 +22,6 @@ def load_csv_data(data_path, sub_sample=False):
 
     # convert class labels from strings to binary (-1,1)
     yb = np.ones(len(y))
-    # TODO: Check here it should be -1, not 0
     yb[np.where(y == 'b')] = 0
 
     # sub-sample
@@ -47,7 +46,6 @@ def create_csv_submission(ids, y_pred, name):
         writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
         writer.writeheader()
         for r1, r2 in zip(ids, y_pred):
-            # TODO: Check here at Prediction
             writer.writerow({'Id': int(r1), 'Prediction': int(r2) if int(r2) == 1 else -1})
 
 
@@ -74,7 +72,7 @@ def standardize(x, tr_mean=None, tr_std=None):
         x = x / (tr_std + 0.0000001)
         std_x = None
 
-    return x, mean_x, std_x
+    return x, (mean_x, std_x)
 
 
 def normalize(x, diff=None, minim=None):
@@ -94,53 +92,19 @@ def normalize(x, diff=None, minim=None):
         xdiff = diff
 
     x = (x - xmin) / xdiff
-    x = build_model_data(x)
+    x = append_constant_column(x)
 
-    return x, xdiff, xmin
+    return x, (xdiff, xmin)
 
 
-def build_model_data(feats):
+def append_constant_column(feats):
     """
-    Get necessary format for feats.
+    Get feats "tilda".
     :param feats:
     :return:
     """
-    # Build matrix 'tilda' x
     tx = np.c_[np.ones(feats.shape[0]), feats]
     return tx
-
-
-def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
-    """
-    Generate a minibatch iterator for a dataset.
-    Takes as input two iterables 'y' and 'tx'.
-    Outputs an iterator which gives mini-batches of `batch_size` matching elements from `y` and `tx`.
-    Data can be randomly shuffled to avoid ordering in the original data messing with the randomness of the minibatches.
-    Example of use :
-    for minibatch_y, minibatch_tx in batch_iter(y, tx, 32):
-        <DO-SOMETHING>
-
-    :param y: output desired values
-    :param tx: input data
-    :param batch_size: size of batch
-    :param num_batches: number of batches
-    :param shuffle: shuffle the data or not
-    :return:
-    """
-    data_size = len(y)
-
-    if shuffle:
-        shuffle_indices = np.random.permutation(np.arange(data_size))
-        shuffled_y = y[shuffle_indices]
-        shuffled_tx = tx[shuffle_indices]
-    else:
-        shuffled_y = y
-        shuffled_tx = tx
-    for batch_num in range(num_batches):
-        start_index = batch_num * batch_size
-        end_index = min((batch_num + 1) * batch_size, data_size)
-        if start_index != end_index:
-            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
 
 
 def split_data(x, y, ratio=0.8, seed=1):
@@ -154,7 +118,7 @@ def split_data(x, y, ratio=0.8, seed=1):
     :param seed:
     :return:
     """
-    # set seed
+    # Set seed
     np.random.seed(seed)
     # Randomly select indexes for training and validation
     num_row = y.shape[0]
@@ -162,7 +126,7 @@ def split_data(x, y, ratio=0.8, seed=1):
     index_split = int(np.floor(ratio * num_row))
     index_tr = indices[:index_split]
     index_val = indices[index_split:]
-    # create split
+    # Create split
     x_tr = x[index_tr]
     x_val = x[index_val]
     y_tr = y[index_tr]
@@ -189,12 +153,13 @@ def cross_validation_split(dataset, folds=5):
     return dataset_split
 
 
-def build_poly(x, degree, multiply_each=False):
+def build_poly(x, degree, multiply_each=False, square_root=False):
     """
     Polynomial basis functions for input data x, for j=0 up to j=degree.
     :param x: input data
     :param degree: polynomial degree
     :param multiply_each: Form new columns by muliplying xi * xj for i,j=0,...,nr_feats
+    :param square_root: Take square root of each feature.
     :return: matrix formed by applying the polynomial basis to the input data. All features to power 1, then to power 2
     and so on.
     """
@@ -208,14 +173,21 @@ def build_poly(x, degree, multiply_each=False):
     if multiply_each:
         for i in range(nr_feats):
             for j in range(nr_feats):
-                mul = np.multiply(x[:, i], x[:, j]).reshape((-1, 1))
-                final_matrix = np.hstack([final_matrix, mul])
+                if i != j:
+                    mul = np.multiply(x[:, i], x[:, j]).reshape((-1, 1))
+                    final_matrix = np.hstack([final_matrix, mul])
+
+    if square_root:
+        for i in range(nr_feats):
+            root = np.sqrt(x[:, i]).reshape((-1, 1))
+            final_matrix = np.hstack([final_matrix, root])
+
     return final_matrix
 
 
 def replace_values(config, feats):
     """
-    Replace values of -999 with zeros or feature-wise mean.
+    Replace values of -999 with zeros or feature-wise mean/mode/median.
     :param config:
     :param feats:
     :return:
@@ -226,96 +198,131 @@ def replace_values(config, feats):
         # Column-wise mean on the masked array
         feats = np.where(np.isnan(feats), ma.array(feats, mask=np.isnan(feats)).mean(axis=0), feats)
     elif config["replace_with"] == 'zero':
+        # Replace -999 values with 0
         feats = np.where(feats == float(-999), float(0), feats)
+    elif config["replace_with"] == 'median':
+        # Replace -999 values with nan
+        feats = np.where(feats == float(-999), np.nan, feats)
+        # Column-wise median on the masked array
+        feats = np.where(np.isnan(feats), np.nanmedian(feats, axis=0), feats)
+    elif config["replace_with"] == 'mode':
+        # TODO: Implement this
+        pass
     return feats
 
 
-def prepare_train_data(config, args):
-    labels, feats, _, feats_name = load_csv_data(config['train_data'])
-    feats, labels = remove_outliers(feats, labels)
+def prepare_train_data(config, args, labels, feats, feats_name=None):
+    """
+    Training data preprocessing pipeline.
+    :param config:
+    :param args:
+    :param labels:
+    :param feats:
+    :param feats_name:
+    :return:
+    """
+    # Remove samples with outlier features
+    if config["remove_outliers"]:
+        feats, labels = remove_outliers(feats, labels)
 
-    # These are the features with low correlation
-    # feats = feats[:, [0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29]]
-    # feats_name = feats_name[[0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29]]
-
-    cat_feat_index = np.where(feats_name == 'PRI_jet_num')[0][0]
-    # correlation = compute_correlation(feats.T)
-
+    # Set categorical feature index
+    cat_feat_index = 22
+    # Replace -999 values with zeros/mean
     if config["replace_with"] is not None:
         feats = replace_values(config, feats)
 
+    # Seprate continuous and categorical features
     cont_feats = np.delete(feats, cat_feat_index, axis=1)
     cat_feat = feats[:, cat_feat_index]
 
+    # See features histograms panel
     if args.see_hist:
         name = 'train_hist_panel'
         if config["replace_with"] is not None:
             name += '_replaced_with_' + str(config["replace_with"])
         plot_hist_panel(feats, feats_name, config['viz_path'] + name)
-        # These seems like good features to me, but selecting only them does not help apparently
 
     if config["build_poly"]:
-        # Build polynomial features
-        feats = build_poly(cont_feats, config["degree"], multiply_each=config["multiply_each"])
+        # Build polynomial features for continuous ones
+        feats = build_poly(cont_feats, config["degree"], multiply_each=config["multiply_each"],
+                           square_root=config["square_root"])
         feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
     else:
-        # Create x 'tilda'
-        feats = build_model_data(feats)
+        # Create x 'tilda' without polynomial features
+        feats = append_constant_column(feats)
+
     labels = labels.reshape((labels.shape[0], 1))
 
-    # Feature standardization: we should not standardize feature 23 because it is categorical
+    # Feature standardization or normalization for continuous features
     cont_feats = np.delete(feats, cat_feat_index + 1, axis=1)
     if config["only_normalize"]:
-        feats, diff, minim = normalize(cont_feats[:, 1:])
-        stats = diff, minim
+        feats, stats = normalize(cont_feats[:, 1:])
     else:
-        feats, tr_mean, tr_std = standardize(cont_feats)
-        stats = tr_mean, tr_std
+        feats, stats = standardize(cont_feats)
 
+    # Visualize features in 2D.
     if args.see_pca:
         compute_pca(feats, labels, config['viz_path'] + '2_comp_pca')
 
     feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
+
+    # See features histograms panel after scaling
     if args.see_hist:
         plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + 'train_hist_panel_after_scale')
 
     return feats, labels, stats
 
 
-def prepare_test_data(config, stat1, stat2):
-    # Load test data
-    _, test_feats, test_index, feats_name = load_csv_data(config['test_data'])
-    # test_feats = test_feats[:,
-    #              [0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29]]
-    # feats_name = feats_name[[0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29]]
-
-    cat_feat_index = np.where(feats_name == 'PRI_jet_num')[0][0]
+def prepare_test_data(config, stat1, stat2, test_feats, test_index=None, test_labels=None):
+    """
+    Test data preprocessing pipeline.
+    :param config:
+    :param stat1:
+    :param stat2:
+    :param test_feats:
+    :param test_index:
+    :param test_labels:
+    :return:
+    """
+    # Set categorical feature index
+    cat_feat_index = 22
+    # Replace -999 values with zeros/mean
     if config["replace_with"] is not None:
         test_feats = replace_values(config, test_feats)
 
+    # Seprate continuous and categorical features
     cont_test_feats = np.delete(test_feats, cat_feat_index, axis=1)
     cat_test_feat = test_feats[:, cat_feat_index]
 
     if config["build_poly"]:
-        # Build polynomial features
+        # Build polynomial features for continuous ones
         test_feats = build_poly(cont_test_feats, config["degree"], multiply_each=config["multiply_each"])
         test_feats = np.insert(test_feats, cat_feat_index + 1, cat_test_feat, axis=1)
     else:
-        # Create x 'tilda'
-        test_feats = build_model_data(test_feats)
+        # Create x 'tilda' without polynomial features
+        test_feats = append_constant_column(test_feats)
 
-    # Normalize features
+    # Feature standardization or normalization for continuous features
     cont_test_feats = np.delete(test_feats, cat_feat_index + 1, axis=1)
     if config["only_normalize"]:
-        test_feats, _, _ = normalize(cont_test_feats[:, 1:], stat1, stat2)
+        test_feats, _ = normalize(cont_test_feats[:, 1:], stat1, stat2)
     else:
-        test_feats, _, _ = standardize(cont_test_feats, stat1, stat2)
+        test_feats, _ = standardize(cont_test_feats, stat1, stat2)
+
     test_feats = np.insert(test_feats, cat_feat_index + 1, cat_test_feat, axis=1)
 
-    return test_feats, test_index
+    if test_labels:
+        test_labels = test_labels.reshape((test_labels.shape[0], 1))
+
+    return test_feats, test_index, test_labels
 
 
 def compute_correlation(x):
+    """
+    Compute correlation between features.
+    :param x: Input data
+    :return: A dict with highly correlated feature ids and their number of occurrences.
+    """
     corr = np.corrcoef(x)
     corr = np.tril(corr)
     high_corr = np.where(corr > 0.99)
@@ -328,11 +335,11 @@ def compute_correlation(x):
     return freq
 
 
-def remove_outliers(feats, labels, threshold=3):
+def remove_outliers(feats, labels):
     """
     Remove samples that have outliers features.
+    More exactly, remove samples where at least a feature is bigger or lower than 2.22 quantiles from the median of it.
     :param feats:
-    :param threshold:
     :param labels:
     :return:
     """
@@ -341,13 +348,33 @@ def remove_outliers(feats, labels, threshold=3):
     std_1 = np.std(feats, axis=0)
     for i in range(feats.shape[0]):
         z_scores_per_sample = (feats[i] - mean_1) / (std_1 + 0.0000001)
-        # If there is a feature with z_score above threshold consider the sample as an outlier
-        if np.any(np.abs(z_scores_per_sample) > threshold):
+        # If there is a feature with z_score above threshold consider the sample as an outlier ?!?!
+        if np.any(np.abs(z_scores_per_sample) > 3):
             outliers.append(i)
 
     feats = np.delete(feats, outliers, axis=0)
     labels = np.delete(labels, outliers)
     return feats, labels
+
+    # TODO: this didn't work better
+    # outliers = []
+    # feats = np.where(feats == float(-999), np.nan, feats)
+    # q1 = np.nanquantile(feats, 0.25, axis=0)
+    # q3 = np.nanquantile(feats, 0.75, axis=0)
+    # median = np.nanmedian(feats, axis=0)
+    # iqr = q3 - q1
+    # minim = median - 2.22 * iqr
+    # maxim = median + 2.22 * iqr
+    #
+    # for i in range(feats.shape[0]):
+    #     condition = np.logical_and(~np.isnan(feats[i]), np.logical_or(feats[i] < minim, feats[i] > maxim))
+    #     if np.any(condition):
+    #         outliers.append(i)
+    #
+    # feats = np.delete(feats, outliers, axis=0)
+    # feats = np.where(np.isnan(feats), float(-999), feats)
+    # labels = np.delete(labels, outliers)
+    # return feats, labels
 
 
 def compute_pca(scaled_x, y, output_path):
@@ -369,3 +396,61 @@ def compute_pca(scaled_x, y, output_path):
     projected_2 = scaled_x.dot(vectors.T[1])
 
     plot_pca(projected_1, projected_2, np.ravel(y), output_path)
+
+
+def split_data_by_jet(x):
+    """
+    Splits data by nr_jet=0, nr_jet=1 and nr_jet>1
+    :param x:
+    :return:
+    """
+    data_dict = {"zero_jet": x[x[:, 22] == 0],
+                 "one_jet": x[x[:, 22] == 1],
+                 "more_than_one_jet": x[np.logical_or(x[:, 22] == 2, x[:, 22] == 3)]
+                 }
+    return data_dict
+
+
+def do_cross_validation(feats, labels, lambda_, config):
+    """
+    Perform cross validation.
+    :param feats:
+    :param labels:
+    :param lambda_:
+    :param config:
+    :return:
+    """
+    # Concatenate feats and labels
+    data = np.hstack((feats, labels))
+    # Split in k-folds for cross_validation
+    folds = np.array(cross_validation_split(data))
+
+    final_val_f1 = 0
+    final_train_f1 = 0
+    for i, fold in enumerate(folds):
+        # Get validation data and labels for the validation fold
+        val_feats, val_labels = (fold[:, :-1], fold[:, -1].reshape((-1, 1)))
+        # Set training data and labels as the rest of the folds
+        train_split = np.vstack([fold for j, fold in enumerate(folds) if j != i])
+        tr_feats, tr_labels = (train_split[:, :-1], train_split[:, -1].reshape((-1, 1)))
+        # Find weights
+        if lambda_:
+            weights, tr_loss = reg_logistic_regression(tr_labels, tr_feats, lambda_, np.zeros((val_feats.shape[1], 1)),
+                                                       config['max_iters'], config['gamma'])
+        else:
+            weights, tr_loss = logistic_regression(tr_labels, tr_feats, np.zeros((val_feats.shape[1], 1)),
+                                                   config['max_iters'], config['gamma'])
+        # Make predictions for both training and validation
+        tr_preds = predict_labels(weights, tr_feats, config["reg_threshold"])
+        val_preds = predict_labels(weights, val_feats, config["reg_threshold"])
+        # Get f1 score for training and validation
+        tr_f1 = get_f1(tr_preds, tr_labels)
+        val_f1 = get_f1(val_preds, val_labels)
+
+        final_val_f1 += val_f1
+        final_train_f1 += tr_f1
+        print("For fold {}, training f1 score is {:.2f} % and validation f1 score is {:.2f} %".format(i + 1,
+                                                                                                      tr_f1 * 100,
+                                                                                                      val_f1 * 100))
+    # Compute final validation accuracy
+    return final_val_f1 / len(folds), final_train_f1 / len(folds)
