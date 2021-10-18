@@ -1,5 +1,5 @@
 import numpy as np
-from utils.vizualization import bias_variance_decomposition_visualization, cross_validation_visualization_lambdas
+from utils.vizualization import bias_variance_decomposition_visualization
 from utils.data import split_data, prepare_test_data, prepare_train_data, do_cross_validation
 from utils.algo import predict_labels, get_f1
 from utils.implementations import reg_logistic_regression, logistic_regression
