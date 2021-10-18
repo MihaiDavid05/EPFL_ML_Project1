@@ -9,14 +9,14 @@ boson machine learning challenge](https://higgsml.lal.in2p3.fr/files/2014/04/doc
 If you have libraries such as `matplotlib`, `numpy`, `pyyaml` and `seaborn` already installed,
 step 1 can be omitted.
 
-#####1. Import environment
+##### 1. Import environment
 There is an exported conda environment under `environment.yaml`.
 To import it please run the following command:
 ```bash
 conda env create -f environment.yml
 ```
 
-#####2. Set path
+##### 2. Set path
 Please add the project root folder to `$PYTHONPATH` using following command:
 ```bash
 export PYTHONPATH=$PYTHONPATH:<path_to_project_folder>
