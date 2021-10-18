@@ -192,22 +192,25 @@ def replace_values(config, feats):
     :param feats:
     :return:
     """
+    # Replace -999 values with nan
+    feats = np.where(feats == float(-999), np.nan, feats)
     if config["replace_with"] == 'mean':
-        # Replace -999 values with nan
-        feats = np.where(feats == float(-999), np.nan, feats)
         # Column-wise mean on the masked array
         feats = np.where(np.isnan(feats), ma.array(feats, mask=np.isnan(feats)).mean(axis=0), feats)
     elif config["replace_with"] == 'zero':
-        # Replace -999 values with 0
-        feats = np.where(feats == float(-999), float(0), feats)
+        # Replace nan values with 0
+        feats = np.where(np.isnan(feats), float(0), feats)
     elif config["replace_with"] == 'median':
-        # Replace -999 values with nan
-        feats = np.where(feats == float(-999), np.nan, feats)
         # Column-wise median on the masked array
         feats = np.where(np.isnan(feats), np.nanmedian(feats, axis=0), feats)
     elif config["replace_with"] == 'mode':
-        # TODO: Implement this
-        pass
+        # Column-wise modes
+        modes = []
+        for j in range(feats.shape[1]):
+            not_nan = ~np.isnan(feats[:, j])
+            vals, counts = np.unique(feats[:, j][not_nan], return_counts=True)
+            modes.append(vals[np.argmax(counts)])
+        feats = np.where(np.isnan(feats), modes, feats)
     return feats
 
 
@@ -356,7 +359,7 @@ def remove_outliers(feats, labels):
     labels = np.delete(labels, outliers)
     return feats, labels
 
-    # TODO: this didn't work better
+    # TODO: this didn't work better, why ?!?
     # outliers = []
     # feats = np.where(feats == float(-999), np.nan, feats)
     # q1 = np.nanquantile(feats, 0.25, axis=0)

@@ -6,7 +6,7 @@ boson machine learning challenge](https://higgsml.lal.in2p3.fr/files/2014/04/doc
 
 
 ## Environment
-If you have basic libraries such as `matplotlib` and `numpy` already installed,
+If you have libraries such as `matplotlib`, `numpy`, `pyyaml` and `seaborn` already installed,
 step 1 can be omitted.
 
 #####1. Import environment

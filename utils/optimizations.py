@@ -13,6 +13,15 @@ def argmax(d):
 
 
 def find_best_poly_lambda(x, y, config, args, output_filename):
+    """
+    Find best polynoial degree - lambda pair using data splits.
+    :param x:
+    :param y:
+    :param config:
+    :param args:
+    :param output_filename:
+    :return:
+    """
     lambdas = np.logspace(-4, 0, 5)
     degrees = list(range(3, 10))
     seeds = range(3)
@@ -63,6 +72,14 @@ def find_best_poly_lambda(x, y, config, args, output_filename):
 
 
 def find_best_poly_lambda_cross_val(x, y, config, args):
+    """
+    Find best polynoial degree - lambda pair using cross validation.
+    :param x:
+    :param y:
+    :param config:
+    :param args:
+    :return:
+    """
     lambdas = np.logspace(-4, 0, 5)
     degrees = list(range(3, 8))
     # Be sure to check config given as cli param before setting other parameters here
@@ -91,6 +108,15 @@ def find_best_poly_lambda_cross_val(x, y, config, args):
 
 
 def find_best_reg_threshold(x, y, config, args):
+    """
+    Find best regression threshold using cross validation.
+    :param x:
+    :param y:
+    :param config:
+    :param args:
+    :return:
+    """
+
     thresholds = np.linspace(0.05, 0.5, 10)
     # Be sure to check config given as cli param before setting other parameters here
     config["max_iters"] = 4000

@@ -1,4 +1,4 @@
-# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE TENTH EXPERIMENT (COMPARABLE WITH 11), BUILD ANOTHER ONE
+# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE FOURTEENTH EXPERIMENT (COMPARABLE WITH 11), BUILD ANOTHER ONE
 
 # This experiment was done by training on the whole training set.
 # All the features + 3 degree polynomial, but standardized to zero mean and unit variance.
@@ -6,7 +6,7 @@
 # Max_iters was increased to 10000.
 # Cross validation was run.
 # Removed outliers at training, before replacing values of -999.
-# Accuracy ? and F1 score ? on the test set.
+# Accuracy 0.807 and F1 score 0.698 on the test set.
 
 
 # Parameters
