@@ -11,20 +11,18 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     :param gamma:
     :return:
     """
-    # Define parameters to store w and loss
-    losses = []
+    # Define parameters to store w
     w = initial_w
+    loss = None
     for n_iter in range(max_iters):
         # compute gradient and loss
         gradient = compute_gradient(y, tx, w)
         loss = compute_loss(y, tx, w)
         # update w by gradient
         w = w - gamma * gradient
-        # store loss
-        losses.append(loss)
         print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
             bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
-    return losses, w
+    return w, loss
 
 
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
@@ -37,8 +35,8 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     :param gamma:
     :return:
     """
-    # Define parameters to store w and loss
-    losses = []
+    # Define parameters to store w
+    loss = None
     w = initial_w
     for n_iter in range(max_iters):
         for minibatch_y, minibatch_tx in batch_iter(y, tx, 1):
@@ -47,12 +45,10 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
             loss = compute_loss(minibatch_y, minibatch_tx, w)
             # update w by gradient
             w = w - gamma * gradient
-            # store loss
-            losses.append(loss)
             print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
                 bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
 
-    return losses, w
+    return w, loss
 
 
 def least_squares(y, tx):
@@ -62,9 +58,9 @@ def least_squares(y, tx):
     :param tx:
     :return: mse and optimal weights
     """
-    optimal_weights = np.linalg.solve(np.dot(tx.T, tx), np.dot(tx.T, y))
-    mse_loss = compute_loss(y, tx, optimal_weights)
-    return mse_loss, optimal_weights
+    w = np.linalg.solve(np.dot(tx.T, tx), np.dot(tx.T, y))
+    loss = compute_loss(y, tx, w)
+    return w, loss
 
 
 def ridge_regression(y, tx, lambda_):
@@ -75,7 +71,9 @@ def ridge_regression(y, tx, lambda_):
     :param lambda_:
     :return:
     """
-    return np.linalg.solve(np.dot(tx.T, tx) + lambda_ * 2 * tx.shape[0] * np.identity(tx.shape[1]), np.dot(tx.T, y))
+    w = np.linalg.solve(np.dot(tx.T, tx) + lambda_ * 2 * tx.shape[0] * np.identity(tx.shape[1]), np.dot(tx.T, y))
+    loss = compute_loss(y, tx, w)
+    return w, loss
 
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):

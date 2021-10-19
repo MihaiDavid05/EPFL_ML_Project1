@@ -1,7 +1,8 @@
 import argparse
 import numpy as np
 from utils.config import read_config
-from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data, do_cross_validation
+from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data,\
+    do_cross_validation, split_data_by_jet, remove_useless_columns
 from utils.algo import predict_labels, get_f1, get_precision_recall_accuracy
 from utils.implementations import logistic_regression, reg_logistic_regression
 from utils.vizualization import plot_loss
@@ -13,6 +14,9 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('config_filename', type=str, help='Config name that you want to use during the run.')
     parser.add_argument('--test', action='store_true', help='Also test and create submission file')
+    parser.add_argument('--by_jet', action='store_true', help='Train and test 3 different models on 3 different'
+                                                              ' datasets representing the entire dataset split by'
+                                                              ' jet number')
     parser.add_argument('--see_hist', action='store_true', help='See features histogram panel')
     parser.add_argument('--see_loss', action='store_true', help='See training loss plot')
     parser.add_argument('--see_pca', action='store_true', help='See PCA with 2 components')
@@ -20,15 +24,16 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def train(config, args):
+def train(config, args, labels, feats, feats_name):
     """
     Pipeline for training.
     :param config: Configuration parameters.
     :param args: Command line arguments
+    :param labels:
+    :param feats:
+    :param feats_name:
     :return:
     """
-    # Load data
-    labels, feats, _, feats_name = load_csv_data(config['train_data'])
     # Prepare data for training
     feats, labels, stat = prepare_train_data(config, args, labels, feats, feats_name)
     # Perform cross validation
@@ -57,7 +62,7 @@ def train(config, args):
     return stat, weights
 
 
-def test(config, stat1, stat2, tr_weights, output):
+def test(config, stat1, stat2, tr_weights, output, test_feats, test_index):
     """
     Pipeline for testing.
     :param config: Configuration parameters.
@@ -65,10 +70,10 @@ def test(config, stat1, stat2, tr_weights, output):
     :param stat2: Feature-wise training standard deviation or min
     :param tr_weights: Weights of the trained model.
     :param output: Output filename.
+    :param test_feats:
+    :param test_index:
     :return:
     """
-    # Load data
-    _, test_feats, test_index, feats_name = load_csv_data(config['test_data'])
     # Prepare data for testing
     test_feats, test_index, _ = prepare_test_data(config, stat1, stat2, test_feats, test_index)
     # Get predictions
@@ -84,8 +89,35 @@ if __name__ == '__main__':
     c = read_config(config_path)
     output_filename = c['output_path'] + cli_args.config_filename + '_submission'
 
-    # Train pipeline
-    stats, w = train(c, cli_args)
-    # Test pipeline
-    if cli_args.test:
-        test(c, stats[0], stats[1], w, output_filename)
+    if cli_args.by_jet:
+        y_tr, x_tr, _, x_name_tr = load_csv_data(c['train_data'])
+        _, x_te, index_te, _ = load_csv_data(c['test_data'])
+
+        data_dict_tr = split_data_by_jet(x_tr, y_tr)
+        data_dict_te = split_data_by_jet(x_te, np.zeros(x_te.shape[0]))
+
+        data_dict_tr = remove_useless_columns(data_dict_tr)
+        data_dict_te = remove_useless_columns(data_dict_te)
+
+        for k in data_dict_tr.keys():
+            indices_tr, x_tr, y_tr = data_dict_tr[k]
+            indices_te, x_te, _ = data_dict_te[k]
+
+            stats_tr, w_tr = train(c, cli_args, y_tr, x_tr, x_name_tr)
+            test(c, stats_tr[0], stats_tr[1], w_tr, output_filename, x_te, index_te)
+    else:
+        # Load data
+        labels, feats, _, feats_name = load_csv_data(c['train_data'])
+        # Train pipeline
+        stats, w = train(c, cli_args, labels, feats, feats_name)
+        if cli_args.test:
+            # Load data
+            _, test_feats, test_index, _ = load_csv_data(c['test_data'])
+            # Test pipeline
+            test(c, stats[0], stats[1], w, output_filename, test_feats, test_index)
+
+    # TODO: 0. check other implement this todos
+    # TODO: 1. check if multiply_each in build_poly, helps
+    # TODO: 2. try ridge regression
+    # TODO: 3. visualize val loss and train loss together
+    # TODO: 4. make 3 separate models, by jet

@@ -97,6 +97,14 @@ def normalize(x, diff=None, minim=None):
     return x, (xdiff, xmin)
 
 
+def log_transform(x):
+    cont_pos_feats_idx = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 13, 16, 19, 21, 22, 25, 28]
+    for j in cont_pos_feats_idx:
+        x[:, j] = np.log(x[:, j] + 1)
+
+    return x
+
+
 def append_constant_column(feats):
     """
     Get feats "tilda".
@@ -178,7 +186,9 @@ def build_poly(x, degree, multiply_each=False, square_root=False):
                     final_matrix = np.hstack([final_matrix, mul])
 
     if square_root:
-        for i in range(nr_feats):
+        # Note that feature 22 was dropped for this step
+        cont_poz_feats_idx = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 13, 16, 19, 21, 22, 25, 28]
+        for i in cont_poz_feats_idx:
             root = np.sqrt(x[:, i]).reshape((-1, 1))
             final_matrix = np.hstack([final_matrix, root])
 
@@ -230,7 +240,7 @@ def prepare_train_data(config, args, labels, feats, feats_name=None):
 
     # Set categorical feature index
     cat_feat_index = 22
-    # Replace -999 values with zeros/mean
+    # Replace -999 values
     if config["replace_with"] is not None:
         feats = replace_values(config, feats)
 
@@ -238,12 +248,21 @@ def prepare_train_data(config, args, labels, feats, feats_name=None):
     cont_feats = np.delete(feats, cat_feat_index, axis=1)
     cat_feat = feats[:, cat_feat_index]
 
+    # Visualize features in 2D.
+    if args.see_pca:
+        compute_pca(feats, labels, config['viz_path'] + '2_comp_pca')
+
     # See features histograms panel
     if args.see_hist:
+        log_scale = True
         name = 'train_hist_panel'
         if config["replace_with"] is not None:
-            name += '_replaced_with_' + str(config["replace_with"])
-        plot_hist_panel(feats, feats_name, config['viz_path'] + name)
+            name += '_replaced_with_' + str(config["replace_with"]) + '_log_' + str(log_scale)
+        plot_hist_panel(feats, feats_name, config['viz_path'] + name, log_scale_y=log_scale)
+
+    # Apply log transformation to positive features
+    if config["log_transform"]:
+        cont_feats = log_transform(cont_feats)
 
     if config["build_poly"]:
         # Build polynomial features for continuous ones
@@ -263,15 +282,13 @@ def prepare_train_data(config, args, labels, feats, feats_name=None):
     else:
         feats, stats = standardize(cont_feats)
 
-    # Visualize features in 2D.
-    if args.see_pca:
-        compute_pca(feats, labels, config['viz_path'] + '2_comp_pca')
-
     feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
 
     # See features histograms panel after scaling
     if args.see_hist:
-        plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + 'train_hist_panel_after_scale')
+        name = 'train_hist_panel_' + str(config["replace_with"]) + '_log_' + str(log_scale) + '_end_preprocessing'
+        plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + name,
+                        log_scale_y=log_scale)
 
     return feats, labels, stats
 
@@ -297,9 +314,14 @@ def prepare_test_data(config, stat1, stat2, test_feats, test_index=None, test_la
     cont_test_feats = np.delete(test_feats, cat_feat_index, axis=1)
     cat_test_feat = test_feats[:, cat_feat_index]
 
+    # Apply log transformation to positive features
+    if config["log_transform"]:
+        cont_test_feats = log_transform(cont_test_feats)
+
     if config["build_poly"]:
         # Build polynomial features for continuous ones
-        test_feats = build_poly(cont_test_feats, config["degree"], multiply_each=config["multiply_each"])
+        test_feats = build_poly(cont_test_feats, config["degree"], multiply_each=config["multiply_each"],
+                                square_root=config["square_root"])
         test_feats = np.insert(test_feats, cat_feat_index + 1, cat_test_feat, axis=1)
     else:
         # Create x 'tilda' without polynomial features
@@ -351,7 +373,7 @@ def remove_outliers(feats, labels):
     std_1 = np.std(feats, axis=0)
     for i in range(feats.shape[0]):
         z_scores_per_sample = (feats[i] - mean_1) / (std_1 + 0.0000001)
-        # If there is a feature with z_score above threshold consider the sample as an outlier ?!?!
+        # If there is a feature with absolute z_score above 3 consider the sample as an outlier ?!?!
         if np.any(np.abs(z_scores_per_sample) > 3):
             outliers.append(i)
 
@@ -359,7 +381,7 @@ def remove_outliers(feats, labels):
     labels = np.delete(labels, outliers)
     return feats, labels
 
-    # TODO: this didn't work better, why ?!?
+    # # This didn't work better, why ?!?
     # outliers = []
     # feats = np.where(feats == float(-999), np.nan, feats)
     # q1 = np.nanquantile(feats, 0.25, axis=0)
@@ -401,17 +423,32 @@ def compute_pca(scaled_x, y, output_path):
     plot_pca(projected_1, projected_2, np.ravel(y), output_path)
 
 
-def split_data_by_jet(x):
+def split_data_by_jet(x, y=None):
     """
     Splits data by nr_jet=0, nr_jet=1 and nr_jet>1
     :param x:
+    :param y:
     :return:
     """
-    data_dict = {"zero_jet": x[x[:, 22] == 0],
-                 "one_jet": x[x[:, 22] == 1],
-                 "more_than_one_jet": x[np.logical_or(x[:, 22] == 2, x[:, 22] == 3)]
+    cond_zero = x[:, 22] == 0
+    cond_one = x[:, 22] == 1
+    cond_two_three = np.logical_or(x[:, 22] == 2, x[:, 22] == 3)
+    data_dict = {"zero_jet": (np.argwhere(cond_zero), x[cond_zero], y[cond_zero]),
+                 "one_jet": (np.argwhere(cond_one), x[cond_one], y[cond_one]),
+                 "more_than_one_jet": (np.argwhere(cond_two_three), x[cond_two_three], y[cond_two_three])
                  }
     return data_dict
+
+
+def remove_useless_columns(data):
+    """
+    Remove columns full of -999 or nan.
+    :param data:
+    :return:
+    """
+    # TODO: implement this
+    for k, v in data.items():
+        pass
 
 
 def do_cross_validation(feats, labels, lambda_, config):
@@ -449,7 +486,7 @@ def do_cross_validation(feats, labels, lambda_, config):
         # Get f1 score for training and validation
         tr_f1 = get_f1(tr_preds, tr_labels)
         val_f1 = get_f1(val_preds, val_labels)
-
+        # Update f1 score
         final_val_f1 += val_f1
         final_train_f1 += tr_f1
         print("For fold {}, training f1 score is {:.2f} % and validation f1 score is {:.2f} %".format(i + 1,

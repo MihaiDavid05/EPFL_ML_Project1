@@ -116,12 +116,11 @@ def find_best_reg_threshold(x, y, config, args):
     :param args:
     :return:
     """
-
-    thresholds = np.linspace(0.05, 0.5, 10)
+    thresholds = np.linspace(0.01, 0.05, 5)
     # Be sure to check config given as cli param before setting other parameters here
     config["max_iters"] = 4000
-    config["lambda"] = best_lambda
-    config["degree"] = best_degree
+    config["lambda"] = 1  # or 0.001
+    config["degree"] = 6
 
     res_dict_tr = {}
     res_dict_te = {}

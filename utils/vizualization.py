@@ -3,21 +3,24 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def plot_hist_panel(feats, feats_name, output_path):
+def plot_hist_panel(feats, feats_name, output_path, log_scale_y=False):
     """
     PLot a panel with histograms for each feature.
     :param feats:
     :param feats_name:
     :param output_path:
+    :param log_scale_y:
     :return:
     """
     h = 6
     w = 5
+    poz_feats_idx = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 13, 16, 19, 21, 23, 26, 29]
     fig, ax = plt.subplots(h, w, figsize=(10, 8))
     for i in range(h):
         for j in range(w):
             sbplt = ax[i, j]
-            sbplt.set_yscale('log')
+            if log_scale_y:
+                sbplt.set_yscale('log')
             sbplt.hist(feats[:, j + i * w], bins=100)
             sbplt.set_title(feats_name[j + i * w])
 

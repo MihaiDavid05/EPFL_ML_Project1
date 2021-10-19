@@ -28,6 +28,8 @@ degree: 3
 multiply_each: False
 # Take square root of features
 square_root: False
+# Apply log transform as scaler
+log_transform: False
 # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
 replace_with: 'mean'
 # Apply only normalization

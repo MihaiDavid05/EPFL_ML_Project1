@@ -6,7 +6,7 @@
 # Max_iters was increased to 10000.
 # Cross validation was run.
 # Removed outliers at training, before replacing values of -999.
-# Accuracy 0.807 and F1 score 0.698 on the test set.
+# Accuracy 0.80 and F1 score 0.714 on the test set. - KEEP MEDIAN AS REPLACING VALUES METHOD.
 
 
 # Parameters
@@ -31,6 +31,8 @@ degree: 3
 multiply_each: False
 # Take square root of features
 square_root: False
+# Apply log transform as scaler
+log_transform: False
 # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
 replace_with: 'mode'
 # Apply only normalization

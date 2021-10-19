@@ -1,14 +1,16 @@
-# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE TWELVETH EXPERIMENT, BUILD ANOTHER ONE
+# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE 18TH EXPERIMENT (COMPARABLE WITH 16), BUILD ANOTHER ONE
 
 # This experiment was done by training on the whole training set.
-# All the features + 10 degree polynomial, but standardized to zero mean and unit variance.
-# Replaced all -999 values with feature-wise mean.
+# All the features + 3 degree polynomial and SQUARE ROOT features, but standardized to zero mean and unit variance.
+# Log transform applied on positive features.
+# Replaced all -999 values with feature-wise median !!!.
 # Max_iters was increased to 10000.
 # Cross validation was run.
 # Removed outliers at training, before replacing values of -999.
-# Threshold of 0.05 for logistic regression
-# Accuracy ? and F1 score ? on the test set. - WORSE THAN WITH 3 DEGREE POLY
+# Accuracy ? and F1 score ? on the test set.
 
+# Validation f1 score is 70.63 %
+# Training F1 score is 70.67 % and accuracy is 81.1727206321801
 
 # Parameters
 
@@ -27,15 +29,15 @@ kfold: 5
 # Whether to build polynomial features or not
 build_poly: True
 # Degrees for polynomial features
-degree: 10
+degree: 3
 # Wheather to multiply each column with each column and expand features
 multiply_each: False
 # Take square root of features
-square_root: False
+square_root: True
 # Apply log transform as scaler
-log_transform: False
+log_transform: True
 # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
-replace_with: 'mean'
+replace_with: 'median'
 # Apply only normalization
 only_normalize: False
 # Logistic regression threshold

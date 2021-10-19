@@ -81,14 +81,12 @@ def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_g
     :return:
     """
     w = initial_w
-    losses = []
+    loss = None
     for n_iter in range(max_iters):
         gr = comp_gradient(y, tx, w, lambda_)
         loss = comp_loss(y, tx, w, lambda_)
-
         w = w - gamma * gr
-        losses.append(loss)
-    return w, losses
+    return w, loss
 
 
 def get_precision_recall_accuracy(preds, labels):
@@ -137,3 +135,35 @@ def predict_labels(weights, data, threshold=0.5):
     y_pred[np.where(y_pred > threshold)] = 1
 
     return y_pred
+
+
+def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
+    """
+    Generate a minibatch iterator for a dataset.
+    Takes as input two iterables 'y' and 'tx'.
+    Outputs an iterator which gives mini-batches of `batch_size` matching elements from `y` and `tx`.
+    Data can be randomly shuffled to avoid ordering in the original data messing with the randomness of the minibatches.
+    Example of use :
+    for minibatch_y, minibatch_tx in batch_iter(y, tx, 32):
+        <DO-SOMETHING>
+    :param y: output desired values
+    :param tx: input data
+    :param batch_size: size of batch
+    :param num_batches: number of batches
+    :param shuffle: shuffle the data or not
+    :return:
+    """
+    data_size = len(y)
+
+    if shuffle:
+        shuffle_indices = np.random.permutation(np.arange(data_size))
+        shuffled_y = y[shuffle_indices]
+        shuffled_tx = tx[shuffle_indices]
+    else:
+        shuffled_y = y
+        shuffled_tx = tx
+    for batch_num in range(num_batches):
+        start_index = batch_num * batch_size
+        end_index = min((batch_num + 1) * batch_size, data_size)
+        if start_index != end_index:
+            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
