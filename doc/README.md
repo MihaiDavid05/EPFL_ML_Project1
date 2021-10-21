@@ -35,12 +35,12 @@ Configs follow a YAML format.
 For training run the following commands:
 ```bash
 cd src
-python run.py <config_filenme> [OPTIONAL_ARGUMENTS]
+python run.py <config_filename> [OPTIONAL_ARGUMENTS]
 ``` 
 For training and testing run the following commands
 ```bash
 cd src
-python run.py <config_filenme> --test [OPTIONAL_ARGUMENTS]
+python run.py <config_filename> --test [OPTIONAL_ARGUMENTS]
 ``` 
 
 ## Results
