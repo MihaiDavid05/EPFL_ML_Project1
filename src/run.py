@@ -4,10 +4,14 @@ from utils.config import read_config
 from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data,\
     do_cross_validation, split_data_by_jet, remove_useless_columns
 from utils.algo import predict_labels, get_f1, get_precision_recall_accuracy
-from utils.implementations import logistic_regression, reg_logistic_regression
+from utils.implementations import logistic_regression, reg_logistic_regression, ridge_regression
 from utils.vizualization import plot_loss
 
 CONFIGS_PATH = '../configs/'
+
+MODELS = {'reg_log': reg_logistic_regression,
+          'log': logistic_regression,
+          'ridge': ridge_regression}
 
 
 def parse_arguments():
@@ -24,28 +28,31 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def train(config, args, labels, feats, feats_name):
+def train(config, args, y, x, x_name):
     """
     Pipeline for training.
     :param config: Configuration parameters.
     :param args: Command line arguments
-    :param labels:
-    :param feats:
-    :param feats_name:
+    :param y:
+    :param x:
+    :param x_name:
     :return:
     """
     # Prepare data for training
-    feats, labels, stat = prepare_train_data(config, args, labels, feats, feats_name)
+    x, y, stat = prepare_train_data(config, args, y, x, x_name)
     # Perform cross validation
     if config['cross_val']:
-        final_val_f1, _ = do_cross_validation(feats, labels, config['lambda'], config)
+        final_val_f1, _ = do_cross_validation(x, y, config['lambda'], config)
         print("Validation f1 score is {:.2f} %".format(final_val_f1 * 100))
     # Use logisitc regression or regularized logisitc regression and find weights
     if config['lambda'] is not None:
-        weights, tr_loss = reg_logistic_regression(labels, feats, config['lambda'], np.zeros((feats.shape[1], 1)),
-                                                   config['max_iters'], config['gamma'])
+        if config['model'] == 'ridge':
+            weights, tr_loss = ridge_regression(y, x, config['lambda'])
+        else:
+            weights, tr_loss = reg_logistic_regression(y, x, config['lambda'], np.zeros((x.shape[1], 1)),
+                                                       config['max_iters'], config['gamma'])
     else:
-        weights, tr_loss = logistic_regression(labels, feats, np.zeros((feats.shape[1], 1)), config['max_iters'],
+        weights, tr_loss = logistic_regression(y, x, np.zeros((x.shape[1], 1)), config['max_iters'],
                                                config['gamma'])
     # Plot training loss
     if args.see_loss:
@@ -53,16 +60,16 @@ def train(config, args, labels, feats, feats_name):
         plot_loss(range(config['max_iters']), np.ravel(tr_loss), output_path=output_path)
 
     # Get predictions
-    tr_preds = predict_labels(weights, feats, config["reg_threshold"])
+    tr_preds = predict_labels(weights, x, config["reg_threshold"])
     # Get F1 score for training
-    f1_score = get_f1(tr_preds, labels)
-    prec, recall, acc = get_precision_recall_accuracy(tr_preds, labels)
+    f1_score = get_f1(tr_preds, y)
+    prec, recall, acc = get_precision_recall_accuracy(tr_preds, y)
     print("Training F1 score is {:.2f} % and accuracy is {}".format(f1_score * 100, acc * 100))
 
     return stat, weights
 
 
-def test(config, stat1, stat2, tr_weights, output, test_feats, test_index):
+def test(config, stat1, stat2, tr_weights, output, x, ind):
     """
     Pipeline for testing.
     :param config: Configuration parameters.
@@ -70,16 +77,16 @@ def test(config, stat1, stat2, tr_weights, output, test_feats, test_index):
     :param stat2: Feature-wise training standard deviation or min
     :param tr_weights: Weights of the trained model.
     :param output: Output filename.
-    :param test_feats:
-    :param test_index:
+    :param x:
+    :param ind:
     :return:
     """
     # Prepare data for testing
-    test_feats, test_index, _ = prepare_test_data(config, stat1, stat2, test_feats, test_index)
+    x, ind, _ = prepare_test_data(config, stat1, stat2, x, ind)
     # Get predictions
-    test_preds = predict_labels(tr_weights, test_feats, config["reg_threshold"])
+    y = predict_labels(tr_weights, x, config["reg_threshold"])
     # Create submission file
-    create_csv_submission(test_index, test_preds, output)
+    create_csv_submission(ind, y, output)
 
 
 if __name__ == '__main__':
@@ -116,8 +123,9 @@ if __name__ == '__main__':
             # Test pipeline
             test(c, stats[0], stats[1], w, output_filename, test_feats, test_index)
 
-    # TODO: 0. check other implement this todos
-    # TODO: 1. check if multiply_each in build_poly, helps
-    # TODO: 2. try ridge regression
-    # TODO: 3. visualize val loss and train loss together
-    # TODO: 4. make 3 separate models, by jet
+    # TODO: 1. check if multiply_each, in build_poly, helps
+    # TODO: 2. visualize val loss and train loss together
+    # TODO: 3. make 3 separate models, by jet - check experiment 21
+
+    # TODO maybe: We have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted log reg
+    # https://machinelearningmastery.com/cost-sensitive-logistic-regression/

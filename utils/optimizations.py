@@ -2,7 +2,7 @@ import numpy as np
 from utils.vizualization import bias_variance_decomposition_visualization
 from utils.data import split_data, prepare_test_data, prepare_train_data, do_cross_validation
 from utils.algo import predict_labels, get_f1
-from utils.implementations import reg_logistic_regression, logistic_regression
+from utils.implementations import reg_logistic_regression, logistic_regression, ridge_regression
 
 
 def argmax(d):
@@ -44,9 +44,12 @@ def find_best_poly_lambda(x, y, config, args, output_filename):
                 tr_feats, tr_labels, tr_stat = prepare_train_data(config, args, y_tr, x_tr)
                 te_feats, te_labels, te_stat = prepare_test_data(config, tr_stat[0], tr_stat[1], x_te, y_te)
                 if config['lambda'] is not None:
-                    weights, tr_loss = reg_logistic_regression(tr_labels, tr_feats, config['lambda'],
-                                                               np.zeros((tr_feats.shape[1], 1)),
-                                                               config['max_iters'], config['gamma'])
+                    if config['model'] == 'ridge':
+                        weights, tr_loss = ridge_regression(tr_labels, tr_feats, config['lambda'])
+                    else:
+                        weights, tr_loss = reg_logistic_regression(tr_labels, tr_feats, config['lambda'],
+                                                                   np.zeros((tr_feats.shape[1], 1)),
+                                                                   config['max_iters'], config['gamma'])
                 else:
                     weights, tr_loss = logistic_regression(tr_labels, tr_feats, np.zeros((tr_feats.shape[1], 1)),
                                                            config['max_iters'],
@@ -117,6 +120,7 @@ def find_best_reg_threshold(x, y, config, args):
     :return:
     """
     thresholds = np.linspace(0.01, 0.05, 5)
+    # TODO: Check this: Best regression threshold seems to be at 0.01 !!!
     # Be sure to check config given as cli param before setting other parameters here
     config["max_iters"] = 4000
     config["lambda"] = 1  # or 0.001

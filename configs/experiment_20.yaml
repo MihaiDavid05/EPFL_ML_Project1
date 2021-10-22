@@ -1,47 +1,49 @@
-# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE THIRTEENTH EXPERIMENT (COMPARABLE WITH 10), BUILD ANOTHER ONE
+# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE 20TH EXPERIMENT (COMPARABLE WITH 3), BUILD ANOTHER ONE
 
 # This experiment was done by training on the whole training set.
-# All the features + 3 degree polynomial, but standardized to zero mean and unit variance.
-# Replaced all -999 values with feature-wise mean.
-# Max_iters was increased to 10000.
-# Cross validation was run.
-# Removed outliers, by, quantiles, at training before replacing values of -999.
-# Accuracy 0.776 and F1 score 0.588 on the test set. - WORSE THAN EXP 10, SO KEEP Z-SCORE METHOD FOR REPLACING VALUES!!!
+# All the features + 2 degree polynomial, but standardized to zero mean and unit variance.
+# Cross-validation.
+# Regularized ridge regression, so need a lambda = 0.0001.
+
+# Training F1 score is 58.97 % and accuracy is 75.33239999999999
+# Validation f1 score is 58.99 %
+# Accuracy 0.753 and F1 score 0.589 on the test set.
+# TODO: check the first column standardization and rerun this
 
 # Parameters
 
 # Model type
-model: log
+model: ridge
 # step_size
-gamma: 0.5
+gamma: 0.2
 # number of steps to run
-max_iters: 10000
+max_iters: 5000
 # regularization parameter
-lambda: null
+lambda: 0.0001
 # ratio split
 ratio: null
 # Enable cross validation
-cross_val: False
+cross_val: True
 # Number of folds for cross-validation
-kfold: null
+kfold: 5
 # Whether to build polynomial features or not
 build_poly: True
 # Degrees for polynomial features
-degree: 3
-# Whether to multiply each column with each column and expand features
+degree: 2
+# Wheather to multiply each column with each column and expand features
 multiply_each: False
 # Take square root of features
 square_root: False
 # Apply log transform as scaler
 log_transform: False
 # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
-replace_with: 'mean'
+replace_with: null
 # Apply only normalization
 only_normalize: False
 # Logistic regression threshold
 reg_threshold: 0.5
 # remove ouliers:
-remove_outliers: True
+remove_outliers: False
 
 # Paths
 train_data: "../data/train.csv"

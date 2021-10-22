@@ -4,7 +4,7 @@ import numpy.ma as ma
 from random import randrange
 from utils.vizualization import plot_hist_panel, plot_pca
 from utils.algo import predict_labels, get_f1
-from utils.implementations import logistic_regression, reg_logistic_regression
+from utils.implementations import logistic_regression, reg_logistic_regression, ridge_regression
 
 
 def load_csv_data(data_path, sub_sample=False):
@@ -98,7 +98,7 @@ def normalize(x, diff=None, minim=None):
 
 
 def log_transform(x):
-    cont_pos_feats_idx = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 13, 16, 19, 21, 22, 25, 28]
+    cont_pos_feats_idx = np.where(np.all(x >= 0, axis=0))[0]
     for j in cont_pos_feats_idx:
         x[:, j] = np.log(x[:, j] + 1)
 
@@ -186,8 +186,7 @@ def build_poly(x, degree, multiply_each=False, square_root=False):
                     final_matrix = np.hstack([final_matrix, mul])
 
     if square_root:
-        # Note that feature 22 was dropped for this step
-        cont_poz_feats_idx = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 13, 16, 19, 21, 22, 25, 28]
+        cont_poz_feats_idx = np.where(np.all(x >= 0, axis=0))[0]
         for i in cont_poz_feats_idx:
             root = np.sqrt(x[:, i]).reshape((-1, 1))
             final_matrix = np.hstack([final_matrix, root])
@@ -238,15 +237,18 @@ def prepare_train_data(config, args, labels, feats, feats_name=None):
     if config["remove_outliers"]:
         feats, labels = remove_outliers(feats, labels)
 
-    # Set categorical feature index
-    cat_feat_index = 22
     # Replace -999 values
     if config["replace_with"] is not None:
         feats = replace_values(config, feats)
 
-    # Seprate continuous and categorical features
-    cont_feats = np.delete(feats, cat_feat_index, axis=1)
-    cat_feat = feats[:, cat_feat_index]
+    # Set categorical feature index
+    if args.by_jet:
+        cont_feats = feats
+    else:
+        cat_feat_index = 22
+        # Separate continuous and categorical features
+        cont_feats = np.delete(feats, cat_feat_index, axis=1)
+        cat_feat = feats[:, cat_feat_index]
 
     # Visualize features in 2D.
     if args.see_pca:
@@ -268,7 +270,8 @@ def prepare_train_data(config, args, labels, feats, feats_name=None):
         # Build polynomial features for continuous ones
         feats = build_poly(cont_feats, config["degree"], multiply_each=config["multiply_each"],
                            square_root=config["square_root"])
-        feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
+        if not args.by_jet:
+            feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
     else:
         # Create x 'tilda' without polynomial features
         feats = append_constant_column(feats)
@@ -276,19 +279,22 @@ def prepare_train_data(config, args, labels, feats, feats_name=None):
     labels = labels.reshape((labels.shape[0], 1))
 
     # Feature standardization or normalization for continuous features
-    cont_feats = np.delete(feats, cat_feat_index + 1, axis=1)
+    if args.by_jet:
+        cont_feats = feats
+    else:
+        cont_feats = np.delete(feats, cat_feat_index + 1, axis=1)
     if config["only_normalize"]:
         feats, stats = normalize(cont_feats[:, 1:])
     else:
         feats, stats = standardize(cont_feats)
 
-    feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
+    if not args.by_jet:
+        feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
 
     # See features histograms panel after scaling
     if args.see_hist:
         name = 'train_hist_panel_' + str(config["replace_with"]) + '_log_' + str(log_scale) + '_end_preprocessing'
-        plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + name,
-                        log_scale_y=log_scale)
+        plot_hist_panel(feats[:, 1:], feats_name, config['viz_path'] + name, log_scale_y=log_scale)
 
     return feats, labels, stats
 
@@ -304,12 +310,12 @@ def prepare_test_data(config, stat1, stat2, test_feats, test_index=None, test_la
     :param test_labels:
     :return:
     """
-    # Set categorical feature index
-    cat_feat_index = 22
     # Replace -999 values with zeros/mean
     if config["replace_with"] is not None:
         test_feats = replace_values(config, test_feats)
 
+    # Set categorical feature index
+    cat_feat_index = 22
     # Seprate continuous and categorical features
     cont_test_feats = np.delete(test_feats, cat_feat_index, axis=1)
     cat_test_feat = test_feats[:, cat_feat_index]
@@ -381,26 +387,6 @@ def remove_outliers(feats, labels):
     labels = np.delete(labels, outliers)
     return feats, labels
 
-    # # This didn't work better, why ?!?
-    # outliers = []
-    # feats = np.where(feats == float(-999), np.nan, feats)
-    # q1 = np.nanquantile(feats, 0.25, axis=0)
-    # q3 = np.nanquantile(feats, 0.75, axis=0)
-    # median = np.nanmedian(feats, axis=0)
-    # iqr = q3 - q1
-    # minim = median - 2.22 * iqr
-    # maxim = median + 2.22 * iqr
-    #
-    # for i in range(feats.shape[0]):
-    #     condition = np.logical_and(~np.isnan(feats[i]), np.logical_or(feats[i] < minim, feats[i] > maxim))
-    #     if np.any(condition):
-    #         outliers.append(i)
-    #
-    # feats = np.delete(feats, outliers, axis=0)
-    # feats = np.where(np.isnan(feats), float(-999), feats)
-    # labels = np.delete(labels, outliers)
-    # return feats, labels
-
 
 def compute_pca(scaled_x, y, output_path):
     """
@@ -426,29 +412,31 @@ def compute_pca(scaled_x, y, output_path):
 def split_data_by_jet(x, y=None):
     """
     Splits data by nr_jet=0, nr_jet=1 and nr_jet>1
-    :param x:
-    :param y:
+    :param x: Input data
+    :param y: Labels
     :return:
     """
     cond_zero = x[:, 22] == 0
     cond_one = x[:, 22] == 1
     cond_two_three = np.logical_or(x[:, 22] == 2, x[:, 22] == 3)
-    data_dict = {"zero_jet": (np.argwhere(cond_zero), x[cond_zero], y[cond_zero]),
-                 "one_jet": (np.argwhere(cond_one), x[cond_one], y[cond_one]),
-                 "more_than_one_jet": (np.argwhere(cond_two_three), x[cond_two_three], y[cond_two_three])
+    data_dict = {"zero_jet": [np.argwhere(cond_zero), x[cond_zero], y[cond_zero]],
+                 "one_jet": [np.argwhere(cond_one), x[cond_one], y[cond_one]],
+                 "more_than_one_jet": [np.argwhere(cond_two_three), x[cond_two_three], y[cond_two_three]]
                  }
     return data_dict
 
 
-def remove_useless_columns(data):
+def remove_useless_columns(data_by_jet):
     """
-    Remove columns full of -999 or nan.
-    :param data:
+    Remove columns full of -999, 0 or nan.
+    :param data_by_jet:
     :return:
     """
-    # TODO: implement this
-    for k, v in data.items():
-        pass
+    for k, v in data_by_jet.items():
+        bad_columns = np.where(np.all(np.isin(v[1], [-999, 0, 1, 2, 3]), axis=0))[0]
+        new_x = np.delete(v[1], bad_columns, axis=1)
+        data_by_jet[k][1] = new_x
+    return data_by_jet
 
 
 def do_cross_validation(feats, labels, lambda_, config):
@@ -475,8 +463,11 @@ def do_cross_validation(feats, labels, lambda_, config):
         tr_feats, tr_labels = (train_split[:, :-1], train_split[:, -1].reshape((-1, 1)))
         # Find weights
         if lambda_:
-            weights, tr_loss = reg_logistic_regression(tr_labels, tr_feats, lambda_, np.zeros((val_feats.shape[1], 1)),
-                                                       config['max_iters'], config['gamma'])
+            if config['model'] == 'ridge':
+                weights, tr_loss = ridge_regression(tr_labels, tr_feats, lambda_)
+            else:
+                weights, tr_loss = reg_logistic_regression(tr_labels, tr_feats, lambda_, np.zeros((val_feats.shape[1], 1)),
+                                                           config['max_iters'], config['gamma'])
         else:
             weights, tr_loss = logistic_regression(tr_labels, tr_feats, np.zeros((val_feats.shape[1], 1)),
                                                    config['max_iters'], config['gamma'])

@@ -1,17 +1,19 @@
 # DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE 19TH EXPERIMENT (COMPARABLE WITH 16), BUILD ANOTHER ONE
 
 # This experiment was done by training on the whole training set.
-# All the features + 6 degree polynomial and SQUARE ROOT features, but standardized to zero mean and unit variance.
+# All the features + 6 degree polynomial and SQUARE ROOT features, but standardized to zero mean and unit variance. # Degree 6 does not seem to help !!!!
 # Replaced all -999 values with feature-wise median !!!.
 # Max_iters was increased to 10000.
 # Cross validation was run.
 # Removed outliers at training, before replacing values of -999.
 # Regularized log reg with lambda=1.
-# Accuracy 0. and F1 score 0. on the test set.
+# Accuracy 0.794 and F1 score 0.679 on the test set. - SO 6 DEGREES ARE WORSE THAN 3
 
 
 # Parameters
 
+# Model type
+model: reg_log
 # step_size
 gamma: 0.5
 # number of steps to run

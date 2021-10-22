@@ -1,0 +1,113 @@
+# TODO: Check this
+
+# Parameters for each of the models (by jet number)
+
+model_0:
+  # Model type
+  model: reg_log
+  # step_size
+  gamma: 0.5
+  # number of steps to run
+  max_iters: 10000
+  # regularization parameter
+  lambda: 1
+  # ratio split
+  ratio: null
+  # Enable cross validation
+  cross_val: True
+  # Number of folds for cross-validation
+  kfold: 5
+  # Whether to build polynomial features or not
+  build_poly: True
+  # Degrees for polynomial features
+  degree: 6
+  # Wheather to multiply each column with each column and expand features
+  multiply_each: False
+  # Take square root of features
+  square_root: True
+  # Apply log transform as scaler
+  log_transform: False
+  # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
+  replace_with: 'median'
+  # Apply only normalization
+  only_normalize: False
+  # Logistic regression threshold
+  reg_threshold: 0.05
+  # remove ouliers:
+  remove_outliers: True
+
+model_1:
+  # Model type
+  model: reg_log
+  # step_size
+  gamma: 0.5
+  # number of steps to run
+  max_iters: 10000
+  # regularization parameter
+  lambda: 1
+  # ratio split
+  ratio: null
+  # Enable cross validation
+  cross_val: True
+  # Number of folds for cross-validation
+  kfold: 5
+  # Whether to build polynomial features or not
+  build_poly: True
+  # Degrees for polynomial features
+  degree: 6
+  # Wheather to multiply each column with each column and expand features
+  multiply_each: False
+  # Take square root of features
+  square_root: True
+  # Apply log transform as scaler
+  log_transform: False
+  # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
+  replace_with: 'median'
+  # Apply only normalization
+  only_normalize: False
+  # Logistic regression threshold
+  reg_threshold: 0.05
+  # remove ouliers:
+  remove_outliers: True
+
+model_2:
+  # Model type
+  model: reg_log
+  # step_size
+  gamma: 0.5
+  # number of steps to run
+  max_iters: 10000
+  # regularization parameter
+  lambda: 1
+  # ratio split
+  ratio: null
+  # Enable cross validation
+  cross_val: True
+  # Number of folds for cross-validation
+  kfold: 5
+  # Whether to build polynomial features or not
+  build_poly: True
+  # Degrees for polynomial features
+  degree: 6
+  # Wheather to multiply each column with each column and expand features
+  multiply_each: False
+  # Take square root of features
+  square_root: True
+  # Apply log transform as scaler
+  log_transform: False
+  # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
+  replace_with: 'median'
+  # Apply only normalization
+  only_normalize: False
+  # Logistic regression threshold
+  reg_threshold: 0.05
+  # remove ouliers:
+  remove_outliers: True
+
+# Paths
+train_data: "../data/train.csv"
+test_data: "../data/test.csv"
+# Submissions output_path
+output_path: "../results/"
+# Visualizations output path
+viz_path: "../visualizations/"

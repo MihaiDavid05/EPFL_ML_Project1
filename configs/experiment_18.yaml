@@ -14,6 +14,8 @@
 
 # Parameters
 
+# Model type
+model: log
 # step_size
 gamma: 0.5
 # number of steps to run

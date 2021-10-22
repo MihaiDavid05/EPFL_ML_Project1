@@ -14,7 +14,6 @@ def plot_hist_panel(feats, feats_name, output_path, log_scale_y=False):
     """
     h = 6
     w = 5
-    poz_feats_idx = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 13, 16, 19, 21, 23, 26, 29]
     fig, ax = plt.subplots(h, w, figsize=(10, 8))
     for i in range(h):
         for j in range(w):

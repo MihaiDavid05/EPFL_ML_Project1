@@ -8,6 +8,8 @@
 
 # Parameters
 
+# Model type
+model: reg_log
 # step_size
 gamma: 0.4
 # number of steps to run
