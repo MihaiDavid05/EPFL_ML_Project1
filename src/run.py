@@ -100,6 +100,9 @@ if __name__ == '__main__':
         y_tr, x_tr, _, x_name_tr = load_csv_data(c['train_data'])
         _, x_te, index_te, _ = load_csv_data(c['test_data'])
 
+        idxs = []
+        preds = []
+
         data_dict_tr = split_data_by_jet(x_tr, y_tr)
         data_dict_te = split_data_by_jet(x_te, np.zeros(x_te.shape[0]))
 
@@ -107,11 +110,18 @@ if __name__ == '__main__':
         data_dict_te = remove_useless_columns(data_dict_te)
 
         for k in data_dict_tr.keys():
-            indices_tr, x_tr, y_tr = data_dict_tr[k]
+            _, x_tr, y_tr = data_dict_tr[k]
             indices_te, x_te, _ = data_dict_te[k]
 
-            stats_tr, w_tr = train(c, cli_args, y_tr, x_tr, x_name_tr)
-            test(c, stats_tr[0], stats_tr[1], w_tr, output_filename, x_te, index_te)
+            stats_tr, w_tr = train(c[k], cli_args, y_tr, x_tr, x_name_tr)
+            x_te, ind, _ = prepare_test_data(c[k], stats_tr[0], stats_tr[1], x_te, indices_te)
+
+            y = predict_labels(w_tr, x_te, c[k]["reg_threshold"])
+            preds.extend(list(np.ravel(y)))
+            idxs.extend(list(np.ravel(indices_te)))
+
+        create_csv_submission(idxs, preds, output_filename)
+
     else:
         # Load data
         labels, feats, _, feats_name = load_csv_data(c['train_data'])
@@ -123,9 +133,9 @@ if __name__ == '__main__':
             # Test pipeline
             test(c, stats[0], stats[1], w, output_filename, test_feats, test_index)
 
-    # TODO: 1. check if multiply_each, in build_poly, helps
+    # TODO: 1. check if multiply_each helps (in build_poly)
     # TODO: 2. visualize val loss and train loss together
-    # TODO: 3. make 3 separate models, by jet - check experiment 21
+    # TODO: 3. make 3 separate models, by jet - check experiment 22_3models
 
     # TODO maybe: We have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
     # https://machinelearningmastery.com/cost-sensitive-logistic-regression/

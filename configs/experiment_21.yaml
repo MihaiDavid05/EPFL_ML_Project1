@@ -62,10 +62,13 @@
 # Training F1 score is 72.97 % and accuracy is 82.2192
 # 12.
 # Threshold of 0.5, degree 15, lambda 0, multiply_each=True, replace = 'mode', remove_outliers = False
+# DID NOT TRY
 
 
-# Accuracy 0. and F1 score 0. on the test set.
-
+# For sub-experiment 11:
+# Accuracy 0.803 and F1 score 0.734 on the test set.
+# For sub-experiment 11 with lambda 0.0001:
+# Accuracy 0.792 and F1 score 0.703 on the test set.
 
 # Parameters
 
@@ -76,7 +79,7 @@ gamma: null
 # number of steps to run
 max_iters: null
 # regularization parameter
-lambda: 0
+lambda: 0.0001
 # ratio split
 ratio: null
 # Enable cross validation
@@ -88,7 +91,7 @@ build_poly: True
 # Degrees for polynomial features
 degree: 15
 # Wheather to multiply each column with each column and expand features
-multiply_each: True
+multiply_each: False
 # Take square root of features
 square_root: True
 # Apply log transform as scaler
