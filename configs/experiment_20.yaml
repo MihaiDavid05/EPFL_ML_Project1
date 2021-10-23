@@ -3,21 +3,20 @@
 # This experiment was done by training on the whole training set.
 # All the features + 2 degree polynomial, but standardized to zero mean and unit variance.
 # Cross-validation.
-# Regularized ridge regression, so need a lambda = 0.0001.
+# Ridge regression, so need a lambda = 0.0001.
 
-# Training F1 score is 58.97 % and accuracy is 75.33239999999999
-# Validation f1 score is 58.99 %
-# Accuracy 0.753 and F1 score 0.589 on the test set.
-# TODO: check the first column standardization and rerun this
+# Validation f1 score is 61.54 %
+# Training F1 score is 61.47 % and accuracy is 76.194
+
 
 # Parameters
 
 # Model type
 model: ridge
 # step_size
-gamma: 0.2
+gamma: null
 # number of steps to run
-max_iters: 5000
+max_iters: null
 # regularization parameter
 lambda: 0.0001
 # ratio split

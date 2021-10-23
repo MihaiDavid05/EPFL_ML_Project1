@@ -1,0 +1,111 @@
+# DO NOT CHANGE THIS BECAUSE THIS IS THE CONFIG FOR THE 21TH EXPERIMENT (COMPARABLE WITH 16), BUILD ANOTHER ONE
+
+# This experiment was done by training on the whole training set.
+# All the features + 3 degree polynomial and SQUARE ROOT features, but standardized to zero mean and unit variance.
+# Replaced all -999 values with feature-wise median !!!.
+# Cross validation was run.
+# Ridge regression, so need a lambda = 0.0001.
+# Removed outliers at training, before replacing values of -999.
+
+# EXPERIMENTS
+
+# 1.
+# Threshold of 0.05, degree 3, lambda 0.0001, multiply_each=False, replace = 'median', remove_outliers = False
+# Validation f1 score is 56.65 %
+# Training F1 score is 56.66 % and accuracy is 48.76552227903579
+# 2.
+# Threshold of 0.5 (tested with 0.3, 0.4, 0.6, 0.7 - they are worse), degree 3, lambda 0.0001, multiply_each=False, replace = 'median', remove_outliers = False
+# Validation f1 score is 68.40 %
+# Training F1 score is 68.43 % and accuracy is 80.0371870642141
+# 3.
+# Threshold of 0.5, degree 15, lambda 0.0001, multiply_each=False, replace = 'median', remove_outliers = False
+# Validation f1 score is 70.10 %
+# Training F1 score is 70.16 % and accuracy is 81.05451889235673
+# 4.
+# Threshold of 0.5, degree 15, lambda 0.00001, multiply_each=False, replace = 'median', remove_outliers = False
+# Validation f1 score is 70.93 %
+# Training F1 score is 71.03 % and accuracy is 81.51183124156097
+
+# LOG TRANSFORM DOES NOT HELP, SQUARE ROOT HELPS, STANDARDIZE HELPS
+
+# 5.
+# Threshold of 0.5, degree 15, lambda 0.0000001, multiply_each=False, replace = 'median', remove_outliers = False
+# Validation f1 score is 71.39 %
+# Training F1 score is 71.49 % and accuracy is 81.77789583194989
+# 6.
+# Threshold of 0.5, degree 15, lambda 1e-10, multiply_each=False, replace = 'median', remove_outliers = False
+# Validation f1 score is 71.86 %
+# Training F1 score is 71.97 % and accuracy is 82.03909068773933
+# 7.
+# Threshold of 0.5, degree 15, lambda 1e-10, multiply_each=False, replace = 'mode', remove_outliers = False
+# Validation f1 score is 72.31
+# Training F1 score is 72.41 % and accuracy is 82.0288
+
+# MODE IS THE BEST BETWEEN MEAN, MODE, MEDIAN
+
+# 8.
+# REMOVING OUTLIERS MAY HELP THE F-SCORE, BUT USUALLY IT DOES NOT HELP
+# Threshold of 0.5, degree 15, lambda 1e-10, multiply_each=False, replace = 'mode', remove_outliers = True
+# Validation f1 score is 72.34 %
+# Training F1 score is 72.41 % and accuracy is 82.0288
+# 9.
+# Threshold of 0.5, degree 16, lambda 1e-10, multiply_each=False, replace = 'mode', remove_outliers = False
+# Validation f1 score is 72.35 %
+# Training F1 score is 72.46 % and accuracy is 82.0504
+# 10.
+# Threshold of 0.5, degree 15, lambda 1e-21, multiply_each=False, replace = 'mode', remove_outliers = False
+# Validation f1 score is 72.74
+# Training F1 score is 72.97 % and accuracy is 82.2192
+# 11.
+# Threshold of 0.5, degree 15, lambda 0, multiply_each=False, replace = 'mode', remove_outliers = False
+# Validation f1 score is 72.70 and accuracy is 82.00 %
+# Training F1 score is 72.97 % and accuracy is 82.2192
+# 12.
+# Threshold of 0.5, degree 15, lambda 0, multiply_each=True, replace = 'mode', remove_outliers = False
+
+
+# Accuracy 0. and F1 score 0. on the test set.
+
+
+# Parameters
+
+# Model type
+model: ridge
+# step_size
+gamma: null
+# number of steps to run
+max_iters: null
+# regularization parameter
+lambda: 0
+# ratio split
+ratio: null
+# Enable cross validation
+cross_val: True
+# Number of folds for cross-validation
+kfold: 5
+# Whether to build polynomial features or not
+build_poly: True
+# Degrees for polynomial features
+degree: 15
+# Wheather to multiply each column with each column and expand features
+multiply_each: True
+# Take square root of features
+square_root: True
+# Apply log transform as scaler
+log_transform: False
+# Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
+replace_with: 'mode'
+# Apply only normalization
+only_normalize: False
+# Logistic regression threshold
+reg_threshold: 0.5
+# remove outliers:
+remove_outliers: False
+
+# Paths
+train_data: "../data/train.csv"
+test_data: "../data/test.csv"
+# Submissions output_path
+output_path: "../results/"
+# Visualizations output path
+viz_path: "../visualizations/"

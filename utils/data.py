@@ -3,7 +3,7 @@ import numpy as np
 import numpy.ma as ma
 from random import randrange
 from utils.vizualization import plot_hist_panel, plot_pca
-from utils.algo import predict_labels, get_f1
+from utils.algo import predict_labels, get_f1, get_precision_recall_accuracy
 from utils.implementations import logistic_regression, reg_logistic_regression, ridge_regression
 
 
@@ -241,15 +241,6 @@ def prepare_train_data(config, args, labels, feats, feats_name=None):
     if config["replace_with"] is not None:
         feats = replace_values(config, feats)
 
-    # Set categorical feature index
-    if args.by_jet:
-        cont_feats = feats
-    else:
-        cat_feat_index = 22
-        # Separate continuous and categorical features
-        cont_feats = np.delete(feats, cat_feat_index, axis=1)
-        cat_feat = feats[:, cat_feat_index]
-
     # Visualize features in 2D.
     if args.see_pca:
         compute_pca(feats, labels, config['viz_path'] + '2_comp_pca')
@@ -264,32 +255,23 @@ def prepare_train_data(config, args, labels, feats, feats_name=None):
 
     # Apply log transformation to positive features
     if config["log_transform"]:
-        cont_feats = log_transform(cont_feats)
+        feats = log_transform(feats)
 
     if config["build_poly"]:
         # Build polynomial features for continuous ones
-        feats = build_poly(cont_feats, config["degree"], multiply_each=config["multiply_each"],
+        feats = build_poly(feats, config["degree"], multiply_each=config["multiply_each"],
                            square_root=config["square_root"])
-        if not args.by_jet:
-            feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
     else:
         # Create x 'tilda' without polynomial features
         feats = append_constant_column(feats)
 
     labels = labels.reshape((labels.shape[0], 1))
 
-    # Feature standardization or normalization for continuous features
-    if args.by_jet:
-        cont_feats = feats
-    else:
-        cont_feats = np.delete(feats, cat_feat_index + 1, axis=1)
     if config["only_normalize"]:
-        feats, stats = normalize(cont_feats[:, 1:])
+        feats, stats = normalize(feats[:, 1:])
     else:
-        feats, stats = standardize(cont_feats)
-
-    if not args.by_jet:
-        feats = np.insert(feats, cat_feat_index + 1, cat_feat, axis=1)
+        feats, stats = standardize(feats[:, 1:])
+    feats = append_constant_column(feats)
 
     # See features histograms panel after scaling
     if args.see_hist:
@@ -314,33 +296,24 @@ def prepare_test_data(config, stat1, stat2, test_feats, test_index=None, test_la
     if config["replace_with"] is not None:
         test_feats = replace_values(config, test_feats)
 
-    # Set categorical feature index
-    cat_feat_index = 22
-    # Seprate continuous and categorical features
-    cont_test_feats = np.delete(test_feats, cat_feat_index, axis=1)
-    cat_test_feat = test_feats[:, cat_feat_index]
-
     # Apply log transformation to positive features
     if config["log_transform"]:
-        cont_test_feats = log_transform(cont_test_feats)
+        test_feats = log_transform(test_feats)
 
     if config["build_poly"]:
         # Build polynomial features for continuous ones
-        test_feats = build_poly(cont_test_feats, config["degree"], multiply_each=config["multiply_each"],
+        test_feats = build_poly(test_feats, config["degree"], multiply_each=config["multiply_each"],
                                 square_root=config["square_root"])
-        test_feats = np.insert(test_feats, cat_feat_index + 1, cat_test_feat, axis=1)
     else:
         # Create x 'tilda' without polynomial features
         test_feats = append_constant_column(test_feats)
 
     # Feature standardization or normalization for continuous features
-    cont_test_feats = np.delete(test_feats, cat_feat_index + 1, axis=1)
     if config["only_normalize"]:
-        test_feats, _ = normalize(cont_test_feats[:, 1:], stat1, stat2)
+        test_feats, _ = normalize(test_feats[:, 1:], stat1, stat2)
     else:
-        test_feats, _ = standardize(cont_test_feats, stat1, stat2)
-
-    test_feats = np.insert(test_feats, cat_feat_index + 1, cat_test_feat, axis=1)
+        test_feats, _ = standardize(test_feats[:, 1:], stat1, stat2)
+    test_feats = append_constant_column(test_feats)
 
     if test_labels:
         test_labels = test_labels.reshape((test_labels.shape[0], 1))
@@ -379,7 +352,7 @@ def remove_outliers(feats, labels):
     std_1 = np.std(feats, axis=0)
     for i in range(feats.shape[0]):
         z_scores_per_sample = (feats[i] - mean_1) / (std_1 + 0.0000001)
-        # If there is a feature with absolute z_score above 3 consider the sample as an outlier ?!?!
+        # If there is a feature with absolute z_score above 3 consider the sample as an outlier
         if np.any(np.abs(z_scores_per_sample) > 3):
             outliers.append(i)
 
@@ -455,6 +428,8 @@ def do_cross_validation(feats, labels, lambda_, config):
 
     final_val_f1 = 0
     final_train_f1 = 0
+    final_train_acc = 0
+    final_val_acc = 0
     for i, fold in enumerate(folds):
         # Get validation data and labels for the validation fold
         val_feats, val_labels = (fold[:, :-1], fold[:, -1].reshape((-1, 1)))
@@ -462,7 +437,7 @@ def do_cross_validation(feats, labels, lambda_, config):
         train_split = np.vstack([fold for j, fold in enumerate(folds) if j != i])
         tr_feats, tr_labels = (train_split[:, :-1], train_split[:, -1].reshape((-1, 1)))
         # Find weights
-        if lambda_:
+        if lambda_ is not None:
             if config['model'] == 'ridge':
                 weights, tr_loss = ridge_regression(tr_labels, tr_feats, lambda_)
             else:
@@ -477,11 +452,16 @@ def do_cross_validation(feats, labels, lambda_, config):
         # Get f1 score for training and validation
         tr_f1 = get_f1(tr_preds, tr_labels)
         val_f1 = get_f1(val_preds, val_labels)
-        # Update f1 score
+        _, _, tr_acc = get_precision_recall_accuracy(tr_preds, tr_labels)
+        _, _, val_acc = get_precision_recall_accuracy(val_preds, val_labels)
+        # Update metrics
         final_val_f1 += val_f1
         final_train_f1 += tr_f1
+        final_train_acc += tr_acc
+        final_val_acc += val_acc
+
         print("For fold {}, training f1 score is {:.2f} % and validation f1 score is {:.2f} %".format(i + 1,
                                                                                                       tr_f1 * 100,
                                                                                                       val_f1 * 100))
     # Compute final validation accuracy
-    return final_val_f1 / len(folds), final_train_f1 / len(folds)
+    return final_val_f1 / len(folds), final_train_f1 / len(folds), final_val_acc/len(folds), final_train_acc/len(folds)

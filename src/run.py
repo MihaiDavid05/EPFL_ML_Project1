@@ -42,8 +42,8 @@ def train(config, args, y, x, x_name):
     x, y, stat = prepare_train_data(config, args, y, x, x_name)
     # Perform cross validation
     if config['cross_val']:
-        final_val_f1, _ = do_cross_validation(x, y, config['lambda'], config)
-        print("Validation f1 score is {:.2f} %".format(final_val_f1 * 100))
+        final_val_f1, _, final_val_acc, _ = do_cross_validation(x, y, config['lambda'], config)
+        print("Validation f1 score is {:.2f} % and accuracy is {:.2f} %".format(final_val_f1 * 100, final_val_acc * 100))
     # Use logisitc regression or regularized logisitc regression and find weights
     if config['lambda'] is not None:
         if config['model'] == 'ridge':
@@ -127,5 +127,5 @@ if __name__ == '__main__':
     # TODO: 2. visualize val loss and train loss together
     # TODO: 3. make 3 separate models, by jet - check experiment 21
 
-    # TODO maybe: We have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted log reg
+    # TODO maybe: We have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
     # https://machinelearningmastery.com/cost-sensitive-logistic-regression/
