@@ -12,10 +12,10 @@ def argmax(d):
 def find_best_poly_lambda(x, y, config, args):
     """
     Find best polynomial degree-lambda pair using cross validation.
-    :param x:
-    :param y:
-    :param config:
-    :param args:
+    :param x: Features.
+    :param y: Labels.
+    :param config: Configuration parameters.
+    :param args: Command line arguments provided when run.
     :return:
     """
     # Set grid values
@@ -51,10 +51,10 @@ def find_best_poly_lambda(x, y, config, args):
 def find_best_reg_threshold(x, y, config, args):
     """
     Find best regression threshold using cross validation.
-    :param x:
-    :param y:
-    :param config:
-    :param args:
+    :param x: Features.
+    :param y: Labels.
+    :param config: Configuration parameters.
+    :param args: Command line arguments provided when run.
     :return:
     """
     # Set grid values
