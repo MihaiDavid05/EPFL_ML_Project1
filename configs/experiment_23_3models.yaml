@@ -1,21 +1,20 @@
 # Parameters for each of the models (by jet number)
 
-# Best results (always the recent configuration)
+# Best results
 
-#Cross validation f1 score is 66.30 % and accuracy is 84.47 %
-#Training F1 score is 66.55 % and accuracy is 84.58 %
-#
-#Cross validation f1 score is 72.09 % and accuracy is 80.65 %
-#Training F1 score is 72.40 % and accuracy is 80.87 %
-#
-#Cross validation f1 score is 81.80 % and accuracy is 83.63 %
-#Training F1 score is 82.21 % and accuracy is 84.01 %
-#
-#Overall validation F1 score is 73.40 % and accuracy is 82.92 %
+# Cross validation f1 score is 65.24 % and accuracy is 84.11 %
+# Training F1 score is 65.35 % and accuracy is 84.15 % 
 
+# Cross validation f1 score is 71.92 % and accuracy is 80.56 %
+# Training F1 score is 72.04 % and accuracy is 80.66 % 
+
+# Cross validation f1 score is 81.46 % and accuracy is 83.29 %
+# Training F1 score is 81.69 % and accuracy is 83.50 % 
+
+# Overall validation F1 score is 72.88 % and accuracy is 82.65 %
+# Overall test F1 score is 74 % and accuracy is 82.9 %
 
 zero_jet:
-
   # Model type
   model: ridge
   # step_size
@@ -23,7 +22,7 @@ zero_jet:
   # number of steps to run
   max_iters: null
   # regularization parameter
-  lambda: 0.00000000001
+  lambda: 0
   # ratio split
   ratio: null
   # Enable cross validation
@@ -33,24 +32,21 @@ zero_jet:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 11
-  # Wheather to multiply each column with each column and expand features
-  multiply_each: True
+  degree: 6
+  # Whether to multiply each column with each column and expand features
+  multiply_each: False
   # Take square root of features
   square_root: True
-  # Apply log transform as scaler
+  # Apply log transform as scalar
   log_transform: False
   # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
-  replace_with: 'mode'
+  replace_with: 'median'
   # Apply only normalization
   only_normalize: False
   # Logistic regression threshold
   reg_threshold: 0.5
   # remove outliers:
   remove_outliers: False
-  # Drop correlated features
-  drop_corr: True
-
   # Paths
   train_data: "../data/train.csv"
   test_data: "../data/test.csv"
@@ -60,12 +56,6 @@ zero_jet:
   viz_path: "../visualizations/"
 
 one_jet:
-  # Weaker results for this model:
-  # degree 8:
-  # Cross validation f1 score is 71.21 % and accuracy is 80.13 %
-  # Training F1 score is 71.17 % and accuracy is 80.10 %
-
-
   # Model type
   model: ridge
   # step_size
@@ -73,7 +63,7 @@ one_jet:
   # number of steps to run
   max_iters: null
   # regularization parameter
-  lambda: 0.0000000001
+  lambda: 0
   # ratio split
   ratio: null
   # Enable cross validation
@@ -84,23 +74,20 @@ one_jet:
   build_poly: True
   # Degrees for polynomial features
   degree: 10
-  # Wheather to multiply each column with each column and expand features
-  multiply_each: True
+  # Whether to multiply each column with each column and expand features
+  multiply_each: False
   # Take square root of features
   square_root: True
-  # Apply log transform as scaler
+  # Apply log transform as scalar
   log_transform: False
   # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
-  replace_with: 'mode'
+  replace_with: 'median'
   # Apply only normalization
   only_normalize: False
   # Logistic regression threshold
   reg_threshold: 0.5
   # remove outliers:
   remove_outliers: False
-  # Drop correlated features
-  drop_corr: False
-
   # Paths
   train_data: "../data/train.csv"
   test_data: "../data/test.csv"
@@ -109,8 +96,8 @@ one_jet:
   # Visualizations output path
   viz_path: "../visualizations/"
 
-more_than_one_jet:
 
+more_than_one_jet:
   # Model type
   model: ridge
   # step_size
@@ -118,7 +105,7 @@ more_than_one_jet:
   # number of steps to run
   max_iters: null
   # regularization parameter
-  lambda: 0.0000000001
+  lambda: 0
   # ratio split
   ratio: null
   # Enable cross validation
@@ -128,12 +115,12 @@ more_than_one_jet:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 11
-  # Wheather to multiply each column with each column and expand features
-  multiply_each: True
+  degree: 10
+  # Whether to multiply each column with each column and expand features
+  multiply_each: False
   # Take square root of features
   square_root: True
-  # Apply log transform as scaler
+  # Apply log transform as scalar
   log_transform: False
   # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
   replace_with: 'mode'
@@ -143,9 +130,6 @@ more_than_one_jet:
   reg_threshold: 0.5
   # remove outliers:
   remove_outliers: False
-  # Drop correlated features
-  drop_corr: False
-
   # Paths
   train_data: "../data/train.csv"
   test_data: "../data/test.csv"

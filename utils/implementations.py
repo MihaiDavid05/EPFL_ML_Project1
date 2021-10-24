@@ -4,12 +4,12 @@ from utils.algo import *
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """
     Least squared gradient descent algorithm.
-    :param y:
-    :param tx:
-    :param initial_w:
-    :param max_iters:
-    :param gamma:
-    :return:
+    :param y: Labels.
+    :param tx: Features.
+    :param initial_w: Initial weights vector.
+    :param max_iters: Number of iterations.
+    :param gamma: Gamma parameter.
+    :return: The last computed weight vector and its associated loss.
     """
     # Define parameters to store w
     w = initial_w
@@ -28,12 +28,12 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     """
     Stochastic gradient descent algorithm.
-    :param y:
-    :param tx:
-    :param initial_w:
-    :param max_iters:
-    :param gamma:
-    :return:
+    :param y: Labels.
+    :param tx: Features.
+    :param initial_w: Initial weights vector.
+    :param max_iters: Number of iterations.
+    :param gamma: Gamma parameter.
+    :return: The last computed weights vector and its associated loss.
     """
     # Define parameters to store w
     loss = None
@@ -54,9 +54,9 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
 def least_squares(y, tx):
     """
     Calculate the least squares solution.
-    :param y:
-    :param tx:
-    :return: mse and optimal weights
+    :param y: Labels.
+    :param tx: Features
+    :return: Optimal weights vector and its associated loss by MSE.
     """
     w = np.linalg.solve(np.dot(tx.T, tx), np.dot(tx.T, y))
     loss = compute_loss(y, tx, w)
@@ -66,10 +66,10 @@ def least_squares(y, tx):
 def ridge_regression(y, tx, lambda_):
     """
     Ridge regression implementation.
-    :param y:
-    :param tx:
-    :param lambda_:
-    :return:
+    :param y: Labels.
+    :param tx: Features.
+    :param lambda_: Lambda parameter.
+    :return: Optimal weights vector and its associated loss by MSE.
     """
     w = np.linalg.solve(np.dot(tx.T, tx) + lambda_ * 2 * tx.shape[0] * np.identity(tx.shape[1]), np.dot(tx.T, y))
     loss = compute_loss(y, tx, w)
@@ -79,12 +79,12 @@ def ridge_regression(y, tx, lambda_):
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """
     Perform simple logistic regression.
-    :param y:
-    :param tx:
-    :param initial_w:
-    :param max_iters:
-    :param gamma:
-    :return:
+    :param y: Labels.
+    :param tx: Features.
+    :param initial_w: Initial weights vector.
+    :param max_iters: Number of iterations.
+    :param gamma: Gamma parameter.
+    :return: Last computed weights vector and its associated loss.
     """
     return generic_gradient_descent(y, tx, 0, initial_w, max_iters, gamma,
                                     compute_gradient_logistic_regression_regularized,
@@ -94,13 +94,13 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """
     Perform regularized logistic regression.
-    :param y:
-    :param tx:
-    :param lambda_:
-    :param initial_w:
-    :param max_iters:
-    :param gamma:
-    :return:
+    :param y: Labels.
+    :param tx: Features.
+    :param lambda_: Lambda parameter.
+    :param initial_w: Initials weights vector.
+    :param max_iters: Number of iterations.
+    :param gamma: Gamma parameter.
+    :return: Last computed weights vector and its associated loss.
     """
     return generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma,
                                     compute_gradient_logistic_regression_regularized,

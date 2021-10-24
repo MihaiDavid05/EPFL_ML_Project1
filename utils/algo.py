@@ -2,6 +2,13 @@ import numpy as np
 
 
 def compute_gradient(y, tx, w):
+    """
+    Compute the gradient of the loss by MSE.
+    :param y: Labels.
+    :param tx: Features.
+    :param w: Weights.
+    :return: Gradient of loss function.
+    """
     e = y - np.dot(tx, w)
     return (-1 / tx.shape[0]) * np.dot(tx.T, e)
 
@@ -9,10 +16,10 @@ def compute_gradient(y, tx, w):
 def compute_loss(y, tx, w):
     """
     Calculate the loss by MSE.
-    :param y:
-    :param tx:
-    :param w:
-    :return:
+    :param y: Labels.
+    :param tx: Features.
+    :param w: Weights.
+    :return: MSE.
     """
     e = y - np.dot(tx, w)
     return np.dot(e.T, e) / (2*tx.shape[0])
@@ -21,47 +28,74 @@ def compute_loss(y, tx, w):
 def compute_loss_mae(y, tx, w):
     """
     Calculate the loss by MAE.
-    :param y:
-    :param tx:
-    :param w:
-    :return:
+    :param y: Labels.
+    :param tx: Features.
+    :param w: Weights.
+    :return: MSA.
     """
     e = y - np.dot(tx, w)
     return np.sum(np.absolute(e)) / (tx.shape[0])
 
 
 def sigmoid(v):
+    """
+    Compute the sigmoid of v
+    :param v:
+    :return: Sigmoid of v.
+    """
     return 1 / (1 + np.exp(-v))
 
 
-def hypothesis_linear_regression(tx, w):
-    return tx @ w
-
-
-def hypothesis_logistic_regression(tx, w):
-    return sigmoid(hypothesis_linear_regression(tx, w))
-
-
 def compute_loss_logistic_regression(y, tx, w):
+    """
+    Compute the loss for logistic regression.
+    :param y: Labels.
+    :param tx: Features.
+    :param w: Weights.
+    :return: Loss.
+    """
     n = y.shape[0]
-    h = hypothesis_logistic_regression(tx, w)
+    s = sigmoid(tx @ w)
 
-    return -1 / n * ((y.T @ np.log(h)) + (1 - y.T) @ np.log(1 - h))
+    return -1 / n * ((y.T @ np.log(s)) + (1 - y.T) @ np.log(1 - s))
 
 
 def compute_loss_logistic_regression_regularized(y, tx, w, lambda_):
+    """
+    Compute the loss for regularized logistic regression.
+    :param y: Labels.
+    :param tx: Features.
+    :param w: Weights.
+    :param lambda_: Lambda parameter.
+    :return: Loss.
+    """
     n = y.shape[0]
 
     return compute_loss_logistic_regression(y, tx, w) + lambda_ / (2 * n) * w.T @ w
 
 
 def compute_gradient_logistic_regression(y, tx, w):
+    """
+    Compute the gradient of the loss by logistic regression.
+    :param y: Labels.
+    :param tx: Features.
+    :param w: Weights.
+    :return: Gradient of loss function.
+    """
     n = y.shape[0]
-    h = hypothesis_logistic_regression(tx, w)
-    return tx.T @ (h - y) / n
+    s = sigmoid(tx @ w)
+    return tx.T @ (s - y) / n
 
 
 def compute_gradient_logistic_regression_regularized(y, tx, w, lambda_):
+    """
+    Compute the gradient of the loss by regularized logistic regression.
+    :param y: Labels.
+    :param tx: Features.
+    :param w: Weights.
+    :param lambda_: Lambda parameter.
+    :return: Gradient of loss function.
+    """
     n = y.shape[0]
 
     return compute_gradient_logistic_regression(y, tx, w) + lambda_ / n * np.sum(w)
