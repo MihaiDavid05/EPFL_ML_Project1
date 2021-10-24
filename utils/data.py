@@ -2,7 +2,7 @@ import csv
 import numpy as np
 import numpy.ma as ma
 from random import randrange
-from utils.vizualization import plot_hist_panel, plot_pca
+from utils.vizualization import plot_hist_panel, plot_pca, plot_correlation
 from utils.algo import predict_labels, get_f1, get_precision_recall_accuracy
 from utils.implementations import model
 
@@ -237,6 +237,11 @@ def prepare_train_data(config, args, y, x, x_name=None):
     :param x_name: Feature names.
     :return: Training data, labels and feature statistics.
     """
+
+    # Compute correlation
+    # TODO: Finish this
+    # compute_correlation(x, x_name, output_path=config['viz_path'] + 'correlation')
+
     # Remove samples with outlier features
     if config["remove_outliers"]:
         x, y = remove_outliers(x, y)
@@ -324,14 +329,26 @@ def prepare_test_data(config, s1, s2, x, x_index=None, y=None):
     return x, x_index, y
 
 
-def compute_correlation(x):
+def compute_correlation(x, x_name, output_path=None):
     """
     Compute correlation between features.
     :param x: Input data.
+    :param x_name: Features names.
+    :param output_path: Plot output path.
     :return: A dict with highly correlated feature ids and their number of occurrences.
     """
-    corr = np.corrcoef(x)
-    corr = np.tril(corr)
+    corrm = np.corrcoef(x.T)
+    plot_correlation(corrm, np.ravel(x_name), output_path=output_path)
+
+    corr1 = corrm - np.diagflat(corrm.diagonal())
+    print("max corr:", corr1.max(), ", min corr: ", corr1.min())
+
+    # c1 = cor.stack().sort_values(ascending=False).drop_duplicates()
+    # high_cor = c1[c1.values != 1]
+    # thresh = threshold
+    # display(high_cor[high_cor > thresh])
+
+    corr = np.tril(corr1)
     high_corr = np.where(corr > 0.99)
     high_corr_idxs = [x for x in list(zip(high_corr[0], high_corr[1])) if x[0] != x[1]]
     all_idxs = [item for t in high_corr_idxs for item in t]

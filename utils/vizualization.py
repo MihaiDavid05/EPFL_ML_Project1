@@ -3,6 +3,21 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
+def plot_correlation(corr, feats_name, output_path):
+    """
+    PLot correlation between features.
+    :param corr: Correlation matrix.
+    :param feats_name: Features name.
+    :param output_path: Plot output path
+    :return:
+    """
+    fig, ax = plt.subplots(1, 1, figsize=(12, 10))
+    sns.heatmap(corr, annot=True, ax=ax, xticklabels=feats_name, yticklabels=feats_name)
+    fig.suptitle("Correlation matrix")
+    fig.tight_layout()
+    fig.savefig(output_path)
+
+
 def plot_hist_panel(feats, feats_name, output_path, log_scale_y=False):
     """
     PLot a panel with histograms for each feature.

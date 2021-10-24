@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
             # Training and testing pipelines for a subset
             stats_tr, w_tr, te_f1, te_acc = train(config[k], cli_args, labels_tr, x_tr, x_name_tr)
-            pred, ind = test(config[k], stats_tr[0], stats_tr[1], w_tr, x_te, indices_te)
+            ind, pred = test(config[k], stats_tr[0], stats_tr[1], w_tr, x_te, indices_te)
 
             # Gather test indices, predictions and metrics
             preds.extend(list(np.ravel(pred)))

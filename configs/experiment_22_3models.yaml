@@ -109,6 +109,8 @@ one_jet:
 
 more_than_one_jet:
   # Weaker results for this model:
+  # degree 15: ?
+
 
   # Model type
   model: ridge
@@ -127,7 +129,7 @@ more_than_one_jet:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 15
+  degree: 12
   # Wheather to multiply each column with each column and expand features
   multiply_each: False
   # Take square root of features
