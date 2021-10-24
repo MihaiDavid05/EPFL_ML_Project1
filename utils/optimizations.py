@@ -59,7 +59,7 @@ def find_best_reg_threshold(x, y, config, args):
     """
     # Set grid values
     thresholds = np.linspace(0.01, 0.05, 5)
-    # TODO: Check this: Best regression threshold seems to be at 0.01 !!!
+
     # Be sure to check config given as cli param before setting other parameters here
     config["max_iters"] = 4000
     config["lambda"] = 1  # or 0.001

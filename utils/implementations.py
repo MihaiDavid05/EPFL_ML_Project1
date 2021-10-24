@@ -55,7 +55,7 @@ def least_squares(y, tx):
     """
     Calculate the least squares solution.
     :param y: Labels.
-    :param tx: Features
+    :param tx: Features.
     :return: Optimal weights vector and its associated loss by MSE.
     """
     w = np.linalg.solve(np.dot(tx.T, tx), np.dot(tx.T, y))

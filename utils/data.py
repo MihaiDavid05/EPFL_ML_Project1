@@ -227,7 +227,7 @@ def replace_values(config, x):
     return x
 
 
-def prepare_train_data(config, args, y, x, x_name=None):
+def prepare_train_data(config, args, y, x, x_name=None, model_key=''):
     """
     Training data pre-processing pipeline.
     :param config: Configuration parameters.
@@ -235,6 +235,7 @@ def prepare_train_data(config, args, y, x, x_name=None):
     :param y: Labels.
     :param x: Input features.
     :param x_name: Feature names.
+    :param model_key: Sub model name if dataset is split.
     :return: Training data, labels and feature statistics.
     """
 
@@ -248,15 +249,12 @@ def prepare_train_data(config, args, y, x, x_name=None):
 
     # Visualize features in 2D.
     if args.see_pca:
-        compute_pca(x, y, config['viz_path'] + '2_comp_pca')
+        compute_pca(x, y, config['viz_path'] + '2_comp_pca_' + model_key)
 
     # See features histograms panel
     if args.see_hist:
-        log_scale = True
-        name = 'train_hist_panel'
-        if config["replace_with"] is not None:
-            name += '_replaced_with_' + str(config["replace_with"]) + '_log_' + str(log_scale)
-        plot_hist_panel(x, x_name, config['viz_path'] + name, log_scale_y=log_scale)
+        name = 'train_hist_panel_replaced_with_' + str(config["replace_with"]) + '_' + model_key
+        plot_hist_panel(x, x_name, config['viz_path'] + name, log_scale_y=True)
 
     # Apply log transformation to positive features
     if config["log_transform"]:
@@ -280,8 +278,8 @@ def prepare_train_data(config, args, y, x, x_name=None):
 
     # See features histograms panel after scaling
     if args.see_hist:
-        name = 'train_hist_panel_' + str(config["replace_with"]) + '_log_' + str(log_scale) + '_end_preprocessing'
-        plot_hist_panel(x[:, 1:], x_name, config['viz_path'] + name, log_scale_y=log_scale)
+        name = 'train_hist_panel_replaced_with_' + str(config["replace_with"]) + '_end_preprocessing_' + model_key
+        plot_hist_panel(x[:, 1:], x_name, config['viz_path'] + name, log_scale_y=True)
 
     return x, y, stats
 
@@ -357,7 +355,8 @@ def drop_correlated(data, model_key, config, drop_idxs=None):
     if drop_idxs is not None:
         corr_idxs = drop_idxs
     else:
-        corr_idxs = compute_correlation(data[model_key][1], data[model_key][-1], output_path=config['viz_path'] + 'correlation')
+        corr_idxs = compute_correlation(data[model_key][1], data[model_key][-1],
+                                        output_path=config['viz_path'] + 'correlation_' + model_key)
         print("Dropped {} correlated features for model {}\n".format(len(corr_idxs), model_key))
     data[model_key][1] = np.delete(data[model_key][1], corr_idxs, axis=1)
     data[model_key][-1] = np.delete(data[model_key][-1], corr_idxs)

@@ -23,7 +23,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def train(c, args, y, x, x_name):
+def train(c, args, y, x, x_name, model_key=''):
     """
     Pipeline for training.
     :param c: Configuration parameters.
@@ -31,10 +31,11 @@ def train(c, args, y, x, x_name):
     :param y: Labels.
     :param x: Train data.
     :param x_name: Features names.
+    :param model_key: Sub model name if dataset is split.
     :return: Training statistics, weights and validation metrics if available
     """
     # Prepare data for training
-    x, y, stat = prepare_train_data(c, args, y, x, x_name)
+    x, y, stat = prepare_train_data(c, args, y, x, x_name, model_key)
 
     # Perform cross validation
     val_f1, val_acc = -1, -1
@@ -47,7 +48,7 @@ def train(c, args, y, x, x_name):
 
     # Plot training loss
     if args.see_loss:
-        output_path = c['paths']["viz_path"] + 'loss_plot_' + args.config_filename
+        output_path = c['paths']["viz_path"] + 'loss_plot_' + args.config_filename + '_' + model_key
         plot_loss(range(c['max_iters']), np.ravel(tr_loss), output_path=output_path)
 
     # Get predictions
@@ -87,6 +88,7 @@ if __name__ == '__main__':
     config = read_config(config_path)
     output_filename = config['output_path'] + cli_args.config_filename + '_submission'
     by_jet = cli_args.config_filename.split('_')[-1] == '3models'
+    cli_args.sub_models = [int(i) for i in cli_args.sub_models]
 
     # If there are 3 subsets, split by jet number, predict on each of them
     if by_jet:
@@ -107,7 +109,7 @@ if __name__ == '__main__':
 
         # Iterate through each subset
         for i, k in enumerate(data_dict_tr.keys()):
-            if str(i) in cli_args.sub_models:
+            if i in cli_args.sub_models:
                 # Drop correlated features
                 if config[k]["drop_corr"]:
                     data_dict_tr, tr_corr_idxs = drop_correlated(data_dict_tr, k, config)
@@ -118,7 +120,7 @@ if __name__ == '__main__':
                 indices_te, x_te, _, x_name_te = data_dict_te[k]
 
                 # Training and testing pipelines for a subset
-                stats_tr, w_tr, te_f1, te_acc = train(config[k], cli_args, labels_tr, x_tr, x_name_tr)
+                stats_tr, w_tr, te_f1, te_acc = train(config[k], cli_args, labels_tr, x_tr, x_name_tr, model_key=k)
                 ind, pred = test(config[k], stats_tr[0], stats_tr[1], w_tr, x_te, indices_te)
 
                 # Gather test indices, predictions and metrics
@@ -128,7 +130,7 @@ if __name__ == '__main__':
                 total_f1.append(te_f1)
 
         # Check that all sub-models were run
-        if cli_args.sub_models == ['0', '1', '2']:
+        if cli_args.sub_models == [0, 1, 2]:
             raise Exception("Not all sub models were run. Prediction file cannot be run. Check cli arguments!")
 
         # Print overall metrics for validation sets
@@ -141,20 +143,15 @@ if __name__ == '__main__':
     else:
         # Load data
         labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
+        _, x_te, index_te, _ = load_csv_data(config['test_data'])
 
         # Train pipeline
         stats, w_tr, _, _ = train(config, cli_args, labels_tr, x_tr, x_name_tr)
 
-        if cli_args.test:
-            # Load data
-            _, x_te, index_te, _ = load_csv_data(config['test_data'])
+        # Test pipeline and create submission
+        ind, pred = test(config, stats[0], stats[1], w_tr, x_te, index_te)
+        create_csv_submission(ind, pred, output_filename)
 
-            # Test pipeline and create submission
-            ind, pred = test(config, stats[0], stats[1], w_tr, x_te, index_te)
-            create_csv_submission(ind, pred, output_filename)
-
-    # TODO: 1. visualize val loss and train loss together
-    # TODO (maybe): 2. we have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
+    # TODO: 0. visualize val loss and train loss together
+    # TODO (maybe): 1. we have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
     # https://machinelearningmastery.com/cost-sensitive-logistic-regression/
-
-    # TODO: skip --test argument

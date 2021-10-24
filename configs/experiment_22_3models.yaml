@@ -5,13 +5,13 @@
 #Cross validation f1 score is 67.26 % and accuracy is 84.63 %
 #Training F1 score is 67.47 % and accuracy is 84.73 %
 #
-#Cross validation f1 score is 72.09 % and accuracy is 80.65 %
-#Training F1 score is 72.40 % and accuracy is 80.87 %
+#Cross validation f1 score is 72.90 % and accuracy is 81.01 %
+#Training F1 score is 73.32 % and accuracy is 81.32 %
 #
-#Cross validation f1 score is 81.80 % and accuracy is 83.63 %
-#Training F1 score is 82.21 % and accuracy is 84.01 %
+#Cross validation f1 score is 82.39 % and accuracy is 84.10 %
+#Training F1 score is 82.82 % and accuracy is 84.49 %
 #
-#Overall validation F1 score is 73.40 % and accuracy is 82.92 %
+#Overall validation F1 score is  % and accuracy is  %
 
 
 zero_jet:
@@ -60,11 +60,6 @@ zero_jet:
   viz_path: "../visualizations/"
 
 one_jet:
-  # Weaker results for this model:
-  # degree 8:
-  # Cross validation f1 score is 71.21 % and accuracy is 80.13 %
-  # Training F1 score is 71.17 % and accuracy is 80.10 %
-
 
   # Model type
   model: ridge
@@ -72,8 +67,8 @@ one_jet:
   gamma: null
   # number of steps to run
   max_iters: null
-  # regularization parameter
-  lambda: 0.0000000001
+  # regularization parameter 1^-16
+  lambda: 0.0000000000000001
   # ratio split
   ratio: null
   # Enable cross validation
@@ -117,8 +112,8 @@ more_than_one_jet:
   gamma: null
   # number of steps to run
   max_iters: null
-  # regularization parameter
-  lambda: 0.0000000001
+  # regularization parameter 1^-16
+  lambda: 0.0000000000000001
   # ratio split
   ratio: null
   # Enable cross validation

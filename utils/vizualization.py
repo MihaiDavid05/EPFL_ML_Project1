@@ -80,7 +80,7 @@ def plot_pca(x1, x2, y, output_path):
 
 def cross_validation_visualization_lambdas(lambdas, f1_tr, f1_te, output_path):
     """
-    Visualize the f1 score for training and validation.
+    Visualize the f1 score for training and validation for a range of lambdas.
     :param lambdas: Regularization parameters array.
     :param f1_tr: F1 score for training
     :param f1_te: F1 score for validation
