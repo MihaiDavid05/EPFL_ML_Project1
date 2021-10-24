@@ -107,7 +107,7 @@ def log_transform(x):
     # Get positive features indexes.
     cont_pos_feats_idx = np.where(np.all(x >= 0, axis=0))[0]
     for j in cont_pos_feats_idx:
-        x[:, j] = np.log(x[:, j] + 1)
+        x[:, j] = np.log(1 / (x[:, j] + 1))
     return x
 
 
@@ -347,10 +347,10 @@ def compute_correlation(x, x_name, output_path=None):
 
 def drop_correlated(data, model_key, config, drop_idxs=None):
     """
-
+    Remove highly correlated features.
     :param data: Input data dictionary.
-    :param model_key: Key for data corresponding to one of the subsets
-    :param config: Configurable parameters
+    :param model_key: Key for data corresponding to one of the subsets.
+    :param config: Configurable parameters.
     :param drop_idxs: Feature indexes found in training for dropping them at test time.
     :return: New data dictionary and correlated features indexes.
     """

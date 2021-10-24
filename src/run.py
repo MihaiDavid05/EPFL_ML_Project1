@@ -17,6 +17,8 @@ def parse_arguments():
     parser.add_argument('--see_hist', action='store_true', help='See features histogram panel')
     parser.add_argument('--see_loss', action='store_true', help='See training loss plot')
     parser.add_argument('--see_pca', action='store_true', help='See PCA with 2 components')
+    parser.add_argument('--sub_models', type=list, default=[0, 1, 2], help='Choose which sub-model to run. 0 - '
+                                                                           'jet_zero, 1- jet_one, 2 - more than 1 jet')
 
     return parser.parse_args()
 
@@ -104,25 +106,30 @@ if __name__ == '__main__':
         data_dict_te = remove_useless_columns(data_dict_te, y_name_tr)
 
         # Iterate through each subset
-        for k in data_dict_tr.keys():
-            # Drop correlated features
-            if config[k]["drop_corr"]:
-                data_dict_tr, tr_corr_idxs = drop_correlated(data_dict_tr, k, config)
-                data_dict_te, _ = drop_correlated(data_dict_te, k, config, tr_corr_idxs)
+        for i, k in enumerate(data_dict_tr.keys()):
+            if str(i) in cli_args.sub_models:
+                # Drop correlated features
+                if config[k]["drop_corr"]:
+                    data_dict_tr, tr_corr_idxs = drop_correlated(data_dict_tr, k, config)
+                    data_dict_te, _ = drop_correlated(data_dict_te, k, config, tr_corr_idxs)
 
-            # Get test indices, training and testing data and labels for a subset
-            _, x_tr, labels_tr, x_name_tr = data_dict_tr[k]
-            indices_te, x_te, _, x_name_te = data_dict_te[k]
+                # Get test indices, training and testing data and labels for a subset
+                _, x_tr, labels_tr, x_name_tr = data_dict_tr[k]
+                indices_te, x_te, _, x_name_te = data_dict_te[k]
 
-            # Training and testing pipelines for a subset
-            stats_tr, w_tr, te_f1, te_acc = train(config[k], cli_args, labels_tr, x_tr, x_name_tr)
-            ind, pred = test(config[k], stats_tr[0], stats_tr[1], w_tr, x_te, indices_te)
+                # Training and testing pipelines for a subset
+                stats_tr, w_tr, te_f1, te_acc = train(config[k], cli_args, labels_tr, x_tr, x_name_tr)
+                ind, pred = test(config[k], stats_tr[0], stats_tr[1], w_tr, x_te, indices_te)
 
-            # Gather test indices, predictions and metrics
-            preds.extend(list(np.ravel(pred)))
-            idxs.extend(list(np.ravel(ind)))
-            total_acc.append(te_acc)
-            total_f1.append(te_f1)
+                # Gather test indices, predictions and metrics
+                preds.extend(list(np.ravel(pred)))
+                idxs.extend(list(np.ravel(ind)))
+                total_acc.append(te_acc)
+                total_f1.append(te_f1)
+
+        # Check that all sub-models were run
+        if cli_args.sub_models == ['0', '1', '2']:
+            raise Exception("Not all sub models were run. Prediction file cannot be run. Check cli arguments!")
 
         # Print overall metrics for validation sets
         print("Overall validation F1 score is {:.2f} % and accuracy is {:.2f} %".format(np.mean(total_f1) * 100,
@@ -146,9 +153,8 @@ if __name__ == '__main__':
             ind, pred = test(config, stats[0], stats[1], w_tr, x_te, index_te)
             create_csv_submission(ind, pred, output_filename)
 
-    # TODO: 1. check if multiply_each helps (in build_poly) in each of the sub models
-    # TODO: 2. visualize val loss and train loss together
-    # TODO (maybe): 3. we have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
+    # TODO: 1. visualize val loss and train loss together
+    # TODO (maybe): 2. we have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
     # https://machinelearningmastery.com/cost-sensitive-logistic-regression/
 
     # TODO: skip --test argument
