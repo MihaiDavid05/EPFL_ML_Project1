@@ -4,7 +4,7 @@ from utils.config import read_config
 from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data, \
     do_cross_validation, split_data_by_jet, remove_useless_columns
 from utils.algo import predict_labels, get_f1, get_precision_recall_accuracy
-from utils.implementations import logistic_regression, reg_logistic_regression, ridge_regression
+from utils.implementations import model
 from utils.vizualization import plot_loss
 
 CONFIGS_PATH = '../configs/'
@@ -37,22 +37,15 @@ def train(c, args, y, x, x_name):
     # Perform cross validation
     val_f1, val_acc = -1, -1
     if c['cross_val']:
-        val_f1, _, val_acc, _ = do_cross_validation(x, y, c['lambda'], c)
+        val_f1, _, val_acc, _ = do_cross_validation(x, y, c)
         print("Cross validation f1 score is {:.2f} % and accuracy is {:.2f} %".format(val_f1 * 100, val_acc * 100))
 
-    # Use logistic regression, regularized logistic regression or ridge regression and find weights
-    if c['lambda'] is not None:
-        if c['model'] == 'ridge':
-            w, tr_loss = ridge_regression(y, x, c['lambda'])
-        else:
-            w, tr_loss = reg_logistic_regression(y, x, c['lambda'], np.zeros((x.shape[1], 1)),
-                                                 c['max_iters'], c['gamma'])
-    else:
-        w, tr_loss = logistic_regression(y, x, np.zeros((x.shape[1], 1)), c['max_iters'],
-                                         c['gamma'])
+    # Find weights with one of the models
+    w, tr_loss = model(y, x, c)
+
     # Plot training loss
     if args.see_loss:
-        output_path = c["viz_path"] + 'loss_plot_' + args.config_filename
+        output_path = c['paths']["viz_path"] + 'loss_plot_' + args.config_filename
         plot_loss(range(c['max_iters']), np.ravel(tr_loss), output_path=output_path)
 
     # Get predictions
@@ -61,7 +54,7 @@ def train(c, args, y, x, x_name):
     # Get F1 score and accuracy for training
     f1_score = get_f1(p, y)
     _, _, acc = get_precision_recall_accuracy(p, y)
-    print("Training F1 score is {:.2f} % and accuracy is {:.2f} %".format(f1_score * 100, acc * 100))
+    print("Training F1 score is {:.2f} % and accuracy is {:.2f} % \n".format(f1_score * 100, acc * 100))
 
     return stat, w, val_f1, val_acc
 
@@ -81,7 +74,7 @@ def test(c, s1, s2, w, x, i):
     x, i, _ = prepare_test_data(c, s1, s2, x, i)
     # Get predictions
     p = predict_labels(w, x, c["reg_threshold"])
-    # Create submission file
+
     return i, p
 
 
@@ -148,7 +141,9 @@ if __name__ == '__main__':
             ind, pred = test(config, stats[0], stats[1], w_tr, x_te, index_te)
             create_csv_submission(ind, pred, output_filename)
 
-    # TODO: 1. check if multiply_each helps (in build_poly)
+    # TODO: 1. check if multiply_each helps (in build_poly) in each of the sub models
     # TODO: 2. visualize val loss and train loss together
-    # TODO maybe: We have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
+    # TODO (maybe): 3. we have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
     # https://machinelearningmastery.com/cost-sensitive-logistic-regression/
+
+    # TODO: skip --test argument

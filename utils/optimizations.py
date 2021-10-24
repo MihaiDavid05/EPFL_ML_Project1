@@ -11,7 +11,7 @@ def argmax(d):
 
 def find_best_poly_lambda(x, y, config, args):
     """
-    Find best polynoial degree - lambda pair using cross validation.
+    Find best polynomial degree-lambda pair using cross validation.
     :param x:
     :param y:
     :param config:
@@ -34,8 +34,7 @@ def find_best_poly_lambda(x, y, config, args):
             config["degree"] = degree
             # Cross validation
             tr_feats, tr_labels, _ = prepare_train_data(config, args, y, x)
-            final_val_f1, final_train_f1, final_val_acc, _ = do_cross_validation(tr_feats, tr_labels, config['lambda'],
-                                                                                 config)
+            final_val_f1, final_train_f1, final_val_acc, _ = do_cross_validation(tr_feats, tr_labels, config)
             print("Validation f1 score is {:.2f} % and accuracy is {:.2f} %".format(final_val_f1 * 100,
                                                                                     final_val_acc * 100))
 
@@ -71,10 +70,9 @@ def find_best_reg_threshold(x, y, config, args):
     for i, th in enumerate(thresholds):
         config["reg_threshold"] = th
         tr_feats, tr_labels, _ = prepare_train_data(config, args, y, x)
-        final_val_f1, final_train_f1, final_val_acc, _ = do_cross_validation(tr_feats, tr_labels, config['lambda'],
-                                                                             config)
-        print(
-            "Validation f1 score is {:.2f} % and accuracy is {:.2f} %".format(final_val_f1 * 100, final_val_acc * 100))
+        final_val_f1, final_train_f1, final_val_acc, _ = do_cross_validation(tr_feats, tr_labels, config)
+        print("Validation f1 score is {:.2f} % and accuracy is {:.2f} %".format(final_val_f1 * 100,
+                                                                                final_val_acc * 100))
 
         res_dict_tr[th] = final_train_f1
         res_dict_te[th] = final_val_f1

@@ -6,11 +6,10 @@ import matplotlib.pyplot as plt
 def plot_hist_panel(feats, feats_name, output_path, log_scale_y=False):
     """
     PLot a panel with histograms for each feature.
-    :param feats:
-    :param feats_name:
-    :param output_path:
-    :param log_scale_y:
-    :return:
+    :param feats: Features.
+    :param feats_name: Features name.
+    :param output_path: PLot output path.
+    :param log_scale_y: Whether to apply log on y scale.
     """
     h = 6
     w = 5
@@ -53,11 +52,10 @@ def plot_loss(iters, tr_loss, output_path):
 def plot_pca(x1, x2, y, output_path):
     """
     Visulize data in 2D.
-    :param x1:
-    :param x2:
-    :param y:
-    :param output_path:
-    :return:
+    :param x1: First feature.
+    :param x2: Second feature.
+    :param y: Labels.
+    :param output_path: Plot output path.
     """
     fig, ax = plt.subplots(1, 1, figsize=(20, 10))
     sns.scatterplot(x1, x2, hue=y, s=5)
@@ -68,11 +66,10 @@ def plot_pca(x1, x2, y, output_path):
 def cross_validation_visualization_lambdas(lambdas, f1_tr, f1_te, output_path):
     """
     Visualize the f1 score for training and validation.
-    :param lambdas:
-    :param f1_tr:
-    :param f1_te:
-    :param output_path:
-    :return:
+    :param lambdas: Regularization parameters array.
+    :param f1_tr: F1 score for training
+    :param f1_te: F1 score for validation
+    :param output_path: Plot output_path
     """
     plt.semilogx(lambdas, f1_tr, marker=".", color='b', label='train error')
     plt.semilogx(lambdas, f1_te, marker=".", color='r', label='test error')

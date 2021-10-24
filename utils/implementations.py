@@ -105,3 +105,23 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     return generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma,
                                     compute_gradient_logistic_regression_regularized,
                                     compute_loss_logistic_regression_regularized)
+
+
+def model(y, x, c):
+    """
+    Choose a specific model according to configuration parameters and get loss and weights.
+    :param y: Labels.
+    :param x: Input data.
+    :param c: Configuration parameters.
+    :return: Weights and training loss.
+    """
+    if c['lambda'] is not None:
+        if c['model'] == 'ridge':
+            w, tr_loss = ridge_regression(y, x, c['lambda'])
+        else:
+            w, tr_loss = reg_logistic_regression(y, x, c['lambda'], np.zeros((x.shape[1], 1)),
+                                                 c['max_iters'], c['gamma'])
+    else:
+        w, tr_loss = logistic_regression(y, x, np.zeros((x.shape[1], 1)), c['max_iters'],
+                                         c['gamma'])
+    return w, tr_loss

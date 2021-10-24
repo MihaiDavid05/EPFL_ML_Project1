@@ -4,7 +4,7 @@ import numpy.ma as ma
 from random import randrange
 from utils.vizualization import plot_hist_panel, plot_pca
 from utils.algo import predict_labels, get_f1, get_precision_recall_accuracy
-from utils.implementations import logistic_regression, reg_logistic_regression, ridge_regression
+from utils.implementations import model
 
 
 def load_csv_data(data_path, sub_sample=False):
@@ -422,12 +422,11 @@ def remove_useless_columns(data_by_jet):
     return data_by_jet
 
 
-def do_cross_validation(x, y, lambda_, c):
+def do_cross_validation(x, y, c):
     """
     Perform cross validation.
     :param x: Input data.
     :param y: Labels.
-    :param lambda_: Regularization parameter
     :param c: Config parameters.
     :return: Training and validation metrics
     """
@@ -445,15 +444,7 @@ def do_cross_validation(x, y, lambda_, c):
         train_split = np.vstack([fold for j, fold in enumerate(folds) if j != i])
         tr_feats, tr_labels = (train_split[:, :-1], train_split[:, -1].reshape((-1, 1)))
         # Find weights with one of the models
-        if lambda_ is not None:
-            if c['model'] == 'ridge':
-                w, tr_loss = ridge_regression(tr_labels, tr_feats, lambda_)
-            else:
-                w, tr_loss = reg_logistic_regression(tr_labels, tr_feats, lambda_, np.zeros((val_feats.shape[1], 1)),
-                                                     c['max_iters'], c['gamma'])
-        else:
-            w, tr_loss = logistic_regression(tr_labels, tr_feats, np.zeros((val_feats.shape[1], 1)),
-                                             c['max_iters'], c['gamma'])
+        w, tr_loss = model(tr_labels, tr_feats, c)
         # Make predictions for both training and validation
         tr_preds = predict_labels(w, tr_feats, c["reg_threshold"])
         val_preds = predict_labels(w, val_feats, c["reg_threshold"])

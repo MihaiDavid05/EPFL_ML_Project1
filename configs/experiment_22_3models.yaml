@@ -1,51 +1,25 @@
-
 # Parameters for each of the models (by jet number)
 
+# Best results (always the recent configuration)
+
+#Cross validation f1 score is 65.57 % and accuracy is 84.27 %
+#Training F1 score is 65.58 % and accuracy is 84.30 %
+
+#Cross validation f1 score is 72.10 % and accuracy is 80.55 %
+#Training F1 score is 72.29 % and accuracy is 80.68 %
+
+#Cross validation f1 score is 81.53 % and accuracy is 83.32 %
+#Training F1 score is 81.72 % and accuracy is 83.51 %
+
+#Overall validation F1 score is 73.06 % and accuracy is 82.71 %
+
+
 zero_jet:
-  # Worse results for this model:
-  # Training F1 score is 64.74 % and accuracy is 83.94202956572218 - 5 poly
+  # Weaker results for this model:
+  # degree 5:
+  # Cross validation f1 score is 64.69 % and accuracy is 83.92 %
+  # Training F1 score is 64.74 % and accuracy is 83.94 %
 
-  # Model type
-  model: ridge
-  # step_size
-  gamma: null
-  # number of steps to run
-  max_iters: null
-  # regularization parameter
-  lambda: 0
-  # ratio split
-  ratio: null
-  # Enable cross validation
-  cross_val: True
-  # Number of folds for cross-validation
-  kfold: 5
-  # Whether to build polynomial features or not
-  build_poly: True
-  # Degrees for polynomial features
-  degree: 5
-  # Wheather to multiply each column with each column and expand features
-  multiply_each: False
-  # Take square root of features
-  square_root: True
-  # Apply log transform as scaler
-  log_transform: False
-  # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
-  replace_with: 'mode'
-  # Apply only normalization
-  only_normalize: False
-  # Logistic regression threshold
-  reg_threshold: 0.5
-  # remove outliers:
-  remove_outliers: False
-  # Paths
-  train_data: "../data/train.csv"
-  test_data: "../data/test.csv"
-  # Submissions output_path
-  output_path: "../results/"
-  # Visualizations output path
-  viz_path: "../visualizations/"
-
-one_jet:
   # Model type
   model: ridge
   # step_size
@@ -86,7 +60,56 @@ one_jet:
   # Visualizations output path
   viz_path: "../visualizations/"
 
+one_jet:
+  # Weaker results for this model:
+  # degree 8:
+  # Cross validation f1 score is 71.21 % and accuracy is 80.13 %
+  # Training F1 score is 71.17 % and accuracy is 80.10 %
+
+
+  # Model type
+  model: ridge
+  # step_size
+  gamma: null
+  # number of steps to run
+  max_iters: null
+  # regularization parameter
+  lambda: 0
+  # ratio split
+  ratio: null
+  # Enable cross validation
+  cross_val: True
+  # Number of folds for cross-validation
+  kfold: 5
+  # Whether to build polynomial features or not
+  build_poly: True
+  # Degrees for polynomial features
+  degree: 10
+  # Wheather to multiply each column with each column and expand features
+  multiply_each: False
+  # Take square root of features
+  square_root: True
+  # Apply log transform as scaler
+  log_transform: False
+  # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
+  replace_with: 'mode'
+  # Apply only normalization
+  only_normalize: False
+  # Logistic regression threshold
+  reg_threshold: 0.5
+  # remove outliers:
+  remove_outliers: False
+  # Paths
+  train_data: "../data/train.csv"
+  test_data: "../data/test.csv"
+  # Submissions output_path
+  output_path: "../results/"
+  # Visualizations output path
+  viz_path: "../visualizations/"
+
 more_than_one_jet:
+  # Weaker results for this model:
+
   # Model type
   model: ridge
   # step_size
