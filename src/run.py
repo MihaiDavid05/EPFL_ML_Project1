@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 from utils.config import read_config
 from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data, \
-    do_cross_validation, split_data_by_jet, remove_useless_columns
+    do_cross_validation, split_data_by_jet, remove_useless_columns, drop_correlated
 from utils.algo import predict_labels, get_f1, get_precision_recall_accuracy
 from utils.implementations import model
 from utils.vizualization import plot_loss
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     if by_jet:
         # Load data
         labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
-        _, x_te, index_te, _ = load_csv_data(config['test_data'])
+        _, x_te, index_te, y_name_tr = load_csv_data(config['test_data'])
 
         # Define lists for test indexes, predictions and metric
         idxs, preds, total_f1, total_acc = [], [], [], []
@@ -100,14 +100,19 @@ if __name__ == '__main__':
         data_dict_te = split_data_by_jet(x_te, np.zeros(x_te.shape[0]), index_te)
 
         # Remove columns full of useless values
-        data_dict_tr = remove_useless_columns(data_dict_tr)
-        data_dict_te = remove_useless_columns(data_dict_te)
+        data_dict_tr = remove_useless_columns(data_dict_tr, x_name_tr)
+        data_dict_te = remove_useless_columns(data_dict_te, y_name_tr)
 
         # Iterate through each subset
         for k in data_dict_tr.keys():
+            # Drop correlated features
+            if config[k]["drop_corr"]:
+                data_dict_tr, tr_corr_idxs = drop_correlated(data_dict_tr, k, config)
+                data_dict_te, _ = drop_correlated(data_dict_te, k, config, tr_corr_idxs)
+
             # Get test indices, training and testing data and labels for a subset
-            _, x_tr, labels_tr = data_dict_tr[k]
-            indices_te, x_te, _ = data_dict_te[k]
+            _, x_tr, labels_tr, x_name_tr = data_dict_tr[k]
+            indices_te, x_te, _, x_name_te = data_dict_te[k]
 
             # Training and testing pipelines for a subset
             stats_tr, w_tr, te_f1, te_acc = train(config[k], cli_args, labels_tr, x_tr, x_name_tr)

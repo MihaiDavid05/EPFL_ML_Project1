@@ -238,10 +238,6 @@ def prepare_train_data(config, args, y, x, x_name=None):
     :return: Training data, labels and feature statistics.
     """
 
-    # Compute correlation
-    # TODO: Finish this
-    # compute_correlation(x, x_name, output_path=config['viz_path'] + 'correlation')
-
     # Remove samples with outlier features
     if config["remove_outliers"]:
         x, y = remove_outliers(x, y)
@@ -335,28 +331,38 @@ def compute_correlation(x, x_name, output_path=None):
     :param x: Input data.
     :param x_name: Features names.
     :param output_path: Plot output path.
-    :return: A dict with highly correlated feature ids and their number of occurrences.
+    :return: Correlated feature indexes
     """
     corrm = np.corrcoef(x.T)
     plot_correlation(corrm, np.ravel(x_name), output_path=output_path)
 
     corr1 = corrm - np.diagflat(corrm.diagonal())
-    print("max corr:", corr1.max(), ", min corr: ", corr1.min())
-
-    # c1 = cor.stack().sort_values(ascending=False).drop_duplicates()
-    # high_cor = c1[c1.values != 1]
-    # thresh = threshold
-    # display(high_cor[high_cor > thresh])
-
     corr = np.tril(corr1)
-    high_corr = np.where(corr > 0.99)
+    high_corr = np.where(corr > 0.9)
     high_corr_idxs = [x for x in list(zip(high_corr[0], high_corr[1])) if x[0] != x[1]]
-    all_idxs = [item for t in high_corr_idxs for item in t]
-    freq = {}
-    for i in all_idxs:
-        freq[i] = all_idxs.count(i)
+    all_corr_idxs = list(set([int(item) for t in high_corr_idxs for item in t]))
 
-    return freq
+    return all_corr_idxs
+
+
+def drop_correlated(data, model_key, config, drop_idxs=None):
+    """
+
+    :param data: Input data dictionary.
+    :param model_key: Key for data corresponding to one of the subsets
+    :param config: Configurable parameters
+    :param drop_idxs: Feature indexes found in training for dropping them at test time.
+    :return: New data dictionary and correlated features indexes.
+    """
+    if drop_idxs is not None:
+        corr_idxs = drop_idxs
+    else:
+        corr_idxs = compute_correlation(data[model_key][1], data[model_key][-1], output_path=config['viz_path'] + 'correlation')
+        print("Dropped {} correlated features for model {}\n".format(len(corr_idxs), model_key))
+    data[model_key][1] = np.delete(data[model_key][1], corr_idxs, axis=1)
+    data[model_key][-1] = np.delete(data[model_key][-1], corr_idxs)
+
+    return data, corr_idxs
 
 
 def remove_outliers(x, y):
@@ -424,18 +430,22 @@ def split_data_by_jet(x, y=None, test_index=None):
     return data_dict
 
 
-def remove_useless_columns(data_by_jet):
+def remove_useless_columns(data_by_jet, feats_names):
     """
     Remove columns full of -999, 0 or nan for each subset given by jet number
     :param data_by_jet: Dictionary with data for each subset given by jet number.
-    :return: New clean data dictionary.
+    :param feats_names: Feature names.
+    :return: New clean data dictionary with feature names.
     """
     for k, v in data_by_jet.items():
         # Get indexes of columns full of useless values
         bad_columns_idx = np.where(np.all(np.isin(v[1], [-999, 0, 1, 2, 3]), axis=0))[0]
         # Delete this columns and store clean data
         new_x = np.delete(v[1], bad_columns_idx, axis=1)
+        new_x_names = [feats_names[i] for i in range(len(feats_names)) if i not in bad_columns_idx]
         data_by_jet[k][1] = new_x
+        data_by_jet[k].append(new_x_names)
+
     return data_by_jet
 
 

@@ -2,23 +2,19 @@
 
 # Best results (always the recent configuration)
 
-#Cross validation f1 score is 65.57 % and accuracy is 84.27 %
-#Training F1 score is 65.58 % and accuracy is 84.30 %
-
-#Cross validation f1 score is 72.10 % and accuracy is 80.55 %
-#Training F1 score is 72.29 % and accuracy is 80.68 %
-
-#Cross validation f1 score is 81.53 % and accuracy is 83.32 %
-#Training F1 score is 81.72 % and accuracy is 83.51 %
-
-#Overall validation F1 score is 73.06 % and accuracy is 82.71 %
+#Cross validation f1 score is 66.30 % and accuracy is 84.47 %
+#Training F1 score is 66.55 % and accuracy is 84.58 %
+#
+#Cross validation f1 score is 72.09 % and accuracy is 80.65 %
+#Training F1 score is 72.40 % and accuracy is 80.87 %
+#
+#Cross validation f1 score is 81.80 % and accuracy is 83.63 %
+#Training F1 score is 82.21 % and accuracy is 84.01 %
+#
+#Overall validation F1 score is 73.40 % and accuracy is 82.92 %
 
 
 zero_jet:
-  # Weaker results for this model:
-  # degree 5:
-  # Cross validation f1 score is 64.69 % and accuracy is 83.92 %
-  # Training F1 score is 64.74 % and accuracy is 83.94 %
 
   # Model type
   model: ridge
@@ -27,7 +23,7 @@ zero_jet:
   # number of steps to run
   max_iters: null
   # regularization parameter
-  lambda: 0
+  lambda: 0.00000000001
   # ratio split
   ratio: null
   # Enable cross validation
@@ -37,9 +33,9 @@ zero_jet:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 8
+  degree: 11
   # Wheather to multiply each column with each column and expand features
-  multiply_each: False
+  multiply_each: True
   # Take square root of features
   square_root: True
   # Apply log transform as scaler
@@ -52,6 +48,9 @@ zero_jet:
   reg_threshold: 0.5
   # remove outliers:
   remove_outliers: False
+  # Drop correlated features
+  drop_corr: True
+
   # Paths
   train_data: "../data/train.csv"
   test_data: "../data/test.csv"
@@ -74,7 +73,7 @@ one_jet:
   # number of steps to run
   max_iters: null
   # regularization parameter
-  lambda: 0
+  lambda: 0.0000000001
   # ratio split
   ratio: null
   # Enable cross validation
@@ -86,7 +85,7 @@ one_jet:
   # Degrees for polynomial features
   degree: 10
   # Wheather to multiply each column with each column and expand features
-  multiply_each: False
+  multiply_each: True
   # Take square root of features
   square_root: True
   # Apply log transform as scaler
@@ -99,6 +98,9 @@ one_jet:
   reg_threshold: 0.5
   # remove outliers:
   remove_outliers: False
+  # Drop correlated features
+  drop_corr: False
+
   # Paths
   train_data: "../data/train.csv"
   test_data: "../data/test.csv"
@@ -108,9 +110,6 @@ one_jet:
   viz_path: "../visualizations/"
 
 more_than_one_jet:
-  # Weaker results for this model:
-  # degree 15: ?
-
 
   # Model type
   model: ridge
@@ -119,7 +118,7 @@ more_than_one_jet:
   # number of steps to run
   max_iters: null
   # regularization parameter
-  lambda: 0
+  lambda: 0.0000000001
   # ratio split
   ratio: null
   # Enable cross validation
@@ -129,9 +128,9 @@ more_than_one_jet:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 12
+  degree: 11
   # Wheather to multiply each column with each column and expand features
-  multiply_each: False
+  multiply_each: True
   # Take square root of features
   square_root: True
   # Apply log transform as scaler
@@ -144,6 +143,9 @@ more_than_one_jet:
   reg_threshold: 0.5
   # remove outliers:
   remove_outliers: False
+  # Drop correlated features
+  drop_corr: False
+
   # Paths
   train_data: "../data/train.csv"
   test_data: "../data/test.csv"
