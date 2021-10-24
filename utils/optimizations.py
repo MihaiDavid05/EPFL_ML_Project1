@@ -1,8 +1,5 @@
 import numpy as np
-from utils.vizualization import bias_variance_decomposition_visualization
-from utils.data import split_data, prepare_test_data, prepare_train_data, do_cross_validation
-from utils.algo import predict_labels, get_f1
-from utils.implementations import reg_logistic_regression, logistic_regression, ridge_regression
+from utils.data import prepare_train_data, do_cross_validation
 
 
 def argmax(d):
@@ -12,69 +9,7 @@ def argmax(d):
     return [k for k in d if d[k] == max_val][0], max_val
 
 
-def find_best_poly_lambda(x, y, config, args, output_filename):
-    """
-    Find best polynoial degree - lambda pair using data splits.
-    :param x:
-    :param y:
-    :param config:
-    :param args:
-    :param output_filename:
-    :return:
-    """
-    lambdas = np.logspace(-4, 0, 5)
-    degrees = list(range(3, 10))
-    seeds = range(3)
-    # Be sure to check config given as cli param before setting other parameters here
-    ratio_train = 0.8
-    config["build_poly"] = True
-
-    f1_tr = np.empty((len(seeds), len(degrees)))
-    f1_te = np.empty((len(seeds), len(degrees)))
-
-    res_dict_tr = {}
-    res_dict_te = {}
-    for i, ld in enumerate(lambdas):
-        config["lambda"] = ld
-        for index_seed, seed in enumerate(seeds):
-            x_tr, x_te, y_tr, y_te = split_data(x, y, ratio_train, seed=index_seed)
-            for index_degree, degree in enumerate(degrees):
-
-                config["degree"] = degree
-                tr_feats, tr_labels, tr_stat = prepare_train_data(config, args, y_tr, x_tr)
-                te_feats, te_labels, te_stat = prepare_test_data(config, tr_stat[0], tr_stat[1], x_te, y_te)
-                if config['lambda'] is not None:
-                    if config['model'] == 'ridge':
-                        weights, tr_loss = ridge_regression(tr_labels, tr_feats, config['lambda'])
-                    else:
-                        weights, tr_loss = reg_logistic_regression(tr_labels, tr_feats, config['lambda'],
-                                                                   np.zeros((tr_feats.shape[1], 1)),
-                                                                   config['max_iters'], config['gamma'])
-                else:
-                    weights, tr_loss = logistic_regression(tr_labels, tr_feats, np.zeros((tr_feats.shape[1], 1)),
-                                                           config['max_iters'],
-                                                           config['gamma'])
-                tr_preds = predict_labels(weights, tr_feats, config["reg_threshold"])
-                te_preds = predict_labels(weights, te_feats, config["reg_threshold"])
-
-                f1_score_tr = get_f1(tr_preds, tr_labels)
-                f1_score_te = get_f1(te_preds, te_labels)
-                res_dict_tr[(ld, degree)] = f1_score_tr
-                res_dict_te[(ld, degree)] = f1_score_te
-
-                f1_tr[index_seed, index_degree] = f1_score_tr
-                f1_te[index_seed, index_degree] = f1_score_te
-        print("Finished for lambda {}".format(i))
-
-    output_path = config["viz_path"] + output_filename
-    bias_variance_decomposition_visualization(degrees, f1_tr, f1_te, output_path)
-    print("For training, best lambda is {} and best degree is {}".format(argmax(res_dict_tr)[0][0],
-                                                                         argmax(res_dict_tr)[0][1]))
-    print("For test, best lambda is {} and best degree is {}".format(argmax(res_dict_te)[0][0],
-                                                                     argmax(res_dict_te)[0][1]))
-
-
-def find_best_poly_lambda_cross_val(x, y, config, args):
+def find_best_poly_lambda(x, y, config, args):
     """
     Find best polynoial degree - lambda pair using cross validation.
     :param x:
@@ -83,8 +18,10 @@ def find_best_poly_lambda_cross_val(x, y, config, args):
     :param args:
     :return:
     """
+    # Set grid values
     lambdas = np.logspace(-4, 0, 5)
     degrees = list(range(3, 8))
+
     # Be sure to check config given as cli param before setting other parameters here
     config["max_iters"] = 4000
     config["reg_threshold"] = 0.5
@@ -121,6 +58,7 @@ def find_best_reg_threshold(x, y, config, args):
     :param args:
     :return:
     """
+    # Set grid values
     thresholds = np.linspace(0.01, 0.05, 5)
     # TODO: Check this: Best regression threshold seems to be at 0.01 !!!
     # Be sure to check config given as cli param before setting other parameters here

@@ -6,15 +6,21 @@ boson machine learning challenge](https://higgsml.lal.in2p3.fr/files/2014/04/doc
 
 
 ## Environment
-If you have libraries such as `matplotlib`, `numpy`, `pyyaml` and `seaborn` already installed,
-step 1 can be omitted.
+NOTE: You can skip step 1 if you have next libraries installed: `matplotlib`, `numpy`, `pyyaml`, `seaborn`.
 
 ##### 1. Import environment
-There is an exported conda environment under `environment.yaml`.
-To import it please run the following command:
+There is an exported conda environment under `environment.yaml`and a `requirements.txt` with all the libraries.
+
+Use one of the following command to get all the libraries:
 ```bash
 conda env create -f environment.yml
 ```
+or 
+```bash
+pip install -r requirements.txt
+```
+
+NOTE: For conda importing you should have Anaconda installed.
 
 ##### 2. Set path
 Please add the project root folder to `$PYTHONPATH` using following command:
@@ -28,7 +34,12 @@ Please download the data and store all the `.csv` files under the `data` folder.
 
 ## Configs
 Check `config` folder for different configs and experiments descriptions.
+
 Configs follow a YAML format.
+ 
+A `_3models` suffix for configuration files mean that it contains parameters for 
+3 separate models used to train 3 subsets of the dataset. These subsets were created by splitting the 
+entire dataset by the column `PRI_jet_num`, which is an ordinal feature.
 
 ## Train and test
 
@@ -37,10 +48,21 @@ For training run the following commands:
 cd src
 python run.py <config_filename> [OPTIONAL_ARGUMENTS]
 ``` 
+Example:
+```bash
+cd src
+python run.py experiment_1 --see_hist
+``` 
+
 For training and testing run the following commands
 ```bash
 cd src
 python run.py <config_filename> --test [OPTIONAL_ARGUMENTS]
+``` 
+Example:
+```bash
+cd src
+python run.py experiment_2 --test --see_hist
 ``` 
 
 ## Results

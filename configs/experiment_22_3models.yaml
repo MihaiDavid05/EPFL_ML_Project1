@@ -2,6 +2,9 @@
 # Parameters for each of the models (by jet number)
 
 zero_jet:
+  # Worse results for this model:
+  # Training F1 score is 64.74 % and accuracy is 83.94202956572218 - 5 poly
+
   # Model type
   model: ridge
   # step_size
@@ -13,13 +16,13 @@ zero_jet:
   # ratio split
   ratio: null
   # Enable cross validation
-  cross_val: False
+  cross_val: True
   # Number of folds for cross-validation
-  kfold: null
+  kfold: 5
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 15
+  degree: 5
   # Wheather to multiply each column with each column and expand features
   multiply_each: False
   # Take square root of features
@@ -60,7 +63,7 @@ one_jet:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 15
+  degree: 8
   # Wheather to multiply each column with each column and expand features
   multiply_each: False
   # Take square root of features

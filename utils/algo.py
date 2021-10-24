@@ -70,15 +70,15 @@ def compute_gradient_logistic_regression_regularized(y, tx, w, lambda_):
 def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_gradient, comp_loss):
     """
     Generic function for computing weights and loss.
-    :param y:
-    :param tx:
-    :param lambda_:
-    :param initial_w:
-    :param max_iters:
-    :param gamma:
-    :param comp_gradient:
-    :param comp_loss:
-    :return:
+    :param y: Labels.
+    :param tx: Features.
+    :param lambda_: Regularization parameter.
+    :param initial_w: Initial weights.
+    :param max_iters: Number of iterations.
+    :param gamma: Step size.
+    :param comp_gradient: Gradient computing method (function).
+    :param comp_loss: Loss computing method (function).
+    :return: Final weights and loss.
     """
     w = initial_w
     loss = None
@@ -92,17 +92,19 @@ def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_g
 def get_precision_recall_accuracy(preds, labels):
     """
     Compute precision, recall and accuracy.
-    :param preds:
-    :param labels:
-    :return:
+    :param preds: Predictions.
+    :param labels: Labels or ground truths.
+    :return: Precision, recall, accuracy.
     """
     preds = np.ravel(preds)
     labels = np.ravel(labels)
+    # Compute true positives, false positives, false negatives and true negatives
     tp = len(np.where(np.logical_and(preds == 1, labels == 1))[0])
     fp = len(np.where(np.logical_and(preds == 1, labels == 0))[0])
     fn = len(np.where(np.logical_and(preds == 0, labels == 1))[0])
     tn = len(np.where(np.logical_and(preds == 0, labels == 0))[0])
 
+    # Compute precision recall and accuracy
     precision = tp / (tp + fp)
     recall = tp / (tp + fn)
     accuracy = (tp + tn) / (tp + fp + fn + tn)
@@ -112,10 +114,10 @@ def get_precision_recall_accuracy(preds, labels):
 
 def get_f1(preds, labels):
     """
-    Compute f1 score.
-    :param preds:
-    :param labels:
-    :return:
+    Compute F1 score.
+    :param preds: Predictions.
+    :param labels: Labels or ground truths.
+    :return: F1 score.
     """
     precision, recall, _ = get_precision_recall_accuracy(preds, labels)
     f1_score = (2 * precision * recall) / (precision + recall)
@@ -124,10 +126,10 @@ def get_f1(preds, labels):
 
 def predict_labels(weights, data, threshold=0.5):
     """
-    Generates class predictions given weights, and a test data matrix.
-    :param weights:
-    :param data:
-    :param threshold
+    Generates class predictions given weights, and test data.
+    :param weights: Optimal weights found at training.
+    :param data: Test data.
+    :param threshold: Threshold for deciding whether the prediction is positive or negative.
     :return:
     """
     y_pred = np.dot(data, weights)

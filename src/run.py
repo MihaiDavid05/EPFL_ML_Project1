@@ -1,7 +1,7 @@
 import argparse
 import numpy as np
 from utils.config import read_config
-from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data,\
+from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data, \
     do_cross_validation, split_data_by_jet, remove_useless_columns
 from utils.algo import predict_labels, get_f1, get_precision_recall_accuracy
 from utils.implementations import logistic_regression, reg_logistic_regression, ridge_regression
@@ -9,18 +9,11 @@ from utils.vizualization import plot_loss
 
 CONFIGS_PATH = '../configs/'
 
-MODELS = {'reg_log': reg_logistic_regression,
-          'log': logistic_regression,
-          'ridge': ridge_regression}
-
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('config_filename', type=str, help='Config name that you want to use during the run.')
     parser.add_argument('--test', action='store_true', help='Also test and create submission file')
-    parser.add_argument('--by_jet', action='store_true', help='Train and test 3 different models on 3 different'
-                                                              ' datasets representing the entire dataset split by'
-                                                              ' jet number')
     parser.add_argument('--see_hist', action='store_true', help='See features histogram panel')
     parser.add_argument('--see_loss', action='store_true', help='See training loss plot')
     parser.add_argument('--see_pca', action='store_true', help='See PCA with 2 components')
@@ -28,114 +21,134 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def train(config, args, y, x, x_name):
+def train(c, args, y, x, x_name):
     """
     Pipeline for training.
-    :param config: Configuration parameters.
-    :param args: Command line arguments
-    :param y:
-    :param x:
-    :param x_name:
-    :return:
+    :param c: Configuration parameters.
+    :param args: Command line arguments.
+    :param y: Labels.
+    :param x: Train data.
+    :param x_name: Features names.
+    :return: Training statistics, weights and validation metrics if available
     """
     # Prepare data for training
-    x, y, stat = prepare_train_data(config, args, y, x, x_name)
+    x, y, stat = prepare_train_data(c, args, y, x, x_name)
+
     # Perform cross validation
-    if config['cross_val']:
-        final_val_f1, _, final_val_acc, _ = do_cross_validation(x, y, config['lambda'], config)
-        print("Validation f1 score is {:.2f} % and accuracy is {:.2f} %".format(final_val_f1 * 100, final_val_acc * 100))
-    # Use logisitc regression or regularized logisitc regression and find weights
-    if config['lambda'] is not None:
-        if config['model'] == 'ridge':
-            weights, tr_loss = ridge_regression(y, x, config['lambda'])
+    val_f1, val_acc = -1, -1
+    if c['cross_val']:
+        val_f1, _, val_acc, _ = do_cross_validation(x, y, c['lambda'], c)
+        print("Cross validation f1 score is {:.2f} % and accuracy is {:.2f} %".format(val_f1 * 100, val_acc * 100))
+
+    # Use logistic regression, regularized logistic regression or ridge regression and find weights
+    if c['lambda'] is not None:
+        if c['model'] == 'ridge':
+            w, tr_loss = ridge_regression(y, x, c['lambda'])
         else:
-            weights, tr_loss = reg_logistic_regression(y, x, config['lambda'], np.zeros((x.shape[1], 1)),
-                                                       config['max_iters'], config['gamma'])
+            w, tr_loss = reg_logistic_regression(y, x, c['lambda'], np.zeros((x.shape[1], 1)),
+                                                 c['max_iters'], c['gamma'])
     else:
-        weights, tr_loss = logistic_regression(y, x, np.zeros((x.shape[1], 1)), config['max_iters'],
-                                               config['gamma'])
+        w, tr_loss = logistic_regression(y, x, np.zeros((x.shape[1], 1)), c['max_iters'],
+                                         c['gamma'])
     # Plot training loss
     if args.see_loss:
-        output_path = config["viz_path"] + 'loss_plot_' + args.config_filename
-        plot_loss(range(config['max_iters']), np.ravel(tr_loss), output_path=output_path)
+        output_path = c["viz_path"] + 'loss_plot_' + args.config_filename
+        plot_loss(range(c['max_iters']), np.ravel(tr_loss), output_path=output_path)
 
     # Get predictions
-    tr_preds = predict_labels(weights, x, config["reg_threshold"])
-    # Get F1 score for training
-    f1_score = get_f1(tr_preds, y)
-    prec, recall, acc = get_precision_recall_accuracy(tr_preds, y)
-    print("Training F1 score is {:.2f} % and accuracy is {}".format(f1_score * 100, acc * 100))
+    p = predict_labels(w, x, c["reg_threshold"])
 
-    return stat, weights
+    # Get F1 score and accuracy for training
+    f1_score = get_f1(p, y)
+    _, _, acc = get_precision_recall_accuracy(p, y)
+    print("Training F1 score is {:.2f} % and accuracy is {:.2f} %".format(f1_score * 100, acc * 100))
+
+    return stat, w, val_f1, val_acc
 
 
-def test(config, stat1, stat2, tr_weights, output, x, ind):
+def test(c, s1, s2, w, x, i):
     """
     Pipeline for testing.
-    :param config: Configuration parameters.
-    :param stat1: Feature-wise training mean or max - min
-    :param stat2: Feature-wise training standard deviation or min
-    :param tr_weights: Weights of the trained model.
-    :param output: Output filename.
-    :param x:
-    :param ind:
-    :return:
+    :param c: Configuration parameters.
+    :param s1: Feature-wise training mean or max - min
+    :param s2: Feature-wise training standard deviation or min
+    :param w: Weights.
+    :param x: Test data.
+    :param i: Test sample indexes.
+    :return: Test indexes and predictions
     """
     # Prepare data for testing
-    x, ind, _ = prepare_test_data(config, stat1, stat2, x, ind)
+    x, i, _ = prepare_test_data(c, s1, s2, x, i)
     # Get predictions
-    y = predict_labels(tr_weights, x, config["reg_threshold"])
+    p = predict_labels(w, x, c["reg_threshold"])
     # Create submission file
-    create_csv_submission(ind, y, output)
+    return i, p
 
 
 if __name__ == '__main__':
     # Parse arguments and get configurable parameters
     cli_args = parse_arguments()
     config_path = CONFIGS_PATH + cli_args.config_filename + '.yaml'
-    c = read_config(config_path)
-    output_filename = c['output_path'] + cli_args.config_filename + '_submission'
+    config = read_config(config_path)
+    output_filename = config['output_path'] + cli_args.config_filename + '_submission'
+    by_jet = cli_args.config_filename.split('_')[-1] == '3models'
 
-    if cli_args.by_jet:
-        y_tr, x_tr, _, x_name_tr = load_csv_data(c['train_data'])
-        _, x_te, index_te, _ = load_csv_data(c['test_data'])
+    # If there are 3 subsets, split by jet number, predict on each of them
+    if by_jet:
+        # Load data
+        labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
+        _, x_te, index_te, _ = load_csv_data(config['test_data'])
 
-        idxs = []
-        preds = []
+        # Define lists for test indexes, predictions and metric
+        idxs, preds, total_f1, total_acc = [], [], [], []
 
-        data_dict_tr = split_data_by_jet(x_tr, y_tr)
-        data_dict_te = split_data_by_jet(x_te, np.zeros(x_te.shape[0]))
+        # Split data according to jet number
+        data_dict_tr = split_data_by_jet(x_tr, labels_tr, np.zeros(x_tr.shape[0]))
+        data_dict_te = split_data_by_jet(x_te, np.zeros(x_te.shape[0]), index_te)
 
+        # Remove columns full of useless values
         data_dict_tr = remove_useless_columns(data_dict_tr)
         data_dict_te = remove_useless_columns(data_dict_te)
 
+        # Iterate through each subset
         for k in data_dict_tr.keys():
-            _, x_tr, y_tr = data_dict_tr[k]
+            # Get test indices, training and testing data and labels for a subset
+            _, x_tr, labels_tr = data_dict_tr[k]
             indices_te, x_te, _ = data_dict_te[k]
 
-            stats_tr, w_tr = train(c[k], cli_args, y_tr, x_tr, x_name_tr)
-            x_te, ind, _ = prepare_test_data(c[k], stats_tr[0], stats_tr[1], x_te, indices_te)
+            # Training and testing pipelines for a subset
+            stats_tr, w_tr, te_f1, te_acc = train(config[k], cli_args, labels_tr, x_tr, x_name_tr)
+            pred, ind = test(config[k], stats_tr[0], stats_tr[1], w_tr, x_te, indices_te)
 
-            y = predict_labels(w_tr, x_te, c[k]["reg_threshold"])
-            preds.extend(list(np.ravel(y)))
-            idxs.extend(list(np.ravel(indices_te)))
+            # Gather test indices, predictions and metrics
+            preds.extend(list(np.ravel(pred)))
+            idxs.extend(list(np.ravel(ind)))
+            total_acc.append(te_acc)
+            total_f1.append(te_f1)
 
+        # Print overall metrics for validation sets
+        print("Overall validation F1 score is {:.2f} % and accuracy is {:.2f} %".format(np.mean(total_f1) * 100,
+                                                                                        np.mean(total_acc) * 100))
+
+        # Sort predictions by index and create submission
+        idxs, preds = zip(*sorted(zip(idxs, preds), key=lambda x: x[0]))
         create_csv_submission(idxs, preds, output_filename)
-
     else:
         # Load data
-        labels, feats, _, feats_name = load_csv_data(c['train_data'])
+        labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
+
         # Train pipeline
-        stats, w = train(c, cli_args, labels, feats, feats_name)
+        stats, w_tr, _, _ = train(config, cli_args, labels_tr, x_tr, x_name_tr)
+
         if cli_args.test:
             # Load data
-            _, test_feats, test_index, _ = load_csv_data(c['test_data'])
-            # Test pipeline
-            test(c, stats[0], stats[1], w, output_filename, test_feats, test_index)
+            _, x_te, index_te, _ = load_csv_data(config['test_data'])
+
+            # Test pipeline and create submission
+            ind, pred = test(config, stats[0], stats[1], w_tr, x_te, index_te)
+            create_csv_submission(ind, pred, output_filename)
 
     # TODO: 1. check if multiply_each helps (in build_poly)
     # TODO: 2. visualize val loss and train loss together
-    # TODO: 3. make 3 separate models, by jet - check experiment 22_3models
-
     # TODO maybe: We have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
     # https://machinelearningmastery.com/cost-sensitive-logistic-regression/

@@ -41,7 +41,7 @@ replace_with: 'median'
 only_normalize: False
 # Logistic regression threshold
 reg_threshold: 0.05
-# remove ouliers:
+# remove outliers:
 remove_outliers: True
 
 # Paths
