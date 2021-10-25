@@ -119,6 +119,7 @@ def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_g
     for n_iter in range(max_iters):
         gr = comp_gradient(y, tx, w, lambda_)
         loss = comp_loss(y, tx, w, lambda_)
+        print(loss)
         w = w - gamma * gr
     return w, loss
 

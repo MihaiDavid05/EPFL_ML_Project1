@@ -1,14 +1,16 @@
-# DO NOT CHANGE THIS BECAUSE IT IS THE BEST MODEL
+# COMPARABLE WITH 23
+
+# try to apply log reg to jet_1 or jet_2
 
 # Parameters for each of the models (by jet number)
 
 # Best results (always the recent configuration)
 
-#Cross validation f1 score is 67.24 % and accuracy is 84.62 %
-#Training F1 score is 67.47 % and accuracy is 84.73 %
+#Cross validation f1 score is 67.22 % and accuracy is 85.92 %
+#Training F1 score is 67.37 % and accuracy is 86.00 %
 #
-#Cross validation f1 score is 72.66 % and accuracy is 80.83 %
-#Training F1 score is 73.32 % and accuracy is 81.32 %
+#Cross validation f1 score is 72.91 % and accuracy is 81.00 %
+#Training F1 score is 73.32 % and accuracy is 81.31 %
 #
 #Cross validation f1 score is 82.39 % and accuracy is 84.08 %
 #Training F1 score is 82.82 % and accuracy is 84.49 %
@@ -49,7 +51,7 @@ zero_jet:
   # Logistic regression threshold
   reg_threshold: 0.5
   # remove outliers:
-  remove_outliers: True
+  remove_outliers: 'iqr'
   # Drop correlated features
   drop_corr: True
   # Expand angle features by taking cos and sin
@@ -100,7 +102,7 @@ one_jet:
   # Drop correlated features
   drop_corr: False
   # Expand angle features by taking cos and sin
-  trig: False
+  trig: True
 
   # Paths
   train_data: "../data/train.csv"
@@ -143,7 +145,7 @@ more_than_one_jet:
   # Logistic regression threshold
   reg_threshold: 0.5
   # remove outliers:
-  remove_outliers: True
+  remove_outliers: False
   # Drop correlated features
   drop_corr: False
   # Expand angle features by taking cos and sin

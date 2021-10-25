@@ -31,6 +31,10 @@ if __name__ == '__main__':
 
     # If there are 3 subsets, split by jet number, predict on each of them
     if by_jet:
+        # Define grids
+        lambdas = [np.logspace(-4, 0, 5), np.logspace(-4, 0, 5), np.logspace(-4, 0, 5)]
+        degrees = [list(range(3, 8)), list(range(3, 8)), list(range(3, 8))]
+        thresholds = [np.linspace(0.01, 0.05, 5), np.linspace(0.01, 0.05, 5), np.linspace(0.01, 0.05, 5)]
         # Load data
         labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
 
@@ -55,18 +59,22 @@ if __name__ == '__main__':
 
                 # Optimizations
                 if cli_args.search_type == 'lambda_degree':
-                    find_best_poly_lambda(x_tr, labels_tr, config, cli_args)
+                    find_best_poly_lambda(x_tr, labels_tr, degrees[i], lambdas[i], config, cli_args, x_name_tr, model_key=k)
                 elif cli_args.search_type == 'reg_thresh':
-                    find_best_reg_threshold(x_tr, labels_tr, config, cli_args)
+                    find_best_reg_threshold(x_tr, labels_tr, thresholds[i], config, cli_args, x_name_tr, model_key=k)
                 else:
                     print("No parameter search given")
     else:
+        # Define grids
+        lambdas = np.logspace(-4, 0, 5)
+        degrees = list(range(3, 8))
+        thresholds = np.linspace(0.01, 0.05, 5)
         # Load data
         labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
         # Optimizations
         if cli_args.search_type == 'lambda_degree':
-            find_best_poly_lambda(x_tr, labels_tr, config, cli_args)
+            find_best_poly_lambda(x_tr, labels_tr, degrees, lambdas, config, cli_args, x_name_tr)
         elif cli_args.search_type == 'reg_thresh':
-            find_best_reg_threshold(x_tr, labels_tr, config, cli_args)
+            find_best_reg_threshold(x_tr, labels_tr, thresholds, config, cli_args, x_name_tr)
         else:
             print("No parameter search given")

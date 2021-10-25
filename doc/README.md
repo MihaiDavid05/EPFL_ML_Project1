@@ -6,9 +6,9 @@ boson machine learning challenge](https://higgsml.lal.in2p3.fr/files/2014/04/doc
 
 
 ## Environment
-NOTE: You can skip step 1 if you have next libraries installed: `matplotlib`, `numpy`, `pyyaml`, `seaborn`.
+*NOTE*: You can skip step 1 if you have next libraries installed: `matplotlib`, `numpy`, `pyyaml`, `seaborn`.
 
-##### 1. Import environment
+#### 1. Import environment
 There is an exported conda environment under `environment.yaml`and a `requirements.txt` with all the libraries.
 
 Use one of the following command to get all the libraries:
@@ -20,14 +20,15 @@ or
 pip install -r requirements.txt
 ```
 
-NOTE: For conda importing you should have Anaconda installed.
+*NOTE*: For conda importing you should have Anaconda installed.
 
-##### 2. Set path
+#### 2. Set path
 Please add the project root folder to `$PYTHONPATH` using following command:
 ```bash
 export PYTHONPATH=$PYTHONPATH:<path_to_project_folder>
 ```
-We used PyCharm IDE and Python 3.7. 
+We used PyCharm IDE and Python 3.7.
+ 
 ## Data
 Please download the data and store all the `.csv` files under the `data` folder.
 
@@ -63,6 +64,11 @@ python run.py experiment_23_3models --see_pca --sub_models 0,1
 
 All submissions will be stored under `results` folder in the form `<config_filename>_submission`.
 
+Prediction files were submitted to AICrowd platform.
+Our best results were **0.833 accuracy** and **0.749 F1-score**.
+
+These results correspond to `experiment_23_3models` configuration file.
+
 ## Code structure
 
 1.Folder `utils`:
@@ -78,7 +84,7 @@ searches and cross-validation.
 * `run.py`: Main file for running the training and testing + an argument parser.
 * `optimize.py`: Script for running different experiments from optimizations.py file.
 
-3.Folder `visualizations`: All the plots will be stored here.
+3.Folder `visualizations`: All the plots are stored here.
 
 4.Folder `results`: All submission files will be stored here.
 

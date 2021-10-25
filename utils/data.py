@@ -98,15 +98,25 @@ def normalize(x, diff=None, minim=None):
     return x, (xdiff, xmin)
 
 
-def log_transform(x):
+def log_transform(x, model_key=''):
     """
     Log transformation for positive features.
     :param x: Input features.
+    :param model_key: String name if sub_model is used.
     :return: Log-transformed features.
     """
-    # Get positive features indexes.
-    cont_pos_feats_idx = np.where(np.all(x >= 0, axis=0))[0]
-    for j in cont_pos_feats_idx:
+    # Get features indexes that need log transform.
+    if model_key == 'zero_jet':
+        feats_to_log = [4, 7, 10]
+    elif model_key == 'one_jet':
+        feats_to_log = [0, 1, 2, 3, 5, 6, 7, 9, 12, 15, 17, 18, 21]
+    elif model_key == 'more_than_one_jet':
+        feats_to_log = [0, 1, 2, 3, 5, 8, 9, 10, 13, 16, 19, 21, 22, 25, 28]
+    else:
+        feats_to_log = [0, 1, 2, 3, 5, 8, 9, 10, 13, 16, 19, 21, 23, 26, 29]
+
+    # feats_to_log = np.where(np.all(x >= 0, axis=0))[0]
+    for j in feats_to_log:
         x[:, j] = np.log(1 / (x[:, j] + 1))
     return x
 
@@ -165,13 +175,14 @@ def cross_validation_split(data, folds=5):
     return data_split
 
 
-def build_poly(x, degree, multiply_each=False, square_root=False):
+def build_poly(x, degree, multiply_each=False, square_root=False, trig=None):
     """
     Polynomial basis functions for input data x, for j=0 up to j=degree.
     :param x: Input data.
     :param degree: Polynomial degree.
     :param multiply_each: Form new columns by multiplying xi * xj for i,j=0,...,nr_feats and i != j
     :param square_root: Take square root of each feature.
+    :param trig: Column indices on which to apply cos and sin.
     :return: Expanded data with methods above.
     """
     # Build polynomial features
@@ -194,6 +205,10 @@ def build_poly(x, degree, multiply_each=False, square_root=False):
         for i in cont_poz_feats_idx:
             root = np.sqrt(x[:, i]).reshape((-1, 1))
             final_matrix = np.hstack([final_matrix, root])
+
+    if trig is not None:
+        for i in trig:
+            final_matrix = np.hstack([final_matrix, np.cos(x[:, i]).reshape((-1, 1)), np.sin(x[:, i]).reshape((-1, 1))])
 
     return final_matrix
 
@@ -235,13 +250,19 @@ def prepare_train_data(config, args, y, x, x_name=None, model_key=''):
     :param y: Labels.
     :param x: Input features.
     :param x_name: Feature names.
-    :param model_key: Sub model name if dataset is split.
+    :param model_key: String name if sub_model is used.
     :return: Training data, labels and feature statistics.
     """
-    log_y = False
+    log_y = True
+    angle_features = None
+
+    # Gather or columns related to angles
+    if config["trig"]:
+        angle_features = [i for i in range(len(x_name)) if 'phi' in x_name[i]]
+
     # Remove samples with outlier features
     if config["remove_outliers"]:
-        x, y = remove_outliers(x, y)
+        x, y = remove_outliers(x, y, config["remove_outliers"])
 
     # Replace -999 values
     if config["replace_with"] is not None:
@@ -258,12 +279,12 @@ def prepare_train_data(config, args, y, x, x_name=None, model_key=''):
 
     # Apply log transformation to positive features
     if config["log_transform"]:
-        x = log_transform(x)
+        x = log_transform(x, model_key)
 
     if config["build_poly"]:
         # Expand features by polynomial degrees or other methods
         x = build_poly(x, config["degree"], multiply_each=config["multiply_each"],
-                       square_root=config["square_root"])
+                       square_root=config["square_root"], trig=angle_features)
     else:
         # If not expanding features, just append column of ones
         x = append_constant_column(x)
@@ -284,29 +305,37 @@ def prepare_train_data(config, args, y, x, x_name=None, model_key=''):
     return x, y, stats
 
 
-def prepare_test_data(config, s1, s2, x, x_index=None, y=None):
+def prepare_test_data(config, s1, s2, x, x_name, model_key='', x_index=None, y=None):
     """
     Test data pre-processing pipeline.
     :param config: Configuration parameters.
     :param s1: Mean or min of training features.
     :param s2: Standard deviation or (max - min) of training features.
     :param x: Input data.
+    :param x_name: Features names.
+    :param model_key: String name if sub_model is used.
     :param x_index: Test samples indexes.
     :param y: Labels, if set is used for validation instead of testing.
     :return:
     """
+    angle_features = None
+
+    # Gather or columns related to angles
+    if config["trig"]:
+        angle_features = [i for i in range(len(x_name)) if 'phi' in x_name[i]]
+
     # Replace -999 values with zeros/mean
     if config["replace_with"] is not None:
         x = replace_values(config, x)
 
     # Apply log transformation to positive features
     if config["log_transform"]:
-        x = log_transform(x)
+        x = log_transform(x, model_key)
 
     if config["build_poly"]:
         # Expand features by polynomial degrees or other methods
         x = build_poly(x, config["degree"], multiply_each=config["multiply_each"],
-                       square_root=config["square_root"])
+                       square_root=config["square_root"], trig=angle_features)
     else:
         # If not expanding features, just append column of ones
         x = append_constant_column(x)
@@ -364,23 +393,40 @@ def drop_correlated(data, model_key, config, drop_idxs=None):
     return data, corr_idxs
 
 
-def remove_outliers(x, y):
+def remove_outliers(x, y, removal_type='std'):
     """
     Remove samples that have outliers features.
     A sample is considered outlier if at least a sample feature is +-3 standard deviations from the mean of the feature.
     :param x: Input data.
     :param y: Labels.
+    :param removal_type: IQR or std based removal ('std' or 'iqr')
     :return:
     """
     outliers = []
-    # Compute feature-wise mean and standard deviation.
-    mean_1 = np.mean(x, axis=0)
-    std_1 = np.std(x, axis=0)
-    for i in range(x.shape[0]):
-        z_scores_per_sample = (x[i] - mean_1) / (std_1 + 0.0000001)
-        # If there is a sample feature with absolute z_score above 3 consider the sample as an outlier
-        if np.any(np.abs(z_scores_per_sample) > 3):
-            outliers.append(i)
+    if removal_type == 'std':
+        # Compute feature-wise mean and standard deviation.
+        mean_1 = np.mean(x, axis=0)
+        std_1 = np.std(x, axis=0)
+        for i in range(x.shape[0]):
+            z_scores_per_sample = (x[i] - mean_1) / (std_1 + 0.0000001)
+            # If there is a sample feature with absolute z_score above 3 consider the sample as an outlier
+            if np.any(np.abs(z_scores_per_sample) > 3):
+                outliers.append(i)
+    else:
+        x = np.where(x == float(-999), np.nan, x)
+        q1 = np.nanquantile(x, 0.25, axis=0)
+        q3 = np.nanquantile(x, 0.75, axis=0)
+        median = np.nanmedian(x, axis=0)
+        iqr = q3 - q1
+        minim = median - 2.22 * iqr
+        maxim = median + 2.22 * iqr
+
+        for i in range(x.shape[0]):
+            condition = np.logical_and(~np.isnan(x[i]), np.logical_or(x[i] < minim, x[i] > maxim))
+            if np.any(condition):
+                outliers.append(i)
+        x = np.where(np.isnan(x), float(-999), x)
+
     # Delete samples with outliers
     x = np.delete(x, outliers, axis=0)
     y = np.delete(y, outliers)

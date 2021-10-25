@@ -62,7 +62,7 @@ def train(c, args, y, x, x_name, model_key=''):
     return stat, w, val_f1, val_acc
 
 
-def test(c, s1, s2, w, x, i):
+def test(c, s1, s2, w, x, x_name, i, model_key=''):
     """
     Pipeline for testing.
     :param c: Configuration parameters.
@@ -70,11 +70,13 @@ def test(c, s1, s2, w, x, i):
     :param s2: Feature-wise training standard deviation or min
     :param w: Weights.
     :param x: Test data.
+    :param x_name: Features names.
     :param i: Test sample indexes.
     :return: Test indexes and predictions
+    :param model_key: String name if sub_model is used.
     """
     # Prepare data for testing
-    x, i, _ = prepare_test_data(c, s1, s2, x, i)
+    x, i, _ = prepare_test_data(c, s1, s2, x, x_name, x_index=i, model_key=model_key)
     # Get predictions
     p = predict_labels(w, x, c["reg_threshold"])
 
@@ -94,7 +96,7 @@ if __name__ == '__main__':
     if by_jet:
         # Load data
         labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
-        _, x_te, index_te, y_name_tr = load_csv_data(config['test_data'])
+        _, x_te, index_te, x_name_te = load_csv_data(config['test_data'])
 
         # Define lists for test indexes, predictions and metric
         idxs, preds, total_f1, total_acc = [], [], [], []
@@ -105,7 +107,7 @@ if __name__ == '__main__':
 
         # Remove columns full of useless values
         data_dict_tr = remove_useless_columns(data_dict_tr, x_name_tr)
-        data_dict_te = remove_useless_columns(data_dict_te, y_name_tr)
+        data_dict_te = remove_useless_columns(data_dict_te, x_name_te)
 
         # Iterate through each subset
         for i, k in enumerate(data_dict_tr.keys()):
@@ -121,7 +123,7 @@ if __name__ == '__main__':
 
                 # Training and testing pipelines for a subset
                 stats_tr, w_tr, te_f1, te_acc = train(config[k], cli_args, labels_tr, x_tr, x_name_tr, model_key=k)
-                ind, pred = test(config[k], stats_tr[0], stats_tr[1], w_tr, x_te, indices_te)
+                ind, pred = test(config[k], stats_tr[0], stats_tr[1], w_tr, x_te, x_name_te, indices_te, model_key=k)
 
                 # Gather test indices, predictions and metrics
                 preds.extend(list(np.ravel(pred)))
@@ -143,15 +145,14 @@ if __name__ == '__main__':
     else:
         # Load data
         labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
-        _, x_te, index_te, _ = load_csv_data(config['test_data'])
+        _, x_te, index_te, x_name_te = load_csv_data(config['test_data'])
 
         # Train pipeline
         stats, w_tr, _, _ = train(config, cli_args, labels_tr, x_tr, x_name_tr)
 
         # Test pipeline and create submission
-        ind, pred = test(config, stats[0], stats[1], w_tr, x_te, index_te)
+        ind, pred = test(config, stats[0], stats[1], w_tr, x_te, x_name_te, index_te)
         create_csv_submission(ind, pred, output_filename)
 
-    # TODO: 0. Try to apply log transformation on specific columns by looking at histograms for each jet
-    # TODO (maybe): 1. we have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
+    # TODO (maybe): We have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
     # https://machinelearningmastery.com/cost-sensitive-logistic-regression/

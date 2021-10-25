@@ -43,6 +43,10 @@ only_normalize: False
 reg_threshold: 0.05
 # remove outliers:
 remove_outliers: True
+# Drop correlated features
+drop_corr: False
+# Expand angle features by taking cos and sin
+trig: False
 
 # Paths
 train_data: "../data/train.csv"
