@@ -6,17 +6,6 @@
 
 # Best results (always the recent configuration)
 
-#Cross validation f1 score is 67.22 % and accuracy is 85.92 %
-#Training F1 score is 67.37 % and accuracy is 86.00 %
-#
-#Cross validation f1 score is 72.91 % and accuracy is 81.00 %
-#Training F1 score is 73.32 % and accuracy is 81.31 %
-#
-#Cross validation f1 score is 82.39 % and accuracy is 84.08 %
-#Training F1 score is 82.82 % and accuracy is 84.49 %
-#
-#Overall validation F1 score is 74.09 % and accuracy is 83.18 %
-#Overall test f1 score is 74.9 % and accuracy is 83.3 %
 
 zero_jet:
 
