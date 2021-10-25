@@ -238,7 +238,7 @@ def prepare_train_data(config, args, y, x, x_name=None, model_key=''):
     :param model_key: Sub model name if dataset is split.
     :return: Training data, labels and feature statistics.
     """
-
+    log_y = False
     # Remove samples with outlier features
     if config["remove_outliers"]:
         x, y = remove_outliers(x, y)
@@ -254,7 +254,7 @@ def prepare_train_data(config, args, y, x, x_name=None, model_key=''):
     # See features histograms panel
     if args.see_hist:
         name = 'train_hist_panel_replaced_with_' + str(config["replace_with"]) + '_' + model_key
-        plot_hist_panel(x, x_name, config['viz_path'] + name, log_scale_y=True)
+        plot_hist_panel(x, x_name, config['viz_path'] + name, log_scale_y=log_y)
 
     # Apply log transformation to positive features
     if config["log_transform"]:
@@ -279,7 +279,7 @@ def prepare_train_data(config, args, y, x, x_name=None, model_key=''):
     # See features histograms panel after scaling
     if args.see_hist:
         name = 'train_hist_panel_replaced_with_' + str(config["replace_with"]) + '_end_preprocessing_' + model_key
-        plot_hist_panel(x[:, 1:], x_name, config['viz_path'] + name, log_scale_y=True)
+        plot_hist_panel(x[:, 1:], x_name, config['viz_path'] + name, log_scale_y=log_y)
 
     return x, y, stats
 

@@ -27,7 +27,7 @@ Please add the project root folder to `$PYTHONPATH` using following command:
 ```bash
 export PYTHONPATH=$PYTHONPATH:<path_to_project_folder>
 ```
-We used PyCharm with Python 3.7. 
+We used PyCharm IDE and Python 3.7. 
 ## Data
 Please download the data and store all the `.csv` files under the `data` folder.
 
@@ -43,26 +43,20 @@ entire dataset by the column `PRI_jet_num`, which is an ordinal feature.
 
 ## Train and test
 
-For training run the following commands:
+For training and testing run the following commands:
 ```bash
 cd src
 python run.py <config_filename> [OPTIONAL_ARGUMENTS]
 ``` 
-Example:
+Examples:
 ```bash
 cd src
-python run.py experiment_1 --see_hist
+python run.py experiment_2 --see_hist
 ``` 
 
-For training and testing run the following commands
 ```bash
 cd src
-python run.py <config_filename> --test [OPTIONAL_ARGUMENTS]
-``` 
-Example:
-```bash
-cd src
-python run.py experiment_2 --test --see_hist
+python run.py experiment_23_3models --see_pca --sub_models 0,1
 ``` 
 
 ## Results
@@ -80,11 +74,11 @@ All submissions will be stored under `results` folder in the form `<config_filen
 searches and cross-validation.
 * `visualization.py`: Functions for plots.
 
-2.Folder `visualizations`: All the plots will be stored here.
-
-3.Folder `src`:
+2.Folder `src`:
 * `run.py`: Main file for running the training and testing + an argument parser.
 * `optimize.py`: Script for running different experiments from optimizations.py file.
+
+3.Folder `visualizations`: All the plots will be stored here.
 
 4.Folder `results`: All submission files will be stored here.
 

@@ -26,16 +26,18 @@ def plot_hist_panel(feats, feats_name, output_path, log_scale_y=False):
     :param output_path: PLot output path.
     :param log_scale_y: Whether to apply log on y scale.
     """
-    h = 6
     w = 5
+    h = len(feats_name) // w + 1
     fig, ax = plt.subplots(h, w, figsize=(10, 8))
     for i in range(h):
-        for j in range(w):
+        j = 0
+        while i * w + j < len(feats_name) and j < w:
             sbplt = ax[i, j]
             if log_scale_y:
                 sbplt.set_yscale('log')
             sbplt.hist(feats[:, j + i * w], bins=100)
             sbplt.set_title(feats_name[j + i * w])
+            j += 1
 
     fig.tight_layout()
 
@@ -73,7 +75,7 @@ def plot_pca(x1, x2, y, output_path):
     :param output_path: Plot output path.
     """
     fig, ax = plt.subplots(1, 1, figsize=(20, 10))
-    sns.scatterplot(x1, x2, hue=y, s=5)
+    sns.scatterplot(x=x1, y=x2, hue=y, s=5)
     fig.tight_layout()
     fig.savefig(output_path)
 

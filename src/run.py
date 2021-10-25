@@ -17,8 +17,8 @@ def parse_arguments():
     parser.add_argument('--see_hist', action='store_true', help='See features histogram panel')
     parser.add_argument('--see_loss', action='store_true', help='See training loss plot')
     parser.add_argument('--see_pca', action='store_true', help='See PCA with 2 components')
-    parser.add_argument('--sub_models', type=list, default=[0, 1, 2], help='Choose which sub-model to run. 0 - '
-                                                                           'jet_zero, 1- jet_one, 2 - more than 1 jet')
+    parser.add_argument('--sub_models', type=str, default='0,1,2', help='Choose which sub-model to run. 0 - '
+                                                                        'jet_zero, 1- jet_one, 2 - more than 1 jet')
 
     return parser.parse_args()
 
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     config = read_config(config_path)
     output_filename = config['output_path'] + cli_args.config_filename + '_submission'
     by_jet = cli_args.config_filename.split('_')[-1] == '3models'
-    cli_args.sub_models = [int(i) for i in cli_args.sub_models]
+    cli_args.sub_models = [int(i) for i in cli_args.sub_models.split(',')]
 
     # If there are 3 subsets, split by jet number, predict on each of them
     if by_jet:
@@ -130,7 +130,7 @@ if __name__ == '__main__':
                 total_f1.append(te_f1)
 
         # Check that all sub-models were run
-        if cli_args.sub_models == [0, 1, 2]:
+        if cli_args.sub_models != [0, 1, 2]:
             raise Exception("Not all sub models were run. Prediction file cannot be run. Check cli arguments!")
 
         # Print overall metrics for validation sets
@@ -152,6 +152,5 @@ if __name__ == '__main__':
         ind, pred = test(config, stats[0], stats[1], w_tr, x_te, index_te)
         create_csv_submission(ind, pred, output_filename)
 
-    # TODO: 0. visualize val loss and train loss together
     # TODO (maybe): 1. we have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
     # https://machinelearningmastery.com/cost-sensitive-logistic-regression/

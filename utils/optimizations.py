@@ -3,8 +3,6 @@ from utils.data import prepare_train_data, do_cross_validation
 
 
 def argmax(d):
-    if not d:
-        return None
     max_val = max(d.values())
     return [k for k in d if d[k] == max_val][0], max_val
 
@@ -62,7 +60,7 @@ def find_best_reg_threshold(x, y, config, args):
 
     # Be sure to check config given as cli param before setting other parameters here
     config["max_iters"] = 4000
-    config["lambda"] = 1  # or 0.001
+    config["lambda"] = 1
     config["degree"] = 6
 
     res_dict_tr = {}
