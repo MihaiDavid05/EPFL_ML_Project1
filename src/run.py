@@ -152,5 +152,6 @@ if __name__ == '__main__':
         ind, pred = test(config, stats[0], stats[1], w_tr, x_te, index_te)
         create_csv_submission(ind, pred, output_filename)
 
+    # TODO: 0. Try to apply log transformation on specific columns by looking at histograms for each jet
     # TODO (maybe): 1. we have an unbalanced dataset: 85667 signals, 164333 backgrounds, try class weighted reg
     # https://machinelearningmastery.com/cost-sensitive-logistic-regression/
