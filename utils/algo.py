@@ -55,9 +55,9 @@ def compute_loss_logistic_regression(y, tx, w):
     :return: Loss.
     """
     n = y.shape[0]
-    s = sigmoid(tx @ w)
+    h = sigmoid(tx @ w)
 
-    return -1 / n * ((y.T @ np.log(s)) + (1 - y.T) @ np.log(1 - s))
+    return -1 / n * (y.T @ np.log(h) + (1 - y.T) @ np.log(1 - h))
 
 
 def compute_loss_logistic_regression_regularized(y, tx, w, lambda_):
@@ -83,8 +83,8 @@ def compute_gradient_logistic_regression(y, tx, w):
     :return: Gradient of loss function.
     """
     n = y.shape[0]
-    s = sigmoid(tx @ w)
-    return tx.T @ (s - y) / n
+    h = sigmoid(tx @ w)
+    return tx.T @ (h - y) / n
 
 
 def compute_gradient_logistic_regression_regularized(y, tx, w, lambda_):
@@ -98,7 +98,7 @@ def compute_gradient_logistic_regression_regularized(y, tx, w, lambda_):
     """
     n = y.shape[0]
 
-    return compute_gradient_logistic_regression(y, tx, w) + lambda_ / n * np.sum(w)
+    return compute_gradient_logistic_regression(y, tx, w) + lambda_ / n * w
 
 
 def generic_gradient_descent(y, tx, lambda_, initial_w, max_iters, gamma, comp_gradient, comp_loss):
