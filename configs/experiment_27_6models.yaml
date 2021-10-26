@@ -3,7 +3,7 @@
 # Parameters for each of the models (by jet number)
 
 zero_jet_0:
-
+  # 26123 samples
   # Model type
   model: ridge
   # step_size
@@ -50,7 +50,7 @@ zero_jet_0:
   viz_path: "../visualizations/"
 
 zero_jet_1:
-
+  # 73790 samples
   # Model type
   model: ridge
   # step_size
@@ -98,7 +98,7 @@ zero_jet_1:
 
 
 one_jet_0:
-
+  # 7562 samples
   # Model type
   model: ridge
   # step_size
@@ -145,7 +145,7 @@ one_jet_0:
   viz_path: "../visualizations/"
 
 one_jet_1:
-
+  # 69982 samples
   # Model type
   model: ridge
   # step_size
@@ -192,7 +192,7 @@ one_jet_1:
   viz_path: "../visualizations/"
 
 more_than_one_jet_0:
-
+  # 4429 samples
   # Model type
   model: ridge
   # step_size
@@ -239,7 +239,7 @@ more_than_one_jet_0:
   viz_path: "../visualizations/"
 
 more_than_one_jet_1:
-
+  # 68114 samples
   # Model type
   model: ridge
   # step_size

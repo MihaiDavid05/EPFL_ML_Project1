@@ -476,6 +476,22 @@ def split_data_by_jet(x, y=None, test_index=None):
     return data_dict
 
 
+def split_data_by_ffeat(data_dict):
+    """
+    Splits data by DER_mass_MMCDER feature values.
+    :param data_dict: Dictionary with data split by jet.
+    :return: New data dictionary. At each key you will find training or testing data and labels.
+    """
+    new_data_dict = {}
+    for k, v in data_dict.items():
+        cond_null = np.where(v[1][:, 0] == -999)[0]
+        cond_ok = np.where(v[1][:, 0] != -999)[0]
+        new_data_dict[k + '_0'] = [data_dict[k][0][cond_null], data_dict[k][1][cond_null], data_dict[k][2][cond_null]]
+        new_data_dict[k + '_1'] = [data_dict[k][0][cond_ok], data_dict[k][1][cond_ok], data_dict[k][2][cond_ok]]
+
+    return new_data_dict
+
+
 def remove_useless_columns(data_by_jet, feats_names):
     """
     Remove columns full of -999, 0 or nan for each subset given by jet number

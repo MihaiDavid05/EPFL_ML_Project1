@@ -1,6 +1,6 @@
 import numpy as np
 from utils.data import create_csv_submission, prepare_train_data, prepare_test_data, load_csv_data, \
-    do_cross_validation, split_data_by_jet, remove_useless_columns, drop_correlated
+    do_cross_validation, split_data_by_jet, remove_useless_columns, drop_correlated, split_data_by_ffeat
 from utils.algo import predict_labels, get_f1, get_precision_recall_accuracy
 from utils.implementations import model
 from utils.vizualization import plot_loss
@@ -150,6 +150,7 @@ def model_by_jet_and_mmcder(cli_args, config, output_filename):
     :param output_filename: Submission file output path.
     :return:
     """
+    # TODO: maybe concat the 2 functions of splitting
     # Load data
     labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
     _, x_te, index_te, x_name_te = load_csv_data(config['test_data'])
@@ -157,10 +158,13 @@ def model_by_jet_and_mmcder(cli_args, config, output_filename):
     # Define lists for test indexes, predictions and metric
     idxs, preds, total_f1, total_acc = [], [], [], []
 
-    # TODO: make this work for 6 models !!!!
     # Split data according to jet number
     data_dict_tr = split_data_by_jet(x_tr, labels_tr, np.zeros(x_tr.shape[0]))
     data_dict_te = split_data_by_jet(x_te, np.zeros(x_te.shape[0]), index_te)
+
+    # Further split data according to first feature
+    data_dict_tr = split_data_by_ffeat(data_dict_tr)
+    data_dict_te = split_data_by_ffeat(data_dict_te)
 
     # Remove columns full of useless values
     data_dict_tr = remove_useless_columns(data_dict_tr, x_name_tr)
