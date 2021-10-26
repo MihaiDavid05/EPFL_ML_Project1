@@ -14,8 +14,8 @@ def parse_arguments():
     parser.add_argument('--see_hist', action='store_true', help='See features histogram panel')
     parser.add_argument('--see_loss', action='store_true', help='See training loss plot')
     parser.add_argument('--see_pca', action='store_true', help='See PCA with 2 components')
-    parser.add_argument('--sub_models', type=str, default='0,1,2', help='Choose which sub-model to run. 0 - '
-                                                                        'jet_zero, 1- jet_one, 2 - more than 1 jet')
+    parser.add_argument('--sub_models_by_jet', type=str, default='0,1,2', help='Choose which sub-model to run. 0-jet'
+                                                                               '_zero, 1-jet_one, 2-more than 1 jet')
     parser.add_argument('--search_type', type=str, default='lambda-degree', help='Type of grid search')
     return parser.parse_args()
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     config = read_config(config_path)
     output_filename = config['output_path'] + cli_args.config_filename + '_submission'
     by_jet = cli_args.config_filename.split('_')[-1] == '3models'
-    cli_args.sub_models = [int(i) for i in cli_args.sub_models.split(',')]
+    cli_args.sub_models_by_jet = [int(i) for i in cli_args.sub_models_by_jet.split(',')]
 
     # If there are 3 subsets, split by jet number, predict on each of them
     if by_jet:
@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
         # Iterate through each subset
         for i, k in enumerate(data_dict_tr.keys()):
-            if i in cli_args.sub_models:
+            if i in cli_args.sub_models_by_jet:
                 # Drop correlated features
                 if config[k]["drop_corr"]:
                     data_dict_tr, tr_corr_idxs = drop_correlated(data_dict_tr, k, config)
@@ -59,7 +59,8 @@ if __name__ == '__main__':
 
                 # Optimizations
                 if cli_args.search_type == 'lambda_degree':
-                    find_best_poly_lambda(x_tr, labels_tr, degrees[i], lambdas[i], config, cli_args, x_name_tr, model_key=k)
+                    find_best_poly_lambda(x_tr, labels_tr, degrees[i], lambdas[i], config, cli_args, x_name_tr,
+                                          model_key=k)
                 elif cli_args.search_type == 'reg_thresh':
                     find_best_reg_threshold(x_tr, labels_tr, thresholds[i], config, cli_args, x_name_tr, model_key=k)
                 else:
