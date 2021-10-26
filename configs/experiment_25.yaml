@@ -1,0 +1,51 @@
+# COMPARABLE WITH EXPERIMENT 21
+# Changed lambda from 0.0001 to 1e-14
+
+# Accuracy 0.805 and F1 score 0.735 on the test set.
+
+# Parameters
+
+# Model type
+model: ridge
+# step_size
+gamma: null
+# number of steps to run
+max_iters: null
+# regularization parameter
+lambda: 0.00000000000001
+# ratio split
+ratio: null
+# Enable cross validation
+cross_val: True
+# Number of folds for cross-validation
+kfold: 5
+# Whether to build polynomial features or not
+build_poly: True
+# Degrees for polynomial features
+degree: 15
+# Wheather to multiply each column with each column and expand features
+multiply_each: False
+# Take square root of features
+square_root: True
+# Apply log transform as scaler
+log_transform: False
+# Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
+replace_with: 'mode'
+# Apply only normalization
+only_normalize: False
+# Logistic regression threshold
+reg_threshold: 0.5
+# remove outliers:
+remove_outliers: False
+# Drop correlated features
+drop_corr: False
+# Expand angle features by taking cos and sin
+trig: False
+
+# Paths
+train_data: "../data/train.csv"
+test_data: "../data/test.csv"
+# Submissions output_path
+output_path: "../results/"
+# Visualizations output path
+viz_path: "../visualizations/"

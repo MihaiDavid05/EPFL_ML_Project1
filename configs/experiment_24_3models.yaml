@@ -1,6 +1,4 @@
-# DO NOT CHANGE ! THIS IS THE BEST CONFIG !
-
-# Parameters for each of the models (by jet number)
+# TODO: Try to obtain something better here, at least for jet one
 
 # Best results (always the recent configuration)
 #Cross validation f1 score is 67.26 % and accuracy is 84.63 %
@@ -13,7 +11,9 @@
 #Training F1 score is 82.82 % and accuracy is 84.49 %
 #
 #Overall validation F1 score is 73.86 % and accuracy is 82.95 %
-#Overall test F1 score is 74.90 % and accuracy is 83.30 %
+
+
+# Parameters for each of the models (by jet number)
 
 zero_jet:
 
@@ -64,14 +64,18 @@ zero_jet:
 
 one_jet:
 
+
+#  Cross validation f1 score is 55.56 % and accuracy is 69.55 %
+#  Training F1 score is 55.73 % and accuracy is 69.71 %
+
   # Model type
-  model: ridge
+  model: reg_log
   # step_size
-  gamma: null
+  gamma: 0.5
   # number of steps to run
-  max_iters: null
+  max_iters: 100
   # regularization parameter 1e-16
-  lambda: 0.0000000000000001
+  lambda: 0.1
   # ratio split
   ratio: null
   # Enable cross validation
@@ -81,13 +85,13 @@ one_jet:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 10
+  degree: 8
   # Wheather to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
   square_root: True
   # Apply log transform as scaler
-  log_transform: False
+  log_transform: True
   # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
   replace_with: 'mode'
   # Apply only normalization
@@ -95,7 +99,7 @@ one_jet:
   # Logistic regression threshold
   reg_threshold: 0.5
   # remove outliers:
-  remove_outliers: False
+  remove_outliers: 'iqr'
   # Drop correlated features
   drop_corr: False
   # Expand angle features by taking cos and sin
