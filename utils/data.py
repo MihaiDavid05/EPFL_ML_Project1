@@ -412,7 +412,7 @@ def remove_outliers(x, y, removal_type='std'):
             # If there is a sample feature with absolute z_score above 3 consider the sample as an outlier
             if np.any(np.abs(z_scores_per_sample) > 3):
                 outliers.append(i)
-    else:
+    elif removal_type == 'iqr':
         x = np.where(x == float(-999), np.nan, x)
         q1 = np.nanquantile(x, 0.25, axis=0)
         q3 = np.nanquantile(x, 0.75, axis=0)

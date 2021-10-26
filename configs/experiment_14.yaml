@@ -42,7 +42,7 @@ only_normalize: False
 # Logistic regression threshold
 reg_threshold: 0.05
 # remove ouliers:
-remove_outliers: True
+remove_outliers: 'std'
 # Drop correlated features
 drop_corr: False
 # Expand angle features by taking cos and sin

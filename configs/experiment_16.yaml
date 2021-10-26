@@ -6,7 +6,8 @@
 # Max_iters was increased to 10000.
 # Cross validation was run.
 # Removed outliers at training, before replacing values of -999.
-# Accuracy 0.808 and F1 score 0.701 on the test set.
+
+# Accuracy 0.808 and F1 score 0.712 on the test set.
 
 
 # Parameters
@@ -22,9 +23,9 @@ lambda: null
 # ratio split
 ratio: null
 # Enable cross validation
-cross_val: False
+cross_val: True
 # Number of folds for cross-validation
-kfold: null
+kfold: 5
 # Whether to build polynomial features or not
 build_poly: True
 # Degrees for polynomial features
@@ -42,7 +43,7 @@ only_normalize: False
 # Logistic regression threshold
 reg_threshold: 0.05
 # remove outliers:
-remove_outliers: True
+remove_outliers: 'std'
 # Drop correlated features
 drop_corr: False
 # Expand angle features by taking cos and sin
