@@ -14,6 +14,10 @@ def parse_arguments():
     parser.add_argument('--see_pca', action='store_true', help='See PCA with 2 components')
     parser.add_argument('--sub_models_by_jet', type=str, default='0,1,2', help='Choose which sub-model to run. 0-jet'
                                                                                '_zero, 1-jet_one, 2-more than 1 jet')
+    parser.add_argument('--sub_models_by_jet_and_ffeat', type=str, default='0,1,2,3,4,5',
+                        help='Choose which sub-model to run. 0-jet_zero and no mmcder, 1-jet_zero and mmcder,'
+                             ' 2-jet_one and no mmcder, 3-jet_one and mmcder, 4-more_than_one and no mmcder,'
+                             ' 5-more_than_one and mmcder,')
 
     return parser.parse_args()
 
@@ -27,6 +31,7 @@ if __name__ == '__main__':
     by_jet = cli_args.config_filename.split('_')[-1] == '3models'
     by_jet_and_feat = cli_args.config_filename.split('_')[-1] == '6models'
     cli_args.sub_models_by_jet = [int(i) for i in cli_args.sub_models_by_jet.split(',')]
+    cli_args.sub_models_by_jet_and_ffeat = [int(i) for i in cli_args.sub_models_by_jet_and_ffeat.split(',')]
 
     # If there are 3 subsets, split by jet number, predict on each of them
     if by_jet:

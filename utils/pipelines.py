@@ -66,6 +66,25 @@ def test(c, s1, s2, w, x, x_name, i, model_key=''):
     return i, p
 
 
+def model_all_data(cli_args, config, output_filename):
+    """
+    Entire pipeline for model according to all data.
+    :param cli_args: Command line arguments.
+    :param config: Configurable parameters.
+    :param output_filename: Submission file output path.
+    """
+    # Load data
+    labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
+    _, x_te, index_te, x_name_te = load_csv_data(config['test_data'])
+
+    # Train pipeline
+    stats, w_tr, _, _ = train(config, cli_args, labels_tr, x_tr, x_name_tr)
+
+    # Test pipeline and create submission
+    ind, pred = test(config, stats[0], stats[1], w_tr, x_te, x_name_te, index_te)
+    create_csv_submission(ind, pred, output_filename)
+
+
 def model_by_jet(cli_args, config, output_filename):
     """
     Entire pipeline for 3 models according to data split by jet.
@@ -123,34 +142,14 @@ def model_by_jet(cli_args, config, output_filename):
     create_csv_submission(idxs, preds, output_filename)
 
 
-def model_all_data(cli_args, config, output_filename):
-    """
-    Entire pipeline for 3 models according to data split by jet.
-    :param cli_args: Command line arguments.
-    :param config: Configurable parameters.
-    :param output_filename: Submission file output path.
-    """
-    # Load data
-    labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
-    _, x_te, index_te, x_name_te = load_csv_data(config['test_data'])
-
-    # Train pipeline
-    stats, w_tr, _, _ = train(config, cli_args, labels_tr, x_tr, x_name_tr)
-
-    # Test pipeline and create submission
-    ind, pred = test(config, stats[0], stats[1], w_tr, x_te, x_name_te, index_te)
-    create_csv_submission(ind, pred, output_filename)
-
-
 def model_by_jet_and_mmcder(cli_args, config, output_filename):
     """
-    Entire pipeline for 3 models according to data split by jet.
+    Entire pipeline for 6 models according to data split by jet and DER_mass_MMCDER feature.
     :param cli_args: Command line arguments.
     :param config: Configurable parameters.
     :param output_filename: Submission file output path.
     :return:
     """
-    # TODO: make this work NOW !!!!
     # Load data
     labels_tr, x_tr, _, x_name_tr = load_csv_data(config['train_data'])
     _, x_te, index_te, x_name_te = load_csv_data(config['test_data'])
@@ -158,6 +157,7 @@ def model_by_jet_and_mmcder(cli_args, config, output_filename):
     # Define lists for test indexes, predictions and metric
     idxs, preds, total_f1, total_acc = [], [], [], []
 
+    # TODO: make this work for 6 models !!!!
     # Split data according to jet number
     data_dict_tr = split_data_by_jet(x_tr, labels_tr, np.zeros(x_tr.shape[0]))
     data_dict_te = split_data_by_jet(x_te, np.zeros(x_te.shape[0]), index_te)
@@ -168,7 +168,7 @@ def model_by_jet_and_mmcder(cli_args, config, output_filename):
 
     # Iterate through each subset
     for i, k in enumerate(data_dict_tr.keys()):
-        if i in cli_args.sub_models_by_jet_feat:
+        if i in cli_args.sub_models_by_jet_and_ffeat:
             # Drop correlated features
             if config[k]["drop_corr"]:
                 data_dict_tr, tr_corr_idxs = drop_correlated(data_dict_tr, k, config)
@@ -189,7 +189,7 @@ def model_by_jet_and_mmcder(cli_args, config, output_filename):
             total_f1.append(te_f1)
 
     # Check that all sub-models were run
-    if cli_args.sub_models_by_jet_feat != [0, 1, 2]:
+    if cli_args.sub_models_by_jet_and_ffeat != [0, 1, 2, 3, 4, 5]:
         raise Exception("Not all sub models were run. Prediction file cannot be run. Check cli arguments!")
 
     # Print overall metrics for validation sets
