@@ -3,17 +3,17 @@
 # Parameters for each of the models (by jet number)
 
 # Best results (always the recent configuration)
-#Cross validation f1 score is 67.26 % and accuracy is 84.63 %
-#Training F1 score is 67.47 % and accuracy is 84.73 %
+#Cross validation f1 score is 66.53 % and accuracy is 84.59 %
+#Training F1 score is 66.85 % and accuracy is 84.73 %
 #
-#Cross validation f1 score is 72.87 % and accuracy is 80.97 %
+#Cross validation f1 score is 72.87 % and accuracy is 80.98 %
 #Training F1 score is 73.32 % and accuracy is 81.32 %
 #
-#Cross validation f1 score is 81.45 % and accuracy is 83.25 %
+#Cross validation f1 score is 82.11 % and accuracy is 83.82 %
 #Training F1 score is 82.82 % and accuracy is 84.49 %
 #
-#Overall validation F1 score is 73.86 % and accuracy is 82.95 %
-#Overall test F1 score is 74.90 % and accuracy is 83.30 %
+#Overall validation F1 score is 73.84 % and accuracy is 83.13 %
+#Overall test F1 score is 75.10 % and accuracy is 83.40 %
 
 zero_jet:
 
@@ -30,7 +30,7 @@ zero_jet:
   # Enable cross validation
   cross_val: True
   # Number of folds for cross-validation
-  kfold: 5
+  kfold: 10
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
@@ -48,9 +48,9 @@ zero_jet:
   # Logistic regression threshold
   reg_threshold: 0.5
   # remove outliers:
-  remove_outliers: 'std'
+  remove_outliers: False
   # Drop correlated features
-  drop_corr: True
+  drop_corr: False
   # Expand angle features by taking cos and sin
   trig: False
 

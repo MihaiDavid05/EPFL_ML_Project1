@@ -37,7 +37,7 @@ if __name__ == '__main__':
     if by_jet:
         model_by_jet(cli_args, config, output_filename)
     elif by_jet_and_feat:
-        model_by_jet_and_mmcder(cli_args, config, output_filename)
+        model_by_jet(cli_args, config, output_filename, by_first_feat=True)
     else:
         model_all_data(cli_args, config, output_filename)
 
