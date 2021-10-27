@@ -1,5 +1,3 @@
-# TODO: make this config THE BEST!!!!
-
 # Parameters for each of the models (by jet number and first feature)
 #Cross validation f1 score is 14.70 % and accuracy is 95.61 %
 #Training F1 score is 16.76 % and accuracy is 95.72 %

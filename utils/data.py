@@ -106,7 +106,7 @@ def log_transform(x, model_key=''):
     :return: Log-transformed features.
     """
     # Get features indexes that need log transform.
-    # TODO: check this
+
     # if model_key == 'zero_jet':
     #     feats_to_log = [4, 7, 10]
     # elif model_key == 'one_jet':
@@ -507,19 +507,6 @@ def remove_useless_columns(data_by_jet, feats_names):
         new_x_names = [feats_names[i] for i in range(len(feats_names)) if i not in bad_columns_idx]
         data_by_jet[k][1] = new_x
         data_by_jet[k].append(new_x_names)
-
-    # TODO: Check this
-    # for k, v in data_by_jet.items():
-    #     # Get indexes of columns full of useless values
-    #     bad_row_idx = np.where(np.any(np.isin(v[1], [-999]), axis=1))[0]
-    #     # Delete this columns and store clean data
-    #     new_x = np.delete(v[1], bad_row_idx, axis=0)
-    #     new_y = np.delete(v[2], bad_row_idx, axis=0)
-    #     new_index = np.delete(v[0], bad_row_idx, axis=0)
-    #
-    #     data_by_jet[k][1] = new_x
-    #     data_by_jet[k][0] = new_index
-    #     data_by_jet[k][2] = new_y
 
     return data_by_jet
 
