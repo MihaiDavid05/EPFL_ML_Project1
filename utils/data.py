@@ -107,15 +107,6 @@ def log_transform(x, model_key=''):
     """
     # Get features indexes that need log transform.
 
-    # if model_key == 'zero_jet':
-    #     feats_to_log = [4, 7, 10]
-    # elif model_key == 'one_jet':
-    #     feats_to_log = [0, 1, 2, 3, 5, 6, 7, 9, 12, 15, 17, 18, 21]
-    # elif model_key == 'more_than_one_jet':
-    #     feats_to_log = [0, 1, 2, 3, 5, 8, 9, 10, 13, 16, 19, 21, 22, 25, 28]
-    # else:
-    #     feats_to_log = [0, 1, 2, 3, 5, 8, 9, 10, 13, 16, 19, 21, 23, 26, 29]
-
     feats_to_log = np.where(np.all(x >= 0, axis=0))[0]
     for j in feats_to_log:
         x[:, j] = np.log(x[:, j] + 1)
@@ -548,5 +539,5 @@ def do_cross_validation(x, y, c):
         final_train_acc.append(tr_acc)
         final_val_acc.append(val_acc)
 
-    # Compute and return final metrics
+    # Compute and return final metrics and error
     return np.mean(final_val_f1), np.mean(final_train_f1), np.mean(final_val_acc), np.mean(final_train_acc)

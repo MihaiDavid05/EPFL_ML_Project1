@@ -1,6 +1,6 @@
 import argparse
 from utils.config import read_config
-from utils.pipelines import model_all_data, model_by_jet, model_by_jet_and_mmcder
+from utils.pipelines import model_all_data, model_by_jet
 
 CONFIGS_PATH = '../configs/'
 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     cli_args.sub_models_by_jet = [int(i) for i in cli_args.sub_models_by_jet.split(',')]
     cli_args.sub_models_by_jet_and_ffeat = [int(i) for i in cli_args.sub_models_by_jet_and_ffeat.split(',')]
 
-    # If there are 3 subsets, split by jet number, predict on each of them
+    # Select pipeline according to dataset split
     if by_jet:
         model_by_jet(cli_args, config, output_filename)
     elif by_jet_and_feat:

@@ -1,4 +1,5 @@
 # Parameters for each of the models (by jet number and first feature)
+
 #Cross validation f1 score is 14.70 % and accuracy is 95.61 %
 #Training F1 score is 16.76 % and accuracy is 95.72 %
 #
@@ -103,9 +104,9 @@ zero_jet_1:
   # Logistic regression threshold
   reg_threshold: 0.5
   # remove outliers:
-  remove_outliers: 'std'
+  remove_outliers: False
   # Drop correlated features
-  drop_corr: True
+  drop_corr: False
   # Expand angle features by taking cos and sin
   trig: False
 
@@ -132,6 +133,9 @@ one_jet_0:
   # 9 -12
 #  Cross validation f1 score is 35.61 % and accuracy is 91.92 %
 #  Training F1 score is 41.03 % and accuracy is 92.70 %
+# 10 -12 log transform
+#Cross validation f1 score is 34.87 % and accuracy is 91.79 %
+#Training F1 score is 40.94 % and accuracy is 92.71 %
 
   # Model type
   model: ridge
@@ -150,7 +154,7 @@ one_jet_0:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 9
+  degree: 10
   # Wheather to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features

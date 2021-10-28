@@ -87,7 +87,8 @@ def model_all_data(cli_args, config, output_filename):
 
 def model_by_jet(cli_args, config, output_filename, by_first_feat=False):
     """
-    Entire pipeline for 6 models according to data split by jet and DER_mass_MMCDER feature.
+    Entire pipeline for subsets of the dataset (3 or 6 models according to data split by jet number and
+    DER_mass_MMCDER feature values).
     :param cli_args: Command line arguments.
     :param config: Configurable parameters.
     :param output_filename: Submission file output path.

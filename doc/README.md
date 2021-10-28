@@ -35,12 +35,15 @@ Please download the data and store all the `.csv` files under the `data` folder.
 
 ## Configs
 Check `config` folder for different configs and experiments descriptions.
-
-Configs follow a YAML format.
+Configs follow a YAML format. We used them in order to keep track of our experiments with different parameters.
  
 A `_3models` suffix for configuration files mean that it contains parameters for 
 3 separate models used to train 3 subsets of the dataset. These subsets were created by splitting the 
 entire dataset by the column `PRI_jet_num`, which is an ordinal feature.
+
+A `_6models` suffix for configuration files mean that it contains parameters for 
+6 separate models used to train 6 subsets of the dataset. These subsets were created by splitting the 
+entire dataset by jet number, as described above, and further by the value of the first feature (-999 vs other).
 
 ## Train and test
 
@@ -49,15 +52,11 @@ For training and testing run the following commands:
 cd src
 python run.py <config_filename> [OPTIONAL_ARGUMENTS]
 ``` 
-Examples:
-```bash
-cd src
-python run.py experiment_2 --see_hist
-``` 
+Example for obtaining the BEST RESULTS:
 
 ```bash
 cd src
-python run.py experiment_23_3models --see_pca --sub_models 0,1
+python run.py experiment_23_3models
 ``` 
 
 ## Results
@@ -65,7 +64,7 @@ python run.py experiment_23_3models --see_pca --sub_models 0,1
 All submissions will be stored under `results` folder in the form `<config_filename>_submission`.
 
 Prediction files were submitted to AICrowd platform.
-Our best results were **0.833 accuracy** and **0.749 F1-score**.
+Our best results were **0.834 accuracy** and **0.751 F1-score**.
 
 These results correspond to `experiment_23_3models` configuration file.
 
@@ -78,11 +77,13 @@ These results correspond to `experiment_23_3models` configuration file.
 * `implementations.py`: Different methods for finding weights.
 * `optimizations.py`: Functions for finding optimal parameters through grid
 searches and cross-validation.
+* `pipelines.py`: Functions for entire pipelines of data processing, training and testing 
+divided into 2 groups: a pipeline that uses all the data and a pipeline that uses sub sets, thus sub models.
 * `visualization.py`: Functions for plots.
 
 2.Folder `src`:
-* `run.py`: Main file for running the training and testing + an argument parser.
-* `optimize.py`: Script for running different experiments from optimizations.py file.
+* `run.py`: Main file for running an experiment + an argument parser.
+* `optimize.py`: Script for running grid searches using functions from optimizations.py file.
 
 3.Folder `visualizations`: All the plots are stored here.
 

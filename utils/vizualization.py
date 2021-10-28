@@ -1,4 +1,3 @@
-import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -80,66 +79,45 @@ def plot_pca(x1, x2, y, output_path):
     fig.savefig(output_path)
 
 
-def cross_validation_visualization_lambdas(lambdas, f1_tr, f1_te, output_path):
+def plot_acc_lambdas(lambdas, acc_tr, acc_te, degree, output_path, model_key=''):
     """
-    Visualize the f1 score for training and validation for a range of lambdas.
+    Visualize the accuracy for training and validation for a range of lambdas.
     :param lambdas: Regularization parameters array.
-    :param f1_tr: F1 score for training
-    :param f1_te: F1 score for validation
+    :param acc_tr: Accuracy for training
+    :param acc_te: Accuracy for validation
+    :param degree: Degree for which lambda VS accuracy are plotted.
     :param output_path: Plot output_path
+    :param model_key: Sub model name, if 3 models were used.
     """
-    plt.semilogx(lambdas, f1_tr, marker=".", color='b', label='train error')
-    plt.semilogx(lambdas, f1_te, marker=".", color='r', label='test error')
+    plt.semilogx(lambdas, acc_tr, marker=".", color='b', label='train acc')
+    plt.semilogx(lambdas, acc_te, marker=".", color='r', label='test acc')
     plt.xlabel("lambda")
-    plt.ylabel("F1 Score")
-    plt.xlim(1e-4, 1)
-    plt.title("cross validation")
+    plt.ylabel("Accuracy")
+    plt.xlim(1e-17, 1)
+    plt.title("Degree " + str(degree) + '_' + model_key)
     plt.legend(loc=2)
     plt.grid(True)
     plt.savefig(output_path)
 
 
-def bias_variance_decomposition_visualization(degrees, f1_tr, f1_te, output_path):
+def plot_rmse_lambdas(lambdas, rmse_tr, rmse_te, degree, output_path, model_key=''):
     """
-    Visualize the bias variance decomposition.
-    :param degrees:
-    :param f1_tr:
-    :param f1_te:
-    :param output_path:
-    :return:
+    Visualize the rmse for training and validation for a range of lambdas.
+    :param lambdas: Regularization parameters array.
+    :param rmse_tr: RMSE for training
+    :param rmse_te: RMSE for validation
+    :param degree: Degree for which lambda VS RMSE are plotted.
+    :param output_path: Plot output_path
+    :param model_key: Sub model name, if 3 models were used.
     """
-    f1_tr_mean = np.expand_dims(np.mean(f1_tr, axis=0), axis=0)
-    f1_te_mean = np.expand_dims(np.mean(f1_te, axis=0), axis=0)
-    plt.plot(
-        degrees,
-        f1_tr.T,
-        linestyle="-",
-        color=([0.7, 0.7, 1]),
-        linewidth=0.3)
-    plt.plot(
-        degrees,
-        f1_te.T,
-        linestyle="-",
-        color=[1, 0.7, 0.7],
-        linewidth=0.3)
-    plt.plot(
-        degrees,
-        f1_tr_mean.T,
-        'b',
-        linestyle="-",
-        label='train',
-        linewidth=1)
-    plt.plot(
-        degrees,
-        f1_te_mean.T,
-        'r',
-        linestyle="-",
-        label='test',
-        linewidth=3)
-    plt.xlim(1, 15)
-    plt.ylim(0.2, 0.9)
-    plt.xlabel("degree")
-    plt.ylabel("f1 score")
-    plt.legend(loc=1)
-    plt.title("Bias-Variance Decomposition")
+    # plt.semilogx(lambdas, rmse_tr, marker=".", color='b', label='train error')
+    # plt.semilogx(lambdas, rmse_te, marker=".", color='r', label='test error')
+    plt.loglog(lambdas, rmse_tr, marker=".", color='b', label='train error')
+    plt.loglog(lambdas, rmse_te, marker=".", color='r', label='test error')
+    plt.xlabel("lambda")
+    plt.ylabel("RMSE")
+    plt.xlim(1e-17, 1)
+    plt.title("Degree " + str(degree) + '_' + model_key)
+    plt.legend(loc=2)
+    plt.grid(True)
     plt.savefig(output_path)
