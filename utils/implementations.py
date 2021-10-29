@@ -115,7 +115,13 @@ def model(y, x, c):
     :param c: Configuration parameters.
     :return: Weights and training loss.
     """
-    if c['lambda'] is not None:
+    if c['model'] == 'ls':
+        w, tr_loss = least_squares(y, x)
+    elif c['model'] == 'ls_gd':
+       w, tr_loss = least_squares_GD(y, x, np.zeros((x.shape[1], 1)), c['max_iters'], c['gamma'])
+    elif c['model'] == 'ls_gd':
+        w, tr_loss = least_squares_SGD(y, x, np.zeros((x.shape[1], 1)), c['max_iters'], c['gamma'])
+    elif c['lambda'] is not None:
         if c['model'] == 'ridge':
             w, tr_loss = ridge_regression(y, x, c['lambda'])
         else:
