@@ -25,11 +25,11 @@ kfold: null
 build_poly: True
 # Degrees for polynomial features
 degree: 2
-# Wheather to multiply each column with each column and expand features
+# Whether to multiply each column with each column and expand features
 multiply_each: False
 # Take square root of features
 square_root: False
-# Apply log transform as scaler
+# Apply log transform as scalar
 log_transform: False
 # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
 replace_with: null
@@ -37,7 +37,7 @@ replace_with: null
 only_normalize: True
 # Logistic regression threshold
 reg_threshold: 0.5
-# remove ouliers:
+# remove outliers:
 remove_outliers: False
 # Drop correlated features
 drop_corr: False

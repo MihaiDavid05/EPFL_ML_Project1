@@ -46,7 +46,7 @@ zero_jet_0:
   build_poly: True
   # Degrees for polynomial features
   degree: 10
-  # Wheather to multiply each column with each column and expand features
+  # Whether to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
   square_root: True
@@ -93,11 +93,11 @@ zero_jet_1:
   build_poly: True
   # Degrees for polynomial features
   degree: 10
-  # Wheather to multiply each column with each column and expand features
+  # Whether to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
   square_root: True
-  # Apply log transform as scaler
+  # Apply log transform as scalar
   log_transform: False
   # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
   replace_with: 'median'
@@ -142,11 +142,11 @@ one_jet_0:
   build_poly: True
   # Degrees for polynomial features
   degree: 6
-  # Wheather to multiply each column with each column and expand features
+  # Whether to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
   square_root: True
-  # Apply log transform as scaler
+  # Apply log transform as scalar
   log_transform: False
   # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
   replace_with: 'mode'
@@ -189,11 +189,11 @@ one_jet_1:
   build_poly: True
   # Degrees for polynomial features
   degree: 10
-  # Wheather to multiply each column with each column and expand features
+  # Whether to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
   square_root: True
-  # Apply log transform as scaler
+  # Apply log transform as scalar
   log_transform: False
   # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
   replace_with: 'mode'
@@ -236,11 +236,11 @@ more_than_one_jet_0:
   build_poly: True
   # Degrees for polynomial features
   degree: 3
-  # Wheather to multiply each column with each column and expand features
+  # Whether to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
   square_root: True
-  # Apply log transform as scaler
+  # Apply log transform as scalar
   log_transform: False
   # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
   replace_with: 'mode'
@@ -283,11 +283,11 @@ more_than_one_jet_1:
   build_poly: True
   # Degrees for polynomial features
   degree: 11
-  # Wheather to multiply each column with each column and expand features
+  # Whether to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
   square_root: True
-  # Apply log transform as scaler
+  # Apply log transform as scalar
   log_transform: False
   # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
   replace_with: 'mode'
