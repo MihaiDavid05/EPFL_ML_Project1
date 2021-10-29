@@ -56,7 +56,7 @@ Example for obtaining the BEST RESULTS:
 
 ```bash
 cd src
-python run.py experiment_23_3models
+python run.py experiment_27_6models
 ``` 
 
 ## Results
@@ -64,9 +64,9 @@ python run.py experiment_23_3models
 All submissions will be stored under `results` folder in the form `<config_filename>_submission`.
 
 Prediction files were submitted to AICrowd platform.
-Our best results were **0.834 accuracy** and **0.751 F1-score**.
+Our best results were **0.835 accuracy** and **0.753 F1-score**.
 
-These results correspond to `experiment_23_3models` configuration file.
+These results correspond to `experiment_27_6models` configuration file.
 
 ## Code structure
 

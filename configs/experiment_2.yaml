@@ -4,7 +4,10 @@
 # All the features, but standardized to zero mean and unit variance.
 # Cross-validation.
 # Regularized logistic regression.
-# Accuracy 0.75 and F1 score 0.622 on the test set.
+
+#Cross validation f1 score is 44.80 % and accuracy is 72.80 %
+#Training F1 score is 44.79 % and accuracy is 72.80 %
+# Accuracy 72.9 and F1 score 44.9 on the test set.
 
 # Parameters
 
@@ -19,9 +22,9 @@ lambda: 0.05
 # ratio split
 ratio: null
 # Enable cross validation
-cross_val: False
+cross_val: True
 # Number of folds for cross-validation
-kfold: null
+kfold: 5
 # Whether to build polynomial features or not
 build_poly: False
 # Degrees for polynomial features

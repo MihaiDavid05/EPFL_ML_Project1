@@ -40,5 +40,3 @@ if __name__ == '__main__':
         model_by_jet(cli_args, config, output_filename, by_first_feat=True)
     else:
         model_all_data(cli_args, config, output_filename)
-
-    # We have unbalanced data: 85667 signals, 164333 backgrounds, maybe try class weighted reg

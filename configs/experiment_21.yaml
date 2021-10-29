@@ -56,19 +56,13 @@
 # Threshold of 0.5, degree 15, lambda 1e-21, multiply_each=False, replace = 'mode', remove_outliers = False
 # Validation f1 score is 72.74
 # Training F1 score is 72.97 % and accuracy is 82.2192
+
 # 11.
 # Threshold of 0.5, degree 15, lambda 0, multiply_each=False, replace = 'mode', remove_outliers = False
 # Validation f1 score is 72.70 and accuracy is 82.00 %
 # Training F1 score is 72.97 % and accuracy is 82.2192
-# 12.
-# Threshold of 0.5, degree 15, lambda 0, multiply_each=True, replace = 'mode', remove_outliers = False
-# DID NOT TRY
-
-
-# For sub-experiment 11:
 # Accuracy 0.803 and F1 score 0.734 on the test set.
-# For sub-experiment 11 with lambda 0.0001:
-# Accuracy 0.792 and F1 score 0.703 on the test set.
+
 
 # Parameters
 

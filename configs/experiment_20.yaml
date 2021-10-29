@@ -5,9 +5,9 @@
 # Cross-validation.
 # Ridge regression, so need a lambda = 0.0001.
 
-# Validation f1 score is 61.54 %
-# Training F1 score is 61.47 % and accuracy is 76.194
-
+# Cross validation f1 score is 56.70 % and accuracy is 74.42 %
+# Training F1 score is 56.69 % and accuracy is 74.43 %
+# Testing F1 score is 56.7 % and accuracy is 74.4 %
 
 # Parameters
 
@@ -26,9 +26,9 @@ cross_val: True
 # Number of folds for cross-validation
 kfold: 5
 # Whether to build polynomial features or not
-build_poly: True
+build_poly: False
 # Degrees for polynomial features
-degree: 2
+degree: null
 # Wheather to multiply each column with each column and expand features
 multiply_each: False
 # Take square root of features

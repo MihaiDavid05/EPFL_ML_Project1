@@ -22,6 +22,8 @@
 #Training F1 score is 83.23 % and accuracy is 84.09 %
 #
 #Overall validation F1 score is 59.05 % and accuracy is 87.20 %
+#Overall test F1 score is 0.753 % and accuracy is 0.835 %
+#Overall training f1 score 61.66 and accuracy is 87.76
 
 zero_jet_0:
   # 26123 samples
@@ -49,7 +51,7 @@ zero_jet_0:
   # Take square root of features
   square_root: True
   # Apply log transform as scaler
-  log_transform: True
+  log_transform: False
   # Replace -999 values with specified value, this can take 'zero', 'mean', 'median', 'mode' or null
   replace_with: 'median'
   # Apply only normalization
