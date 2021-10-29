@@ -98,6 +98,7 @@ def plot_acc_lambdas(lambdas, acc_tr, acc_te, degree, output_path, model_key='')
     plt.legend(loc=2)
     plt.grid(True)
     plt.savefig(output_path)
+    plt.close()
 
 
 def plot_rmse_lambdas(lambdas, rmse_tr, rmse_te, degree, output_path, model_key=''):

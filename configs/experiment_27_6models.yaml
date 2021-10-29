@@ -1,30 +1,30 @@
+
 # Parameters for each of the models (by jet number and first feature)
 
-#Cross validation f1 score is 14.70 % and accuracy is 95.61 %
-#Training F1 score is 16.76 % and accuracy is 95.72 %
+# Best results (always the recent configuration)
+
+#Cross validation f1 score is 34.34 % and accuracy is 95.03 %
+#Training F1 score is 35.71 % and accuracy is 95.13 %
 #
-#Cross validation f1 score is 67.60 % and accuracy is 79.89 %
-#Training F1 score is 67.75 % and accuracy is 79.99 %
+#Cross validation f1 score is 68.68 % and accuracy is 81.17 %
+#Training F1 score is 68.84 % and accuracy is 81.28 %
 #
-#Cross validation f1 score is 34.90 % and accuracy is 91.75 %
-#Training F1 score is 41.67 % and accuracy is 92.78 %
+#Cross validation f1 score is 34.77 % and accuracy is 91.96 %
+#Training F1 score is 40.77 % and accuracy is 92.70 %
 #
-#Cross validation f1 score is 73.61 % and accuracy is 79.88 %
+#Cross validation f1 score is 73.55 % and accuracy is 79.85 %
 #Training F1 score is 73.95 % and accuracy is 80.16 %
 #
-#Cross validation f1 score is 55.60 % and accuracy is 90.17 %
-#Training F1 score is 71.50 % and accuracy is 93.88 %
+#Cross validation f1 score is 60.16 % and accuracy is 91.50 %
+#Training F1 score is 67.46 % and accuracy is 93.23 %
 #
-#Cross validation f1 score is 82.65 % and accuracy is 83.54 %
-#Training F1 score is 83.21 % and accuracy is 84.08 %
+#Cross validation f1 score is 82.80 % and accuracy is 83.66 %
+#Training F1 score is 83.23 % and accuracy is 84.09 %
 #
-#Overall validation F1 score is 54.84 % and accuracy is 86.81 %
+#Overall validation F1 score is 59.05 % and accuracy is 87.20 %
 
 zero_jet_0:
   # 26123 samples
-
-#  Cross validation f1 score is 34.73 % and accuracy is 95.08 %
-#  Training F1 score is 35.40 % and accuracy is 95.14 %
 
   # Model type
   model: ridge
@@ -32,7 +32,7 @@ zero_jet_0:
   gamma: null
   # number of steps to run
   max_iters: null
-  # regularization parameter 1e-14
+  # regularization parameter 1e-8
   lambda: 0.00000001
   # ratio split
   ratio: null
@@ -43,7 +43,7 @@ zero_jet_0:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 9
+  degree: 10
   # Wheather to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
@@ -90,7 +90,7 @@ zero_jet_1:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 12
+  degree: 10
   # Wheather to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
@@ -121,21 +121,6 @@ zero_jet_1:
 
 one_jet_0:
   # 7562 samples
-  # 10
-  #Cross validation f1 score is 34.90 % and accuracy is 91.75 %
-  #Training F1 score is 41.67 % and accuracy is 92.78 %
-  # 11
-  # Cross validation f1 score is 34.69 % and accuracy is 91.64 %
-  # Training F1 score is 41.84 % and accuracy is 92.79 %
-  # 9
-#  Cross validation f1 score is 35.35 % and accuracy is 91.71 %
-#  Training F1 score is 41.28 % and accuracy is 92.74 %
-  # 9 -12
-#  Cross validation f1 score is 35.61 % and accuracy is 91.92 %
-#  Training F1 score is 41.03 % and accuracy is 92.70 %
-# 10 -12 log transform
-#Cross validation f1 score is 34.87 % and accuracy is 91.79 %
-#Training F1 score is 40.94 % and accuracy is 92.71 %
 
   # Model type
   model: ridge
@@ -143,8 +128,8 @@ one_jet_0:
   gamma: null
   # number of steps to run
   max_iters: null
-  # regularization parameter 1e-16
-  lambda: 0.000000000001
+  # regularization parameter 1e-8
+  lambda: 0.00000001
   # ratio split
   ratio: null
   # Enable cross validation
@@ -154,7 +139,7 @@ one_jet_0:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 10
+  degree: 6
   # Wheather to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
@@ -237,8 +222,8 @@ more_than_one_jet_0:
   gamma: null
   # number of steps to run
   max_iters: null
-  # regularization parameter 1e-14
-  lambda: 0.00000000000001
+  # regularization parameter 1e-3
+  lambda: 0.001
   # ratio split
   ratio: null
   # Enable cross validation
@@ -248,7 +233,7 @@ more_than_one_jet_0:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 11
+  degree: 3
   # Wheather to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
@@ -284,8 +269,8 @@ more_than_one_jet_1:
   gamma: null
   # number of steps to run
   max_iters: null
-  # regularization parameter 1e-14
-  lambda: 0.00000000000001
+  # regularization parameter 1e-15
+  lambda: 0.000000000000001
   # ratio split
   ratio: null
   # Enable cross validation

@@ -38,7 +38,7 @@ if __name__ == '__main__':
     elif by_jet_and_ffeat:
         model_ids = [int(i) for i in cli_args.sub_models_by_jet_and_ffeat.split(',')]
 
-    # If there are 3 subsets, split by jet number, predict on each of them
+    # If there are subsets, apply grid search depending on their numbers
     if by_jet or by_jet_and_ffeat:
         # Define grids
         if by_jet:
@@ -46,8 +46,8 @@ if __name__ == '__main__':
             degrees = [range(4, 12), range(4, 12), range(4, 12)]
             thresholds = [np.linspace(0.01, 0.05, 5), np.linspace(0.01, 0.05, 5), np.linspace(0.01, 0.05, 5)]
         else:
-            lambdas = [np.logspace(-15, 0, 16), np.logspace(-15, 0, 16), np.logspace(-16, 0, 17),
-                       np.logspace(-16, 0, 17), np.logspace(-15, 0, 16), np.logspace(-15, 0, 16)]
+            lambdas = [np.logspace(-15, -3, 13), np.logspace(-15, -3, 13), np.logspace(-14, -3, 12),
+                       np.logspace(-16, -3, 14), np.logspace(-15, -3, 13), np.logspace(-15, -3, 13)]
             degrees = [range(3, 12), range(3, 12), range(3, 12), range(3, 12), range(3, 12), range(3, 12)]
             thresholds = [np.linspace(0.01, 0.05, 5), np.linspace(0.01, 0.05, 5), np.linspace(0.01, 0.05, 5),
                           np.linspace(0.01, 0.05, 5), np.linspace(0.01, 0.05, 5), np.linspace(0.01, 0.05, 5)]

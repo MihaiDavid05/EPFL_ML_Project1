@@ -1,30 +1,28 @@
-# TODO: put here values from grid search and test
 
 # Parameters for each of the models (by jet number)
 
 # Best results (always the recent configuration)
-#Cross validation f1 score is 66.53 % and accuracy is 84.59 %
-#Training F1 score is 66.85 % and accuracy is 84.73 %
+
+#Cross validation f1 score is 66.65 % and accuracy is 84.63 %
+#Training F1 score is 66.87 % and accuracy is 84.73 %
 #
-#Cross validation f1 score is 72.87 % and accuracy is 80.98 %
-#Training F1 score is 73.32 % and accuracy is 81.32 %
+#Cross validation f1 score is 72.88 % and accuracy is 81.05 %
+#Training F1 score is 73.18 % and accuracy is 81.27 %
 #
-#Cross validation f1 score is 82.11 % and accuracy is 83.82 %
+#Cross validation f1 score is 82.38 % and accuracy is 84.09 %
 #Training F1 score is 82.82 % and accuracy is 84.49 %
 #
-#Overall validation F1 score is 73.84 % and accuracy is 83.13 %
-#Overall test F1 score is 75.10 % and accuracy is 83.40 %
+#Overall validation F1 score is 73.97 % and accuracy is 83.26 %
 
 zero_jet:
-
   # Model type
   model: ridge
   # step_size
   gamma: null
   # number of steps to run
   max_iters: null
-  # regularization parameter 1e-14
-  lambda: 0.00000000000001
+  # regularization parameter 1e-15
+  lambda: 0.000000000000001
   # ratio split
   ratio: null
   # Enable cross validation
@@ -34,7 +32,7 @@ zero_jet:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 12
+  degree: 10
   # Wheather to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
@@ -63,15 +61,14 @@ zero_jet:
   viz_path: "../visualizations/"
 
 one_jet:
-
   # Model type
   model: ridge
   # step_size
   gamma: null
   # number of steps to run
   max_iters: null
-  # regularization parameter 1e-16
-  lambda: 0.0000000000000001
+  # regularization parameter 1e-13
+  lambda: 0.0000000000001
   # ratio split
   ratio: null
   # Enable cross validation
@@ -81,7 +78,7 @@ one_jet:
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
-  degree: 10
+  degree: 11
   # Wheather to multiply each column with each column and expand features
   multiply_each: True
   # Take square root of features
@@ -110,7 +107,6 @@ one_jet:
   viz_path: "../visualizations/"
 
 more_than_one_jet:
-
   # Model type
   model: ridge
   # step_size
