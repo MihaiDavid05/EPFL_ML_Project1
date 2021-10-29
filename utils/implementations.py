@@ -118,7 +118,7 @@ def model(y, x, c):
     if c['model'] == 'ls':
         w, tr_loss = least_squares(y, x)
     elif c['model'] == 'ls_gd':
-       w, tr_loss = least_squares_GD(y, x, np.zeros((x.shape[1], 1)), c['max_iters'], c['gamma'])
+        w, tr_loss = least_squares_GD(y, x, np.zeros((x.shape[1], 1)), c['max_iters'], c['gamma'])
     elif c['model'] == 'ls_gd':
         w, tr_loss = least_squares_SGD(y, x, np.zeros((x.shape[1], 1)), c['max_iters'], c['gamma'])
     elif c['lambda'] is not None:
