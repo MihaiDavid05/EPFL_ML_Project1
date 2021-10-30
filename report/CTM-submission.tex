@@ -1,8 +1,10 @@
 \documentclass[10pt,conference,compsocconf]{IEEEtran}
 
+\usepackage{verbatim} % to comment out blocks
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{multirow}
 
 
 \begin{document}
@@ -17,24 +19,12 @@
 %%*************************************************************************
 %%*************************************************************************
 \begin{abstract}
-A critical part of scientific discovery is the
-communication of research findings to peers or the general public.
-Mastery of the process of scientific communication improves the
-visibility and impact of research. While this guide is a necessary
-tool for learning how to write in a manner suitable for publication
-at a scientific venue, it is by no means sufficient, on its own, to
-make its reader an accomplished writer. 
-This guide should be a starting point for further development of 
-writing skills.
-Short description of the whole paper, to help the
-reader decide whether to read it. ~\cite{higgsMLdoc}
 \begin{enumerate}
     \item State the problem.
     \item Say why it is an interesting problem.
     \item Say what your solution achieves.
     \item Say what follows from your solution.
 \end{enumerate}
-\end{abstract}
 
 %% draft of abstract, open for change :)
 In this project, we explored how different regression methods could 
@@ -42,7 +32,7 @@ be implemented to predict the outcome of simulated events from the ATLAS
 experiment. Most notably, we are interested in classifying the signal 
 originating from the decay of particles during proton-proton collisions, 
 as either the decay of a Higgs boson or background noise.
-
+\end{abstract}
 
 %%*************************************************************************
 %%*************************************************************************
@@ -107,7 +97,7 @@ signals come from the decay of a Higgs boson or from background noise.
 
 We used a linear regression model on the train set to effectively 
 predict the outputs for the data of the test set. For this we implemented 
-different methods, one of them being least squares and optimized the 
+different methods, one of them being least squares and then optimized the 
 loss using gradient or stochastic gradient descent.
 Our second method relied on ridge regression to penalise large weights 
 vectors and avoid potentially over or underfitting the model.
@@ -118,30 +108,127 @@ the last two methods.
 \begin{table}[ht]
 \centering
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{@{}lrrrrrrr@{}}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
-                                                                           & \multicolumn{5}{c}{Parameters} & \multicolumn{2}{c}{Training} \\ \midrule
+ &
+  \multicolumn{1}{c}{} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{Training} &
+  \multicolumn{1}{l}{Validation} &
+  \multicolumn{1}{l}{Testing} \\ \midrule
+ &
+  \multicolumn{3}{c}{Parameters} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{F1-score} \\ \midrule
 Methods &
   \multicolumn{1}{l}{Gamma} &
   \multicolumn{1}{l}{Lambda} &
-  \multicolumn{1}{l}{Degree} &
   \multicolumn{1}{l}{Max\_iters} &
-  \multicolumn{1}{l}{Reg\_thres} &
-  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} &
+  \multicolumn{1}{l}{Accuracy} &
   \multicolumn{1}{l}{Accuracy} \\ \midrule
-Logistic regression                                                        & 0.5  & -      & 1 & 1000 & 0.5 & 44.73\%       & 72.78\%      \\
-\begin{tabular}[c]{@{}l@{}}Regularized logistic \\ regression\end{tabular} & 0.4  & 0.05   & 1 & 1000 & 0.5 & 44.63\%       & 72.76\%      \\
-Ridge Regression                                                           & -    & 0.0001 & 2 & -    & 0.5 & 61.47\%       & 76.19\%      \\ \bottomrule
+\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Regularized logistic \\ regression\end{tabular}} &
+  0.4 &
+  5e-2 &
+  6000 &
+  44.79\% &
+  44.80\% &
+  44.90\% \\
+ &
+   &
+   &
+   &
+  72.80\% &
+  72.80\% &
+  72.90\% \\
+\multirow{2}{*}{Ridge Regression} &
+  - &
+  1e-4 &
+  - &
+  56.70\% &
+  56.70\% &
+  56.70\% \\
+ &
+   &
+   &
+   &
+  74.43\% &
+  74.42\% &
+  74.40\% \\ \bottomrule
 \end{tabular}%
 }
-\caption{Parameters and training results for the initial implementation.}
+\caption{Parameters, F1-score and accuracy results for the initial implementation
+using the entire data-set.}
 \label{tab:baseline}
 \end{table}
 
-Table~\ref{tab:baseline} shows the initial results obtained and act as a baseline 
-on which we could compare our different configurations.
+\begin{comment}
+\begin{table}[ht]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrrr|r|r|r|}
+\cline{5-7}
+ &
+  \multicolumn{1}{c}{} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l|}{} &
+  \multicolumn{1}{l|}{Training} &
+  \multicolumn{1}{l|}{Validation} &
+  \multicolumn{1}{l|}{Testing} \\ \cline{2-7} 
+\multicolumn{1}{l|}{} &
+  \multicolumn{3}{c|}{Parameters} &
+  \multicolumn{1}{l|}{F1-score} &
+  \multicolumn{1}{l|}{F1-score} &
+  \multicolumn{1}{l|}{F1-score} \\ \hline
+\multicolumn{1}{|l|}{Methods} &
+  \multicolumn{1}{l|}{Gamma} &
+  \multicolumn{1}{l|}{Lambda} &
+  \multicolumn{1}{l|}{Max\_iters} &
+  \multicolumn{1}{l|}{Accuracy} &
+  \multicolumn{1}{l|}{Accuracy} &
+  \multicolumn{1}{l|}{Accuracy} \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Regularized logistic \\ regression\end{tabular}}} &
+  \multicolumn{1}{r|}{0.4} &
+  \multicolumn{1}{r|}{5e-2} &
+  6000 &
+  44.79\% &
+  44.80\% &
+  44.90\% \\
+\multicolumn{1}{|l|}{} &
+  \multicolumn{1}{r|}{} &
+  \multicolumn{1}{r|}{} &
+   &
+  72.80\% &
+  72.80\% &
+  72.90\% \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{Ridge Regression}} &
+  \multicolumn{1}{r|}{-} &
+  \multicolumn{1}{r|}{1e-4} &
+  - &
+  56.70\% &
+  56.70\% &
+  56.70\% \\
+\multicolumn{1}{|l|}{} &
+  \multicolumn{1}{r|}{} &
+  \multicolumn{1}{r|}{} &
+   &
+  74.43\% &
+  74.42\% &
+  74.40\% \\ \hline
+\end{tabular}%
+}
+\caption{Parameters, F1-score and accuracy results for the initial implementation
+using the entire data-set.}
+\label{tab:baseline}
+\end{table}
+\end{comment}
 
-Analysis of first results.
+As Table~\ref{tab:baseline} shows, with only standardization applied to 
+the data-set and a regularization threshold of 0.5, ridge regression has 
+a slight edge both in terms of F1-score and accuracy over regularized 
+logistic regression.
 
 \subsection{Hyperparameters}
 To tune the hyperparameters for regularized logistic regression, 
@@ -154,7 +241,7 @@ we had to go for a trial and error methodology to pinpoint the most
 accurately the optimal parameters.
 Still, even by tuning the parameters to the best of our abilities, 
 we realised that to improve on our results we needed to analyse more 
-careful the data-set.
+carefully the data-set.
 
 \subsection{Data preprocessing}
 The data set comes from the simulation of 250.000 simulated events 
@@ -192,35 +279,129 @@ Log: square root, replace with median, remove outliers 'std'
 reg log: square root, replace with median, remove outliers 'std'
 ridge: square root, replace with mode, don't remove outliers
 
-
 \begin{table}[ht]
 \centering
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{@{}lrrrrrrr@{}}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
-                                                                           & \multicolumn{5}{c}{Parameters}   & \multicolumn{2}{c}{Training} \\ \midrule
+ &
+  \multicolumn{1}{c}{} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{Training} &
+  \multicolumn{1}{l}{Validation} &
+  \multicolumn{1}{l}{Testing} \\ \midrule
+ &
+  \multicolumn{3}{c}{Parameters} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{F1-score} \\ \midrule
 Methods &
   \multicolumn{1}{l}{Gamma} &
   \multicolumn{1}{l}{Lambda} &
-  \multicolumn{1}{l}{Degree} &
   \multicolumn{1}{l}{Max\_iters} &
-  \multicolumn{1}{l}{Reg\_thres} &
-  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} &
+  \multicolumn{1}{l}{Accuracy} &
   \multicolumn{1}{l}{Accuracy} \\ \midrule
-Logistic regression                                                        & 0.5 & -      & 3  & 10000 & 0.05 & 71.2\%        & 80.1\%       \\
-\begin{tabular}[c]{@{}l@{}}Regularized logistic \\ regression\end{tabular} & 0.5 & 0.05   & 6  & 10000 & 0.05 & 67.9\%        & 79.4\%       \\
-Ridge Regression                                                           & -   & 0.0001 & 15 & -     & 0.5  & 72.9\%        & 82.2\%       \\ \bottomrule
+\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Logistic \\ regression\end{tabular}} &
+  0.5 &
+  - &
+  10000 &
+  71.20\% &
+  71.43\% &
+  71.20\% \\
+ &
+   &
+   &
+   &
+  80.10\% &
+  81.66\% &
+  80.80\% \\
+\multirow{2}{*}{Ridge Regression} &
+  - &
+  1e-4 &
+  - &
+  72.97\% &
+  72.70\% &
+  73.40\% \\
+ &
+   &
+   &
+   &
+  82.22\% &
+  82.00\% &
+  80.30\% \\ \bottomrule
 \end{tabular}%
 }
-\caption{Parameters and training results after preprocessing the data.}
-\label{tab:entire_dataset}
+\caption{Parameters, F1-score and accuracy results after preprocessing the data.}
+\label{tab:intermediate}
 \end{table}
+
+\begin{comment}
+\begin{table}[ht]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrrr|r|r|r|}
+\cline{5-7}
+ &
+  \multicolumn{1}{c}{} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l|}{} &
+  \multicolumn{1}{l|}{Training} &
+  \multicolumn{1}{l|}{Validation} &
+  \multicolumn{1}{l|}{Testing} \\ \cline{2-7} 
+\multicolumn{1}{l|}{} &
+  \multicolumn{3}{c|}{Parameters} &
+  \multicolumn{1}{l|}{F1-score} &
+  \multicolumn{1}{l|}{F1-score} &
+  \multicolumn{1}{l|}{F1-score} \\ \hline
+\multicolumn{1}{|l|}{Methods} &
+  \multicolumn{1}{l|}{Gamma} &
+  \multicolumn{1}{l|}{Lambda} &
+  \multicolumn{1}{l|}{Max\_iters} &
+  \multicolumn{1}{l|}{Accuracy} &
+  \multicolumn{1}{l|}{Accuracy} &
+  \multicolumn{1}{l|}{Accuracy} \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Logistic \\ regression\end{tabular}}} &
+  \multicolumn{1}{r|}{0.5} &
+  \multicolumn{1}{r|}{-} &
+  10000 &
+  71.20\% &
+  71.43\% &
+  71.20\% \\
+\multicolumn{1}{|l|}{} &
+  \multicolumn{1}{r|}{} &
+  \multicolumn{1}{r|}{} &
+   &
+  80.10\% &
+  81.66\% &
+  80.80\% \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{Ridge Regression}} &
+  \multicolumn{1}{r|}{-} &
+  \multicolumn{1}{r|}{1e-4} &
+  - &
+  72.97\% &
+  72.70\% &
+  73.40\% \\
+\multicolumn{1}{|l|}{} &
+  \multicolumn{1}{r|}{} &
+  \multicolumn{1}{r|}{} &
+   &
+  82.22\% &
+  82.00\% &
+  80.30\% \\ \hline
+\end{tabular}%
+}
+\caption{Parameters, F1-score and accuracy results after preprocessing the data.}
+\label{tab:intermediate}
+\end{table}
+\end{comment}
 
 We expected that logistic regression would fare better, seeing as it uses 
 the sigmoid function and is, therefore, less liable to be influenced by extreme 
 range of values, as is the case in the data-set. 
-But as Table~\ref{tab:entire_dataset} shows, ridge regression has a (slightly ?) better 
-accuracy and F1-score.
+But as Table~\ref{tab:intermediate} shows, ridge regression has a comparable
+accuracy but overall a better F1-score.
 
 \subsubsection{Further data analysis}
 The description of the feature in the Learning to discover: the Higgs
@@ -243,7 +424,7 @@ balanced subsets.
 %%*************************************************************************
 %%*************************************************************************
 \section{Results}
-From Table~\ref{tab:entire_dataset} we saw that, overall, ridge regression
+From Table~\ref{tab:intermediate} we saw that, overall, ridge regression
 performed better and had the advantage of being computationally faster.
 As such, we chose to focus our attention on this model. For each subset we
 tuned the parameters accordingly and preprocessed the feature matrix 
@@ -253,19 +434,134 @@ model and its variance.
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{@{}lrrrr@{}}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lrrrrrrrrr@{}}
 \toprule
-Ridge regression & \multicolumn{2}{c}{Parameters}              & \multicolumn{2}{c}{Cross-validation} \\ \midrule
-Subsets          & Lambda               & Degree               & F1-score          & Accuracy         \\ \midrule
-PRI\_jet\_0      & 1e-14                & 12                   & 66.53 \%          & 84.59 \%         \\
-PRI\_jet\_1      & 1e-16                & 10                   & 72.87 \%          & 80.98 \%         \\
-PRI\_jet\_2\_3   & 1e-16                & 11                   & 82.11 \%          & 83.82 \%         \\ \midrule
-Overall          & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & 73.84\%           & 83.13\%          \\ \bottomrule
-\end{tabular}
-\caption{Parameters and cross-validation results for each of the subset and the overall 
-F1-score and accuracy.}
-\label{tab:cv_results}
+               & \multicolumn{3}{c}{Parameters} & \multicolumn{2}{c}{Training} & \multicolumn{2}{c}{Validation} & \multicolumn{2}{c}{Testing} \\ \midrule
+Subsets &
+  \multicolumn{1}{l}{Lambda} &
+  \multicolumn{1}{l}{Degree} &
+  \multicolumn{1}{l}{Replace with} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} \\ \midrule
+PRI\_jet\_0 &
+  1e-15 &
+  10 &
+  median &
+  \multirow{3}{*}{74.29\%} &
+  \multirow{3}{*}{83.59\%} &
+  \multirow{3}{*}{73.97\%} &
+  \multirow{3}{*}{83.26\%} &
+  \multirow{3}{*}{75.10\%} &
+  \multirow{3}{*}{83.40\%} \\
+PRI\_jet\_1    & 1e-13      & 11     & mode     &               &              &                &               &              &              \\
+PRI\_jet\_2\_3 & 1e-16      & 11     & mode     &               &              &                &               &              &              \\ \bottomrule
+\end{tabular}%
+}
+\caption{Parameters, F1-score and accuracy results.}
+\label{tab:3_models}
 \end{table}
+
+\begin{comment}
+\begin{table}[ht]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lrrrrrrrrr@{}}
+\toprule
+ &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{6}{c}{Overall} \\ \midrule
+ &
+  \multicolumn{3}{c}{Parameters} &
+  \multicolumn{2}{c}{Training} &
+  \multicolumn{2}{c}{Validation} &
+  \multicolumn{2}{c}{Testing} \\ \midrule
+Subsets &
+  \multicolumn{1}{l}{Lambda} &
+  \multicolumn{1}{l}{Degree} &
+  \multicolumn{1}{l}{Replace with} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} \\ \midrule
+PRI\_jet\_0 &
+  1e-15 &
+  10 &
+  median &
+  \multirow{3}{*}{74.29\%} &
+  \multirow{3}{*}{83.59\%} &
+  \multirow{3}{*}{73.97\%} &
+  \multirow{3}{*}{83.26\%} &
+  \multirow{3}{*}{75.10\%} &
+  \multirow{3}{*}{83.40\%} \\
+PRI\_jet\_1 &
+  1e-13 &
+  11 &
+  mode &
+   &
+   &
+   &
+   &
+   &
+   \\
+PRI\_jet\_2\_3 &
+  1e-16 &
+  11 &
+  mode &
+   &
+   &
+   &
+   &
+   &
+   \\ \bottomrule
+\end{tabular}%
+}
+\caption{Parameters, F1-score and accuracy results.}
+\label{tab:3_models}
+\end{table}
+\begin{table}[ht]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{l|r|r|r|r|r|r|r|r|r|}
+\cline{2-10}
+                                     & \multicolumn{3}{c|}{Parameters} & \multicolumn{2}{c|}{Training} & \multicolumn{2}{c|}{Validation} & \multicolumn{2}{c|}{Testing} \\ \hline
+\multicolumn{1}{|l|}{Subsets} &
+  \multicolumn{1}{l|}{Lambda} &
+  \multicolumn{1}{l|}{Degree} &
+  \multicolumn{1}{l|}{Replace with} &
+  \multicolumn{1}{l|}{F1-score} &
+  \multicolumn{1}{l|}{Accuracy} &
+  \multicolumn{1}{l|}{F1-score} &
+  \multicolumn{1}{l|}{Accuracy} &
+  \multicolumn{1}{l|}{F1-score} &
+  \multicolumn{1}{l|}{Accuracy} \\ \hline
+\multicolumn{1}{|l|}{PRI\_jet\_0} &
+  1e-15 &
+  10 &
+  median &
+  \multirow{3}{*}{74.29\%} &
+  \multirow{3}{*}{83.59\%} &
+  \multirow{3}{*}{73.97\%} &
+  \multirow{3}{*}{83.26\%} &
+  \multirow{3}{*}{75.10\%} &
+  \multirow{3}{*}{83.40\%} \\ \cline{1-4}
+\multicolumn{1}{|l|}{PRI\_jet\_1}    & 1e-13      & 11      & mode     &               &               &                &                &               &              \\ \cline{1-4}
+\multicolumn{1}{|l|}{PRI\_jet\_2\_3} & 1e-16      & 11      & mode     &               &               &                &                &               &              \\ \hline
+\end{tabular}%
+}
+\caption{Parameters, F1-score and accuracy results.}
+\label{tab:3_models}
+\end{table}
+\end{comment}
+
 
 In contrast to subset 1 and 2 and 3, we saw that subset 0 yielded better 
 result if these values were replaced by the median rather than the mode.
@@ -273,6 +569,172 @@ result if these values were replaced by the median rather than the mode.
 subset 0: multiply each, and square root, median, don't remove outliers
 subset 1: multiply each, and square root, mode, don't remove outliers
 subset 2: multiply each, and square root, mode, don't remove outliers
+
+\begin{table}[ht]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lrrrrrrrrr@{}}
+\toprule
+                  & \multicolumn{3}{c}{Parameters} & \multicolumn{2}{c}{Training} & \multicolumn{2}{c}{Validation} & \multicolumn{2}{c}{Testing} \\ \midrule
+Subsets &
+  \multicolumn{1}{l}{Lambda} &
+  \multicolumn{1}{l}{Degree} &
+  \multicolumn{1}{l}{Replace with} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} \\ \midrule
+PRI\_jet\_0\_0 &
+  1e-8 &
+  10 &
+  median &
+  \multirow{6}{*}{61.66\%} &
+  \multirow{6}{*}{87.76\%} &
+  \multirow{6}{*}{59.05\%} &
+  \multirow{6}{*}{87.20\%} &
+  \multirow{6}{*}{75.30\%} &
+  \multirow{6}{*}{83.50\%} \\
+PRI\_jet\_0\_1    & 1e-14     & 10     & median    &               &              &                &               &              &              \\
+PRI\_jet\_1\_0    & 1e-8      & 6      & mode      &               &              &                &               &              &              \\
+PRI\_jet\_1\_1    & 1e-16     & 10     & mode      &               &              &                &               &              &              \\
+PRI\_jet\_2\_3\_0 & 1e-3      & 3      & mode      &               &              &                &               &              &              \\
+PRI\_jet\_2\_3\_1 & 1e-15     & 11     & mode      &               &              &                &               &              &              \\ \bottomrule
+\end{tabular}%
+}
+\caption{Parameters, F1-score and accuracy results.}
+\label{tab:6_models}
+\end{table}
+
+\begin{comment}
+\begin{table}[ht]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lrrrrrrrrr@{}}
+\toprule
+ &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{1}{l}{} &
+  \multicolumn{6}{c}{Overall} \\ \midrule
+ &
+  \multicolumn{3}{c}{Parameters} &
+  \multicolumn{2}{c}{Training} &
+  \multicolumn{2}{c}{Validation} &
+  \multicolumn{2}{c}{Testing} \\ \midrule
+Subsets &
+  \multicolumn{1}{l}{Lambda} &
+  \multicolumn{1}{l}{Degree} &
+  \multicolumn{1}{l}{Replace with} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} &
+  \multicolumn{1}{l}{F1-score} &
+  \multicolumn{1}{l}{Accuracy} \\ \midrule
+PRI\_jet\_0\_0 &
+  1e-8 &
+  10 &
+  median &
+  \multirow{6}{*}{61.66\%} &
+  \multirow{6}{*}{87.76\%} &
+  \multirow{6}{*}{59.05\%} &
+  \multirow{6}{*}{87.20\%} &
+  \multirow{6}{*}{75.30\%} &
+  \multirow{6}{*}{83.50\%} \\
+PRI\_jet\_0\_1 &
+  1e-14 &
+  10 &
+  median &
+   &
+   &
+   &
+   &
+   &
+   \\
+PRI\_jet\_1\_0 &
+  1e-8 &
+  6 &
+  mode &
+   &
+   &
+   &
+   &
+   &
+   \\
+PRI\_jet\_1\_1 &
+  1e-16 &
+  10 &
+  mode &
+   &
+   &
+   &
+   &
+   &
+   \\
+PRI\_jet\_2\_3\_0 &
+  1e-3 &
+  3 &
+  mode &
+   &
+   &
+   &
+   &
+   &
+   \\
+PRI\_jet\_2\_3\_1 &
+  1e-15 &
+  11 &
+  mode &
+   &
+   &
+   &
+   &
+   &
+   \\ \bottomrule
+\end{tabular}%
+}
+\caption{Parameters, F1-score and accuracy results.}
+\label{tab:6_models}
+\end{table}
+\begin{table}[ht]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{l|r|r|r|r|r|r|r|r|r|}
+\cline{2-10}
+                                        & \multicolumn{3}{c|}{Parameters} & \multicolumn{2}{c|}{Training} & \multicolumn{2}{c|}{Validation} & \multicolumn{2}{c|}{Testing} \\ \hline
+\multicolumn{1}{|l|}{Subsets} &
+  \multicolumn{1}{l|}{Lambda} &
+  \multicolumn{1}{l|}{Degree} &
+  \multicolumn{1}{l|}{Replace with} &
+  \multicolumn{1}{l|}{F1-score} &
+  \multicolumn{1}{l|}{Accuracy} &
+  \multicolumn{1}{l|}{F1-score} &
+  \multicolumn{1}{l|}{Accuracy} &
+  \multicolumn{1}{l|}{F1-score} &
+  \multicolumn{1}{l|}{Accuracy} \\ \hline
+\multicolumn{1}{|l|}{PRI\_jet\_0\_0} &
+  1e-8 &
+  10 &
+  median &
+  \multirow{6}{*}{61.66\%} &
+  \multirow{6}{*}{87.76\%} &
+  \multirow{6}{*}{59.05\%} &
+  \multirow{6}{*}{87.20\%} &
+  \multirow{6}{*}{75.30\%} &
+  \multirow{6}{*}{83.50\%} \\ \cline{1-4}
+\multicolumn{1}{|l|}{PRI\_jet\_0\_1}    & 1e-14     & 10     & median     &               &               &                &                &               &              \\ \cline{1-4}
+\multicolumn{1}{|l|}{PRI\_jet\_1\_0}    & 1e-8      & 6      & mode       &               &               &                &                &               &              \\ \cline{1-4}
+\multicolumn{1}{|l|}{PRI\_jet\_1\_1}    & 1e-16     & 10     & mode       &               &               &                &                &               &              \\ \cline{1-4}
+\multicolumn{1}{|l|}{PRI\_jet\_2\_3\_0} & 1e-3      & 3      & mode       &               &               &                &                &               &              \\ \cline{1-4}
+\multicolumn{1}{|l|}{PRI\_jet\_2\_3\_1} & 1e-15     & 11     & mode       &               &               &                &                &               &              \\ \hline
+\end{tabular}%
+}
+\caption{Parameters, F1-score and accuracy results.}
+\label{tab:6_models}
+\end{table}
+\end{comment}
 
 %%When reporting computational or measurement results, always
 %%report the mean (average value) along with a measure of variability
