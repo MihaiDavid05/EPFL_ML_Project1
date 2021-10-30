@@ -17,9 +17,9 @@
 }
 
 \maketitle
-%%*************************************************************************
-%%*************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}
     \item State the problem.
     \item Say why it is an interesting problem.
@@ -35,9 +35,9 @@ originating from the decay of particles during proton-proton collisions,
 as either the decay of a Higgs boson or background noise.
 \end{abstract}
 
-%%*************************************************************************
-%%*************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%Describe your problem and state your
 %%contributions. The hope is that after reading your
 %%paper, the audience will be convinced to try out your idea.
@@ -57,9 +57,9 @@ As such, using a combination of regression and data preprocessing
 methods, the aim of this project is to predict whether the observed 
 signals come from the decay of a Higgs boson or from background noise.
 
-%%*************************************************************************
-%%*************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Models and Methods}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%The models and methods section should describe what was
 %%done to answer the research question, describe how it was done,
 %%justify the experimental design, and explain how the results were analyzed.
@@ -230,30 +230,37 @@ As Table~\ref{tab:baseline} shows, with only standardization applied to
 the data-set and a regularization threshold of 0.5, ridge regression has 
 a slight edge both in terms of F1-score and accuracy over regularized 
 logistic regression.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-missing transition
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+But we can also see that, as is, these models are not optimal, and while 
+they are useful baselines, they could be improved by analysing and 
+preprocessing the data-set.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Hyperparameters}
-To tune the hyperparameters for regularized logistic regression, 
-we first devised a grid search method to compute \textit{(lambda, degree)} 
-pairs using cross-validation and keeping the configuration 
-that maximised the F1-score. With this first result we tried to obtain 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% this subsection could also go just before the intermediate results but then
+%% the structure of the paper would be almost identical to the other paper...
+To tune the hyperparameters we first devised a grid search method to compute \textit{(lambda, degree)} pairs using cross-validation and keeping the 
+configuration that maximised the F1-score. With this first result we then obtained
 the optimal regularization threshold.
-Unfortunately, this proved too computationally expensive. Therefore, 
-we had to go for a trial and error methodology to pinpoint the most 
-accurately the optimal parameters.
-Still, even by tuning the parameters to the best of our abilities, 
-we realised that to improve on our results we needed to analyse more 
-carefully the data-set.
 
+%%Unfortunately, this proved too computationally expensive. Therefore, 
+%%we had to go for a trial and error methodology to pinpoint the most 
+%%accurately the optimal parameters.
+%%Still, even by tuning the parameters to the best of our abilities, 
+%%we realised that to improve on our results we needed to analyse more 
+%%carefully the data-set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Data preprocessing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The data set comes from the simulation of 250.000 simulated events 
 of proton-proton collisions. Each data is composed of 30 features 
 that can be divided into two categories: primitive features related 
 to the momenta of particles or derived feature obtained from the former.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Feature distribution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Our first step in the data preprocessing was to standardize the features 
 to ensure internal consistency. Data points were considered to be 
 outliers if they were at +/- 3 standard deviation from their mean and 
@@ -265,7 +272,9 @@ Finally, undefined features represented by the value -999.0 or Nan,
 were replaced either by their mean, median or mode. Overall, the 
 latter two tended to yield a better accuracy and F1-score.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Feature expansion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 By augmenting the feature vectors we found that we could obtain a more 
 powerful model. One way was to do that was to use polynomial expansion 
 by carefully choosing a degree d:
@@ -277,11 +286,16 @@ $$\forall \phi_{:i} \neq \phi_{:j}, \;\; \phi := [\phi\; |\; \phi_{:i} * \phi_{:
 And then we applied the square root to the positive feature columns 
 of $\phi$.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Intermediate results}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%********************************
 missing transition
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-cross val k = 5
+%%********************************
+Since our baseline did not suffer from overfitting while training them on the entire
+data-set, we decided to switch to logistic regression instead of regularized.
+
+cross val k = 5 ?
 Log: deg 3, square root, replace with median, remove outliers 'std', reg\_thres = 0.05
 ridge: 15 deg, square root, replace with mode, don't remove outliers, reg\_thres = 0.5
 
@@ -403,16 +417,17 @@ Methods &
 \end{table}
 \end{comment}
 
+\FloatBarrier
 We expected that logistic regression would fare better, seeing as it uses 
 the sigmoid function and is, therefore, less liable to be influenced by extreme 
 range of values, as is the case in the data-set. 
 But as Table~\ref{tab:intermediate} shows, ridge regression has a comparable
-accuracy but overall a better F1-score.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-missing transition
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+accuracy but overall a better F1-score. Which is why, to simplify our 
+experiments, we kept ridge regression for our model.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Further data analysis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The description of the feature in the Learning to discover: the Higgs
 boson machine learning challenge~\cite{higgsMLdoc} documentation pointed 
 to the fact that a lot of features depend on the value (either 0, 1, 2 or 3)
@@ -429,20 +444,26 @@ original data-set into three subsets according to their \textit{PRI\_jet\_num} v
 \end{enumerate}
 \textit{PRI\_jet\_num} 2 and 3 where grouped together to have more 
 balanced subsets.
+%%********************************
+rewrite text
+%%********************************
+all subsets still had undefined values (-999) for the first feature \textit{DER\_mass\_MMC} split again each subset
+depending on whether or not the feature is defined.
 
-%%*************************************************************************
-%%*************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 From Table~\ref{tab:intermediate} we saw that, overall, ridge regression
 performed better and had the advantage of being computationally faster.
 As such, we chose to focus our attention on this model. For each subset we
 tuned the parameters accordingly and preprocessed the feature matrix 
 following the aforementioned methods: 
-%% rewrite
+%%********************************
+rewrite text
 subset 0: multiply each, square root, don't remove outliers
 subset 1: multiply each, square root, don't remove outliers
 subset 2: multiply each, square root, don't remove outliers
-%%
+%%********************************
 We used a 10-fold cross-validation to estimate the generalized error or the 
 model and its variance.
 
@@ -576,9 +597,9 @@ PRI\_jet\_2\_3 &
 \end{table}
 \end{comment}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%********************************
 missing transition
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%********************************
 
 \begin{table}[ht]
 \centering
@@ -748,15 +769,16 @@ PRI\_jet\_2\_3\_1 &
 
 \FloatBarrier
 Grid search for (lambda, degree)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%********************************
 missing transition
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%********************************
 %%When reporting computational or measurement results, always
 %%report the mean (average value) along with a measure of variability
 %%(standard deviation(s) or standard error of the mean).
-%%*************************************************************************
-%%*************************************************************************
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%Discuss the strengths and weaknesses of your approach, 
 %%based on the results. Point out the implications of your novel idea on the application concerned.
 
@@ -765,14 +787,9 @@ Test results from AIcrowd accuracy 0.833 f1-score 0.749
 And try to understand why log transform does not help. tested trigonometric 
 for values with angles in radian but did not help, neither did dropping correlated features.
 
-would be great to be able to get exactly the best hyperparameters. 
-
-Since in the optimal configuration we found that all subsets still had undefined values (-999) for the first feature \textit{DER\_mass\_MMC} an idea would be to split again each subset
-depending on whether or not the feature is defined.
-
-%%*************************************************************************
-%%*************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%Summarize your contributions in light of the new results.
 
 %%The aim of a scientific paper is to convey the idea or discovery of
@@ -783,16 +800,16 @@ depending on whether or not the feature is defined.
 %%explicit, and use examples and illustrations to describe the problems
 %%and solutions.
 Data pre-processing was an integral part. 
-%%*************************************************************************
-%%*************************************************************************
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgements}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The author thanks Christian Sigg for his careful reading and helpful
 suggestions.
 
-%%*************************************************************************
-%%*************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%\section{The Structure of a Paper}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%\label{sec:structure-paper}
 %%Scientific papers usually begin with the description of the problem,
 %%justifying why the problem is interesting. Most importantly, it argues
@@ -803,9 +820,8 @@ suggestions.
 %%vacuum, a proper comparison to the current state of the art is often
 %%part of the results.
 
-%%*************************************************************************
-%%*************************************************************************
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliographystyle{IEEEtran}
 \bibliography{CTM-literature}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
