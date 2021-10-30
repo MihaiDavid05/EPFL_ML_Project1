@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{placeins}
 
 
 \begin{document}
@@ -229,6 +230,9 @@ As Table~\ref{tab:baseline} shows, with only standardization applied to
 the data-set and a regularization threshold of 0.5, ridge regression has 
 a slight edge both in terms of F1-score and accuracy over regularized 
 logistic regression.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+missing transition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Hyperparameters}
 To tune the hyperparameters for regularized logistic regression, 
@@ -274,10 +278,12 @@ And then we applied the square root to the positive feature columns
 of $\phi$.
 
 \subsubsection{Intermediate results}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+missing transition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cross val k = 5
-Log: square root, replace with median, remove outliers 'std'
-reg log: square root, replace with median, remove outliers 'std'
-ridge: square root, replace with mode, don't remove outliers
+Log: deg 3, square root, replace with median, remove outliers 'std', reg\_thres = 0.05
+ridge: 15 deg, square root, replace with mode, don't remove outliers, reg\_thres = 0.5
 
 \begin{table}[ht]
 \centering
@@ -402,6 +408,9 @@ the sigmoid function and is, therefore, less liable to be influenced by extreme
 range of values, as is the case in the data-set. 
 But as Table~\ref{tab:intermediate} shows, ridge regression has a comparable
 accuracy but overall a better F1-score.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+missing transition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{Further data analysis}
 The description of the feature in the Learning to discover: the Higgs
@@ -428,7 +437,12 @@ From Table~\ref{tab:intermediate} we saw that, overall, ridge regression
 performed better and had the advantage of being computationally faster.
 As such, we chose to focus our attention on this model. For each subset we
 tuned the parameters accordingly and preprocessed the feature matrix 
-following the aforementioned methods. 
+following the aforementioned methods: 
+%% rewrite
+subset 0: multiply each, square root, don't remove outliers
+subset 1: multiply each, square root, don't remove outliers
+subset 2: multiply each, square root, don't remove outliers
+%%
 We used a 10-fold cross-validation to estimate the generalized error or the 
 model and its variance.
 
@@ -562,13 +576,9 @@ PRI\_jet\_2\_3 &
 \end{table}
 \end{comment}
 
-
-In contrast to subset 1 and 2 and 3, we saw that subset 0 yielded better 
-result if these values were replaced by the median rather than the mode.
-
-subset 0: multiply each, and square root, median, don't remove outliers
-subset 1: multiply each, and square root, mode, don't remove outliers
-subset 2: multiply each, and square root, mode, don't remove outliers
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+missing transition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{table}[ht]
 \centering
@@ -736,6 +746,11 @@ PRI\_jet\_2\_3\_1 &
 \end{table}
 \end{comment}
 
+\FloatBarrier
+Grid search for (lambda, degree)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+missing transition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%When reporting computational or measurement results, always
 %%report the mean (average value) along with a measure of variability
 %%(standard deviation(s) or standard error of the mean).
@@ -777,39 +792,19 @@ suggestions.
 
 %%*************************************************************************
 %%*************************************************************************
-\pagebreak
-\section{The Structure of a Paper}
-\label{sec:structure-paper}
-Scientific papers usually begin with the description of the problem,
-justifying why the problem is interesting. Most importantly, it argues
-that the problem is still unsolved, or that the current solutions are
-unsatisfactory. This leads to the main gist of the paper, which is
-``the idea''. The authors then show evidence, using derivations or
-experiments, that the idea works. Since science does not occur in a
-vacuum, a proper comparison to the current state of the art is often
-part of the results.
+%%\section{The Structure of a Paper}
+%%\label{sec:structure-paper}
+%%Scientific papers usually begin with the description of the problem,
+%%justifying why the problem is interesting. Most importantly, it argues
+%%that the problem is still unsolved, or that the current solutions are
+%%unsatisfactory. This leads to the main gist of the paper, which is
+%%``the idea''. The authors then show evidence, using derivations or
+%%experiments, that the idea works. Since science does not occur in a
+%%vacuum, a proper comparison to the current state of the art is often
+%%part of the results.
 
 %%*************************************************************************
 %%*************************************************************************
-
-\section{Tips for Good Software}
-\label{sec:tips-software}
-
-\begin{itemize}
-\item Have a \texttt{README} file that (at least) describes what your
-  software does, and which commands to run to obtain results. Also
-  mention anything special that needs to be set up, such as
-  toolboxes.
-\item A list of authors and contributors can be included in a file
-  called \texttt{AUTHORS}, acknowledging any help that you may have
-  obtained. For small projects, this information is often also
-  included in the \texttt{README}.
-\item Document your code. Each file should at least have a short
-  description about its reason for existence. Non obvious steps in the
-  code should be commented. Functions arguments and return values should be described.
-\item Describe how the results presented in your paper can be reproduced.
-\end{itemize}
-
 \bibliographystyle{IEEEtran}
 \bibliography{CTM-literature}
 
