@@ -30,7 +30,7 @@ export PYTHONPATH=$PYTHONPATH:<path_to_project_folder>
 We used PyCharm IDE and Python 3.7.
  
 ## Data
-Please download the data and store all the `.csv` files under the `data` folder.
+Please download the data at his [link] (https://www.aicrowd.com/challenges/epfl-machine-learning-higgs/dataset_files) and store all the `.csv` files under the `data` folder.
 
 
 ## Configs

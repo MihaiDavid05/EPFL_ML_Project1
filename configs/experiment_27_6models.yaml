@@ -39,9 +39,9 @@ zero_jet_0:
   # ratio split
   ratio: null
   # Enable cross validation
-  cross_val: True
+  cross_val: False
   # Number of folds for cross-validation
-  kfold: 5
+  kfold: null
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
@@ -86,9 +86,9 @@ zero_jet_1:
   # ratio split
   ratio: null
   # Enable cross validation
-  cross_val: True
+  cross_val: False
   # Number of folds for cross-validation
-  kfold: 5
+  kfold: null
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
@@ -135,9 +135,9 @@ one_jet_0:
   # ratio split
   ratio: null
   # Enable cross validation
-  cross_val: True
+  cross_val: False
   # Number of folds for cross-validation
-  kfold: 5
+  kfold: null
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
@@ -182,9 +182,9 @@ one_jet_1:
   # ratio split
   ratio: null
   # Enable cross validation
-  cross_val: True
+  cross_val: False
   # Number of folds for cross-validation
-  kfold: 5
+  kfold: null
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
@@ -229,9 +229,9 @@ more_than_one_jet_0:
   # ratio split
   ratio: null
   # Enable cross validation
-  cross_val: True
+  cross_val: False
   # Number of folds for cross-validation
-  kfold: 5
+  kfold: null
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
@@ -276,9 +276,9 @@ more_than_one_jet_1:
   # ratio split
   ratio: null
   # Enable cross validation
-  cross_val: True
+  cross_val: False
   # Number of folds for cross-validation
-  kfold: 5
+  kfold: null
   # Whether to build polynomial features or not
   build_poly: True
   # Degrees for polynomial features
